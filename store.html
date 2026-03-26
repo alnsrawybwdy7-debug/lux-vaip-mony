@@ -4,66 +4,138 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LUX_VAIP STORE ☁️</title>
+        <title>LUX_VAIP | المتجر الرسمي</title>
         <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
         <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
         <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;800&display=swap');
+
+            :root {
+                --main-bg: #050811;
+                --card-bg: rgba(30, 41, 59, 0.7);
+                --accent: #6366f1;
+            }
 
             body {
                 font-family: 'Tajawal', sans-serif;
-                background: #0f172a;
+                background-color: var(--main-bg);
                 color: white;
+                margin: 0;
+                overflow-x: hidden;
             }
 
+            /* تأثير الزجاج */
+            .glass {
+                background: var(--card-bg);
+                backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* تصميم البطاقات */
             .product-card {
-                background: #1e293b;
-                border: 1px solid #334155;
-                transition: 0.3s;
-                position: relative;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+
+            .product-card:hover {
+                transform: translateY(-10px) scale(1.02);
+                border-color: var(--accent);
+                box-shadow: 0 20px 30px -10px rgba(99, 102, 241, 0.3);
+            }
+
+            /* هيدر احترافي */
+            .hero-gradient {
+                background: radial-gradient(circle at top, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
             }
 
             .out-of-stock {
-                opacity: 0.4;
                 filter: grayscale(1);
+                opacity: 0.5;
+                pointer-events: none;
             }
 
-            .owner-tag {
-                position: absolute;
-                top: 12px;
-                left: 12px;
-                background: #4f46e5;
-                color: white;
-                padding: 2px 8px;
-                border-radius: 6px;
-                font-size: 10px;
-                z-index: 10;
-                font-weight: bold;
+            /* شريط التمرير */
+            ::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: var(--accent);
+                border-radius: 10px;
+            }
+
+            .loader {
+                width: 48px;
+                height: 48px;
+                border: 5px solid #FFF;
+                border-bottom-color: var(--accent);
+                border-radius: 50%;
+                display: inline-block;
+                box-sizing: border-box;
+                animation: rotation 1s linear infinite;
+            }
+
+            @keyframes rotation {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
             }
         </style>
     </head>
 
-    <body class="pb-12 text-center">
+    <body class="hero-gradient min-h-screen">
 
-        <header class="p-6 border-b border-slate-800 bg-slate-900/95 sticky top-0 z-50 backdrop-blur-md">
-            <h1 class="text-3xl font-black mb-4 tracking-tighter italic">LUX<span class="text-indigo-500">_</span>VAIP
-            </h1>
-            <div class="max-w-md mx-auto relative">
-                <input type="text" id="search-box" oninput="filterProducts()" placeholder="ابحث عن نكهة أو جهاز..."
-                    class="w-full bg-slate-800 border border-slate-700 rounded-xl py-2 px-10 text-sm outline-none focus:border-indigo-500 text-white">
-                <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+        <header class="sticky top-0 z-50 glass border-b border-white/10 px-6 py-4">
+            <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/50">
+                        <i class="fas fa-bolt text-xl text-white"></i>
+                    </div>
+                    <h1 class="text-2xl font-black tracking-tighter italic">LUX<span
+                            class="text-indigo-500">_</span>VAIP</h1>
+                </div>
+
+                <div class="relative w-full md:w-96">
+                    <input type="text" id="searchInput" oninput="searchData()"
+                        class="w-full glass rounded-2xl py-3 px-12 text-sm focus:ring-2 ring-indigo-500 outline-none transition-all"
+                        placeholder="ابحث عن نكهة، سحبة، أو كويل...">
+                    <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400"></i>
+                </div>
             </div>
         </header>
 
-        <main class="container mx-auto px-4 mt-8">
-            <div id="customer-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <p class="col-span-full py-10 text-gray-500 italic">جاري جلب البضاعة من المخازن...</p>
+        <div class="container mx-auto px-6 pt-10 text-center">
+            <span
+                class="px-4 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-xs font-bold border border-indigo-500/20 uppercase tracking-widest">متوفر
+                الآن في الديوانية</span>
+            <h2
+                class="text-4xl md:text-5xl font-extrabold mt-4 mb-2 bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent italic">
+                عالم السحبات والنكهات</h2>
+            <p class="text-gray-400 max-w-lg mx-auto text-sm italic">تشكيلة مصطفى وحسوني - جودة أصلية وتوصيل سريع 🔥</p>
+        </div>
+
+        <main class="container mx-auto px-6 py-12">
+            <div id="loading" class="flex flex-col items-center justify-center py-20">
+                <span class="loader mb-4"></span>
+                <p class="text-gray-500 animate-pulse font-bold">جاري تحديث المخازن...</p>
+            </div>
+            <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             </div>
         </main>
 
+        <footer class="glass border-t border-white/10 py-10 mt-20 text-center">
+            <p class="text-gray-500 text-sm italic font-bold">تطوير وبرمجة أبو نجم 🌟 LUX_VAIP © 2026</p>
+        </footer>
+
         <script>
+            // إعدادات Firebase
             const firebaseConfig = {
                 apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc",
                 authDomain: "lux-vaip.firebaseapp.com",
@@ -76,54 +148,71 @@
             };
 
             firebase.initializeApp(firebaseConfig);
-            const rtdb = firebase.database();
-            let allProducts = [];
+            const db = firebase.database();
+            let allItems = [];
 
-            // السحب المباشر (Real-time)
-            rtdb.ref('luxVaipData').on('value', (snapshot) => {
-                const grid = document.getElementById('customer-grid');
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    allProducts = [];
+            // سحب البيانات (Real-time)
+            db.ref('luxVaipData').on('value', (snap) => {
+                const data = snap.val();
+                allItems = [];
+                document.getElementById('loading').style.display = 'none';
 
-                    // دمج بضاعة مصطفى وحسوني
-                    ['mustafa', 'hussouni'].forEach(user => {
-                        if (data[user] && data[user].products) {
-                            data[user].products.forEach(p => allProducts.push({ ...p, owner: user === 'mustafa' ? 'مصطفى' : 'حسوني' }));
-                        }
-                    });
-                    renderProducts(allProducts);
-                } else {
-                    grid.innerHTML = '<p class="col-span-full py-10">المخزن فارغ حالياً</p>';
+                if (data) {
+                    if (data.mustafa && data.mustafa.products) data.mustafa.products.forEach(p => allItems.push({ ...p, from: 'مصطفى' }));
+                    if (data.hussouni && data.hussouni.products) data.hussouni.products.forEach(p => allItems.push({ ...p, from: 'حسوني' }));
+                    render(allItems);
                 }
             });
 
-            function renderProducts(list) {
-                const grid = document.getElementById('customer-grid');
-                grid.innerHTML = '';
-                list.forEach((p) => {
+            function render(list) {
+                const container = document.getElementById('products-grid');
+                container.innerHTML = '';
+
+                if (list.length === 0) {
+                    container.innerHTML = <div class="col-span-full text-center py-20 text-gray-500 italic">عذراً.. لم يتم العثور على المنتج 🔍</div>;
+                    return;
+                }
+
+                list.forEach(p => {
                     const isAvailable = p.qty > 0;
-                    grid.innerHTML += `
-                    <div class="product-card rounded-3xl p-4 ${!isAvailable ? 'out-of-stock' : ''}">
-                        <div class="owner-tag italic">مخزن ${p.owner}</div>
-                        <img src="${p.img}" class="w-full h-64 object-cover rounded-2xl mb-4">
-                        <h4 class="text-xl font-bold mb-2">${p.name}</h4>
-                        <div class="flex justify-between items-center px-2">
-                            <span class="text-indigo-400 font-black">${p.sell.toLocaleString()} د.ع</span>
-                            ${isAvailable ? <button onclick="sendOrder('${p.name}','${p.sell}','${p.owner}')" class="bg-green-600 px-4 py-2 rounded-lg text-xs font-bold">اطلب</button> : '<span>مباع</span>'}
+                    container.innerHTML += `
+                                <div class="product-card glass rounded-[2.5rem] overflow-hidden flex flex-col ${!isAvailable ? 'out-of-stock' : ''}">
+                                    <div class="relative h-64 group overflow-hidden">
+                                        <img src="${p.img}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="${p.name}">
+                                        <div class="absolute top-4 left-4 bg-indigo-600/90 text-white text-[10px] px-3 py-1 rounded-full font-bold backdrop-blur-md italic">
+                                            مخزن ${p.from}
+                                        </div>
+                                        ${!isAvailable ? '<div class="absolute inset-0 bg-black/60 flex items-center justify-center font-black text-xl tracking-widest">نفذت الكمية</div>' : ''}
+                                    </div>
+                                    
+                                    <div class="p-6 flex flex-col flex-grow">
+                                        <h3 class="text-xl font-bold mb-2 text-white italic truncate">${p.name}</h3>
+                                        <p class="text-gray-400 text-xs line-clamp-2 h-8 italic mb-4">${p.desc || 'أفضل جودة مختارة بعناية.'}</p>
+                                        
+                                        <div class="mt-auto flex justify-between items-center gap-2">
+                                            <div class="flex flex-col">
+                                                <span class="text-gray-500 text-[10px] uppercase font-bold tracking-tighter">السعر</span>
+                                                <span class="text-xl font-black text-indigo-400">${Number(p.sell).toLocaleString()} <span class="text-[10px]">د.ع</span></span>
+                                            </div>
+                                            <button onclick="orderNow('${p.name}', '${p.sell}', '${p.from}')" 
+                                                    class="bg-white text-black hover:bg-indigo-500 hover:text-white px-6 py-3 rounded-2xl font-bold text-sm transition-all duration-300 flex items-center gap-2 shadow-xl active:scale-95">اطلب <i class="fab fa-whatsapp text-lg text-green-500"></i>
+                                </button>
+                            </div>
                         </div>
-                    </div>`;
+                    </div>
+                `;
                 });
             }
 
-            function filterProducts() {
-                const term = document.getElementById('search-box').value.toLowerCase();
-                const filtered = allProducts.filter(p => p.name.toLowerCase().includes(term));
-                renderProducts(filtered);
+            function searchData() {
+                const val = document.getElementById('searchInput').value.toLowerCase();
+                const filtered = allItems.filter(i => i.name.toLowerCase().includes(val) || (i.desc && i.desc.toLowerCase().includes(val)));
+                render(filtered);
             }
 
-            function sendOrder(n, s, o) {
-                window.open(`https://wa.me/9647807483170?text=${encodeURIComponent('أريد طلب المنتج: ' + n + '\nالسعر: ' + s + '\nالمخزن: ' + o)}`);
+            function orderNow(name, price, from) {
+                const msg = مرحباً LUX_VAIP 💨\n\nأريد طلب المنتج التالي: \n━━━━━━━━━━━━\n📦 الاسم: ${ name }\n💰 السعر: ${ price } د.ع\n📍 المخزن: ${ from }\n━━━━━━━━━━━━\nيرجى تأكيد التوافر وطريقة التوصيل.;
+                window.open(`https://wa.me/9647807483170?text=${encodeURIComponent(msg)}`);
             }
         </script>
     </body>
