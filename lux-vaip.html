@@ -3,84 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة إدارة LUX_VAIP | Abdullah-Abd-Alsalam</title>
+    <title>إدارة LUX_VAIP | Abdullah-Abd-Alsalam</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;800&display=swap');
-        body { font-family: 'Tajawal', sans-serif; background: #020617; color: white; }
-        .admin-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 1.5rem; }
-        .input-style { background: #0f172a; border: 1px solid #1e293b; border-radius: 0.75rem; padding: 10px; width: 100%; outline: none; transition: 0.3s; }
-        .input-style:focus { border-color: #6366f1; }
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap');
+        body { font-family: 'Tajawal', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .login-box { background: white; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .stat-card { background: white; border-radius: 0.75rem; padding: 15px; border-right: 5px solid #6366f1; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        input, select { border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 8px; outline-color: #6366f1; width: 100%; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 0.5rem; overflow: hidden; }
+        th { background: #1e293b; color: white; padding: 12px; text-align: right; font-size: 13px; }
+        td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        tr:hover { background: #f8fafc; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4">
 
-    <div id="loginOverlay" class="fixed inset-0 bg-slate-950 z-[100] flex items-center justify-center">
-        <div class="admin-card p-8 w-full max-w-md text-center">
-            <h2 class="text-2xl font-black mb-6 italic text-indigo-400">دخول المدير</h2>
-            <input type="password" id="adminPass" class="input-style mb-4 text-center" placeholder="أدخل كلمة المرور">
-            <button onclick="checkLogin()" class="w-full bg-indigo-600 p-3 rounded-xl font-bold hover:bg-indigo-500">دخول</button>
+    <div id="loginSection" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-6">
+        <div class="login-box p-8 w-full max-w-sm text-center">
+            <h2 class="text-xl font-black mb-4">نظام الإدارة LUX</h2>
+            <input type="password" id="passInput" class="text-center mb-4" placeholder="رمز الدخول">
+            <button onclick="login()" class="w-full bg-indigo-600 text-white py-2 rounded-lg font-bold uppercase">دخول</button>
         </div>
     </div>
 
-    <div id="adminContent" style="display:none;">
-        <header class="flex justify-between items-center mb-10 border-b border-slate-800 pb-6">
-            <div>
-                <h1 class="text-3xl font-black italic">لوحة التحكم <span class="text-indigo-500">LUX</span></h1>
-                <p class="text-xs text-slate-500 mt-1 italic">المطور: Abdullah-Abd-Alsalam</p>
-            </div>
-            <button onclick="location.reload()" class="bg-red-500/10 text-red-500 px-4 py-2 rounded-lg text-xs font-bold">تسجيل خروج</button>
-        </header>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="admin-card p-6 border-l-4 border-indigo-500">
-                <p class="text-slate-400 text-sm italic">إجمالي قطع المخزن</p>
-                <h3 id="statTotalQty" class="text-3xl font-black">0</h3>
-            </div>
-            <div class="admin-card p-6 border-l-4 border-green-500">
-                <p class="text-slate-400 text-sm italic">صافي الربح المتوقع</p>
-                <h3 id="statTotalProfit" class="text-3xl font-black text-green-400">0 <small class="text-xs">د.ع</small></h3>
-            </div>
-            <div class="admin-card p-6 border-l-4 border-yellow-500">
-                <p class="text-slate-400 text-sm italic">قيمة البضاعة (بيع)</p>
-                <h3 id="statTotalValue" class="text-3xl font-black text-yellow-400">0 <small class="text-xs">د.ع</small></h3>
+    <div id="mainSection" style="display:none;">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <h1 class="text-2xl font-black italic">لوحة التحكم <span class="text-indigo-600 underline">LUX_VAIP</span></h1>
+            <div class="flex gap-2">
+                <button onclick="location.reload()" class="bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold">خروج</button>
             </div>
         </div>
 
-        <div class="admin-card p-6 mb-10">
-            <h2 class="text-xl font-bold mb-6 italic border-r-4 border-indigo-500 pr-3">إضافة بضاعة جديدة</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <input type="text" id="pName" class="input-style" placeholder="اسم المنتج">
-                <input type="text" id="pImg" class="input-style" placeholder="رابط الصورة">
-                <input type="number" id="pCost" class="input-style" placeholder="سعر الكلفة">
-                <input type="number" id="pSell" class="input-style" placeholder="سعر البيع">
-                <input type="number" id="pQty" class="input-style" placeholder="الكمية">
-                <select id="pOwner" class="input-style">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div class="stat-card">
+                <p class="text-gray-500 text-xs italic">عدد قطع المخزن</p>
+                <h2 id="totalQty" class="text-2xl font-black text-indigo-600">0</h2>
+            </div>
+            <div class="stat-card !border-green-500">
+                <p class="text-gray-500 text-xs italic">صافي الربح المتوقع</p>
+                <h2 id="totalProfit" class="text-2xl font-black text-green-600">0 <small class="text-xs">د.ع</small></h2>
+            </div>
+            <div class="stat-card !border-yellow-500">
+                <p class="text-gray-500 text-xs italic">قيمة البيع الكلية</p>
+                <h2 id="totalValue" class="text-2xl font-black text-yellow-600">0 <small class="text-xs">د.ع</small></h2>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm mb-8">
+            <h3 class="font-black mb-4 border-b pb-2 italic text-sm"><i class="fas fa-plus-circle ml-1"></i> إضافة منتج جديد للمخازن</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+                <input type="text" id="p_name" placeholder="اسم المنتج">
+                <input type="text" id="p_img" placeholder="رابط الصورة">
+                <input type="number" id="p_cost" placeholder="سعر الكلفة">
+                <input type="number" id="p_sell" placeholder="سعر البيع">
+                <input type="number" id="p_qty" placeholder="الكمية">
+                <select id="p_owner">
                     <option value="mustafa">مخزن مصطفى</option>
                     <option value="hussouni">مخزن حسوني</option>
                 </select>
-                <button onclick="addProduct()" class="lg:col-span-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-xl transition-all">إضافة للمتجر +</button>
+                <button onclick="saveProduct()" class="lg:col-span-6 bg-indigo-600 text-white py-3 rounded-lg font-black hover:bg-indigo-700 transition-all">حفظ وإضافة للموقع</button>
             </div>
         </div>
 
-        <div class="admin-card overflow-hidden">
-            <table class="w-full text-right">
-                <thead class="bg-slate-900 text-slate-400 text-xs">
+        <div class="overflow-x-auto shadow-sm rounded-xl">
+            <table>
+                <thead>
                     <tr>
-                        <th class="p-4">المنتج</th>
-                        <th class="p-4">الكمية</th>
-                        <th class="p-4">البيع</th>
-                        <th class="p-4">الربح/قطعة</th>
-                        <th class="p-4">المخزن</th>
-                        <th class="p-4">إجراءات</th>
+                        <th>المنتج</th>
+                        <th>الكمية</th>
+                        <th>الكلفة</th>
+                        <th>البيع</th>
+                        <th>الربح</th>
+                        <th>المخزن</th>
+                        <th>حذف</th>
                     </tr>
                 </thead>
-                <tbody id="adminTable">
+                <tbody id="pTableBody">
                     </tbody>
             </table>
         </div>
+
+        <footer class="mt-10 text-center py-6">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">System Developed By</p>
+            <p class="text-indigo-600 font-black italic">Abdullah-Abd-Alsalam 🌟</p>
+        </footer>
     </div>
 
     <script>
@@ -97,84 +107,80 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // دخول المدير
-        function checkLogin() {
-            const pass = document.getElementById('adminPass').value;
-            if(pass === "1234") { // غير كلمة المرور هنا
-                document.getElementById('loginOverlay').style.display = 'none';
-                document.getElementById('adminContent').style.display = 'block';
-                loadData();
-            } else { alert("كلمة المرور غلط!"); }
+        function login() {
+            if(document.getElementById('passInput').value === "1234") {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('mainSection').style.display = 'block';
+                fetchData();
+            } else { alert("الرمز غلط!"); }
         }
 
-        function loadData() {
+        function fetchData() {
             db.ref('luxVaipData').on('value', (snap) => {
                 const data = snap.val();
-                const table = document.getElementById('adminTable');
-                table.innerHTML = '';
+                const tbody = document.getElementById('pTableBody');
+                tbody.innerHTML = '';
                 let tQty = 0, tProfit = 0, tValue = 0;
 
                 if(data) {
                     ['mustafa', 'hussouni'].forEach(owner => {
                         if(data[owner] && data[owner].products) {
                             data[owner].products.forEach((p, index) => {
-                                const profit = p.sell - (p.cost || 0);
+                                const profit = (p.sell - (p.cost || 0));
                                 tQty += Number(p.qty);
                                 tValue += (p.sell * p.qty);
                                 tProfit += (profit * p.qty);
 
-                                table.innerHTML += `
-                                    <tr class="border-t border-slate-800 hover:bg-slate-800/30">
-                                        <td class="p-4 font-bold text-sm">${p.name}</td>
-                                        <td class="p-4 text-indigo-400 font-bold underline cursor-pointer" onclick="updateQty('${owner}', ${index}, ${p.qty})">${p.qty}</td>
-                                        <td class="p-4 text-xs">${Number(p.sell).toLocaleString()}</td>
-                                        <td class="p-4 text-green-400 text-xs font-bold">+${Number(profit).toLocaleString()}</td>
-                                        <td class="p-4 text-[10px] italic text-slate-500">${owner}</td>
-                                        <td class="p-4">
-                                            <button onclick="deleteProduct('${owner}', ${index})" class="text-red-500 hover:text-red-400 text-xs"><i class="fas fa-trash"></i></button>
-                                        </td>
+                                tbody.innerHTML += `
+                                    <tr>
+                                        <td class="font-bold">${p.name}</td>
+                                        <td class="text-indigo-600 font-black cursor-pointer underline" onclick="editQty('${owner}', ${index}, ${p.qty})">${p.qty}</td>
+                                        <td class="text-gray-400">${Number(p.cost).toLocaleString()}</td>
+                                        <td class="font-bold">${Number(p.sell).toLocaleString()}</td>
+                                        <td class="text-green-600 font-black">+${profit.toLocaleString()}</td>
+                                        <td class="text-[10px] uppercase font-bold text-gray-400">${owner}</td>
+                                        <td><button onclick="delItem('${owner}', ${index})" class="text-red-400"><i class="fas fa-trash-alt"></i></button></td>
                                     </tr>`;
                             });
                         }
                     });
                 }
-                document.getElementById('statTotalQty').innerText = tQty;
-                document.getElementById('statTotalValue').innerText = tValue.toLocaleString();
-                document.getElementById('statTotalProfit').innerText = tProfit.toLocaleString();
+                document.getElementById('totalQty').innerText = tQty;
+                document.getElementById('totalValue').innerText = tValue.toLocaleString();
+                document.getElementById('totalProfit').innerText = tProfit.toLocaleString();
             });
         }
 
-        function addProduct() {
-            const owner = document.getElementById('pOwner').value;
-            const newP = {
-                name: document.getElementById('pName').value,
-                img: document.getElementById('pImg').value,
-                cost: Number(document.getElementById('pCost').value),
-                sell: Number(document.getElementById('pSell').value),
-                qty: Number(document.getElementById('pQty').value)
+        function saveProduct() {
+            const owner = document.getElementById('p_owner').value;
+            const newItem = {
+                name: document.getElementById('p_name').value,
+                img: document.getElementById('p_img').value,
+                cost: Number(document.getElementById('p_cost').value),
+                sell: Number(document.getElementById('p_sell').value),
+                qty: Number(document.getElementById('p_qty').value)
             };
-            
+
             db.ref(`luxVaipData/${owner}/products`).once('value', (snap) => {
-                const list = snap.val() || [];
-                list.push(newP);
+                let list = snap.val() || [];
+                list.push(newItem);
                 db.ref(`luxVaipData/${owner}/products`).set(list).then(() => {
-                    alert("تمت الإضافة بنجاح!");
+                    alert("تمت الإضافة!");
+                    document.querySelectorAll('input').forEach(i => i.value = '');
                 });
             });
         }
 
-        function updateQty(owner, index, current) {
-            const newQty = prompt("تعديل الكمية الجديدة:", current);
-            if(newQty !== null) {
-                db.ref(`luxVaipData/${owner}/products/${index}/qty`).set(Number(newQty));
-            }
+        function editQty(owner, idx, curr) {
+            const n = prompt("تعديل الكمية:", curr);
+            if(n !== null) db.ref(`luxVaipData/${owner}/products/${idx}/qty`).set(Number(n));
         }
 
-        function deleteProduct(owner, index) {
-            if(confirm("تريد تحذف هذا المنتج نهائياً؟")) {
+        function delItem(owner, idx) {
+            if(confirm("تحذف هذا المنتج؟")) {
                 db.ref(`luxVaipData/${owner}/products`).once('value', (snap) => {
                     let list = snap.val();
-                    list.splice(index, 1);
+                    list.splice(idx, 1);
                     db.ref(`luxVaipData/${owner}/products`).set(list);
                 });
             }
