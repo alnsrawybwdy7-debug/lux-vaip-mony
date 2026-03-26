@@ -1,151 +1,171 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUX_VAIP | Premium Store</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;800&display=swap');
+        
+        :root { --accent: #6366f1; --bg-dark: #020617; }
+        
+        body { font-family: 'Tajawal', sans-serif; background-color: var(--bg-dark); color: white; margin: 0; overflow-x: hidden; }
+        
+        /* تأثيرات الزجاج الفاخرة */
+        .glass-nav { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .product-card { background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255,255,255,0.05); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 2.5rem; overflow: hidden; position: relative; }
+        .product-card:hover { transform: translateY(-12px); border-color: var(--accent); box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.3); }
+        
+        /* شارة المخزن الاحترافية */
+        .owner-badge { position: absolute; top: 15px; left: 15px; background: linear-gradient(45deg, #4f46e5, #9333ea); color: white; padding: 4px 14px; border-radius: 50px; font-size: 10px; font-weight: 800; z-index: 20; box-shadow: 0 5px 15px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.2); }
+        
+        /* تحسين الصور */
+        .img-container { height: 260px; overflow: hidden; position: relative; border-radius: 2rem; margin: 10px; }
+        .product-img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
+        .product-card:hover .product-img { scale: 1.1; }
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>LUX_VAIP | متجر الديوانية</title>
-        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap');
+        /* الأزرار */
+        .order-btn { background: #22c55e; transition: 0.3s; box-shadow: 0 10px 20px -5px rgba(34, 197, 94, 0.4); }
+        .order-btn:hover { background: #16a34a; transform: scale(1.05); box-shadow: 0 15px 25px -5px rgba(34, 197, 94, 0.5); }
 
-            body {
-                font-family: 'Tajawal', sans-serif;
-                background: #020617;
-                color: white;
-                margin: 0;
-            }
+        /* لودر التحميل */
+        .loader { width: 50px; height: 50px; border: 5px solid #1e293b; border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="min-h-screen">
 
-            .glass {
-                background: rgba(15, 23, 42, 0.8);
-                backdrop-filter: blur(12px);
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            }
-
-            .product-card {
-                background: rgba(30, 41, 59, 0.4);
-                border: 1px solid rgba(255, 255, 255, 0.05);
-                transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-                border-radius: 2.5rem;
-                overflow: hidden;
-            }
-
-            .product-card:hover {
-                transform: translateY(-10px);
-                border-color: #6366f1;
-                box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.25);
-            }
-
-            .badge {
-                position: absolute;
-                top: 15px;
-                left: 15px;
-                background: linear-gradient(45deg, #4f46e5, #9333ea);
-                color: white;
-                padding: 3px 12px;
-                border-radius: 50px;
-                font-size: 10px;
-                font-weight: bold;
-                z-index: 10;
-                shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            }
-        </style>
-    </head>
-
-    <body class="min-h-screen pb-10">
-
-        <header class="sticky top-0 z-50 glass px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+    <nav class="sticky top-0 z-50 glass-nav px-6 py-4">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-5">
             <div class="flex items-center gap-3">
-                <div class="p-2 bg-indigo-600 rounded-xl shadow-lg shadow-indigo-500/30">
+                <div class="w-11 h-11 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/40">
                     <i class="fas fa-wind text-white text-xl"></i>
                 </div>
-                <h1 class="text-2xl font-black italic tracking-tighter">LUX<span class="text-indigo-500">_</span>VAIP
-                </h1>
+                <h1 class="text-2xl font-black italic tracking-tighter">LUX<span class="text-indigo-500">_</span>VAIP</h1>
             </div>
 
-            <div class="relative w-full md:w-96">
-                <input type="text" id="searchInput" oninput="searchData()"
-                    class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3 px-12 text-sm outline-none focus:ring-2 ring-indigo-500/50 transition-all"
-                    placeholder="ابحث عن نكهة أو سحبة...">
-                <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+            <div class="relative w-full md:w-[450px] group">
+                <input type="text" id="searchField" oninput="filterItems()" 
+                       class="w-full bg-slate-900/80 border border-slate-700 rounded-2xl py-3.5 px-12 text-sm focus:ring-2 ring-indigo-500/50 outline-none transition-all group-hover:border-slate-500" 
+                       placeholder="ابحث عن نكهة، جهاز، أو مخزن...">
+                <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-400"></i>
             </div>
-        </header>
+        </div>
+    </nav>
 
-        <main class="container mx-auto px-6 py-10">
-            <div id="loading" class="flex flex-col items-center justify-center py-20 text-slate-500 italic">
-                <div class="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4">
-                </div>
-                جاري تحميل البضاعة...
+    <header class="container mx-auto px-6 pt-12 text-center">
+        <span class="bg-indigo-500/10 text-indigo-400 px-4 py-1.5 rounded-full text-[10px] font-bold border border-indigo-500/20 uppercase tracking-widest">Al-Diwaniyah Branch</span>
+        <h2 class="text-4xl md:text-6xl font-black mt-6 mb-4 italic tracking-tight bg-gradient-to-r from-white via-slate-300 to-slate-600 bg-clip-text text-transparent">متجر الفيب الأول</h2>
+        <p class="text-slate-500 max-w-lg mx-auto italic text-sm md:text-base leading-relaxed">اكتشف أحدث السحبات والنكهات الأصلية من مخازن مصطفى وحسوني بتوصيل مباشر.</p>
+    </header>
+
+    <main class="container mx-auto px-6 py-16">
+        <div id="loaderArea" class="flex flex-col items-center justify-center py-20">
+            <div class="loader mb-6"></div>
+            <p class="text-slate-500 font-bold animate-pulse italic">يتم جلب البضاعة الآن...</p>
+        </div>
+
+        <div id="mainGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
             </div>
-            <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
-        </main>
+    </main>
 
-        <script>
-            const firebaseConfig = {
-                apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc",
-                authDomain: "lux-vaip.firebaseapp.com",
-                projectId: "lux-vaip",
-                storageBucket: "lux-vaip.firebasestorage.app",
-                messagingSenderId: "958955103630",
-                appId: "1:958955103630:web:1d3f7f94466021d57b70df",
-                measurementId: "G-NET3PPRG11",
-                databaseURL: "https://lux-vaip-default-rtdb.firebaseio.com/"
-            };
+    <footer class="py-12 border-t border-slate-900/50 text-center">
+        <p class="text-slate-600 text-[11px] font-bold italic tracking-widest">LUX_VAIP PREMIUM SYSTEM &copy; 2026 | BY ABU NAJM</p>
+    </footer>
 
-            firebase.initializeApp(firebaseConfig);
-            const db = firebase.database();
-            let allItems = [];
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc",
+            authDomain: "lux-vaip.firebaseapp.com",
+            projectId: "lux-vaip",
+            storageBucket: "lux-vaip.firebasestorage.app",
+            messagingSenderId: "958955103630",
+            appId: "1:958955103630:web:1d3f7f94466021d57b70df",
+            measurementId: "G-NET3PPRG11",
+            databaseURL: "https://lux-vaip-default-rtdb.firebaseio.com/"
+        };
 
-            db.ref('luxVaipData').on('value', (snap) => {
-                const data = snap.val();
-                allItems = [];
-                document.getElementById('loading').style.display = 'none';
-                if (data) {
-                    if (data.mustafa && data.mustafa.products) data.mustafa.products.forEach(p => allItems.push({ ...p, from: 'مصطفى' }));
-                    if (data.hussouni && data.hussouni.products) data.hussouni.products.forEach(p => allItems.push({ ...p, from: 'حسوني' }));
-                    render(allItems);
+        firebase.initializeApp(firebaseConfig);
+        const rtdb = firebase.database();
+        let storeData = [];
+
+        // Real-time Data Sync
+        rtdb.ref('luxVaipData').on('value', (snapshot) => {
+            const data = snapshot.val();
+            storeData = [];
+            document.getElementById('loaderArea').style.display = 'none';
+
+            if(data) {
+                // دمج بيانات مصطفى
+                if(data.mustafa && data.mustafa.products) {
+                    data.mustafa.products.forEach(p => storeData.push({...p, seller: 'مصطفى'}));
                 }
-            });
-            function render(list) {
-                const container = document.getElementById('grid');
-                container.innerHTML = '';
-                list.forEach(p => {
-                    if (p.qty > 0) {
-                        container.innerHTML += `
-                        <div class="product-card p-4 relative flex flex-col h-full">
-                            <span class="badge italic">مخزن ${p.from}</span>
-                            <div class="h-60 rounded-[2rem] overflow-hidden mb-4 bg-slate-800">
-                                <img src="${p.img}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300'">
+                // دمج بيانات حسوني
+                if(data.hussouni && data.hussouni.products) {
+                    data.hussouni.products.forEach(p => storeData.push({...p, seller: 'حسوني'}));
+                }
+                updateUI(storeData);
+            } else {
+                document.getElementById('mainGrid').innerHTML = '<p class="col-span-full text-center py-20 text-slate-600 italic">لا توجد بضاعة في المخازن حالياً</p>';
+            }
+        });
+
+        function updateUI(list) {
+            const grid = document.getElementById('mainGrid');
+            grid.innerHTML = '';
+
+            if(list.length === 0) {
+                grid.innerHTML = '<p class="col-span-full text-center py-20 text-slate-600 italic text-xl">لم يتم العثور على نتائج بحثك 🔍</p>';
+                return;
+            }
+
+            list.forEach(p => {
+                if(p.qty > 0) {
+                    grid.innerHTML += `
+                        <div class="product-card flex flex-col h-full">
+                            <div class="owner-badge italic">مخزن ${p.seller}</div>
+                            <div class="img-container">
+                                <img src="${p.img}" class="product-img" onerror="this.src='https://via.placeholder.com/400x400?text=LUX_VAIP'">
                             </div>
-                            <div class="px-2 flex flex-col flex-grow">
-                                <h3 class="text-xl font-bold italic mb-2">${p.name}</h3>
-                                <div class="mt-auto flex justify-between items-center pb-2">
-                                    <span class="text-indigo-400 font-black text-lg">${Number(p.sell).toLocaleString()} <small class="text-[9px]">د.ع</small></span>
-                                    <button onclick="orderNow('${p.name}', '${p.sell}', '${p.from}')" 
-                                            class="bg-green-600 hover:bg-green-500 text-white px-5 py-2 rounded-2xl text-xs font-bold transition-all shadow-lg shadow-green-600/20">
-                                        اطلب <i class="fab fa-whatsapp"></i>
+                            <div class="p-6 pt-2 flex flex-col flex-grow">
+                                <h3 class="text-xl font-extrabold text-white mb-2 italic tracking-tight line-clamp-1">${p.name}</h3>
+                                <p class="text-slate-500 text-[11px] leading-relaxed mb-6 italic line-clamp-2 h-8">${p.desc || 'أصلي 100% - استمتع بأفضل تجربة ڤيب.'}</p>
+                                
+                                <div class="mt-auto flex justify-between items-center border-t border-slate-800 pt-5">
+                                    <div class="flex flex-col">
+                                        <span class="text-[9px] text-indigo-400 font-bold uppercase tracking-tighter">السعر النهائي</span>
+                                        <span class="text-xl font-black text-white">${Number(p.sell).toLocaleString()} <small class="text-[10px] text-slate-400 italic">د.ع</small></span>
+                                    </div>
+                                    <button onclick="orderViaWA('${p.name}', '${p.sell}', '${p.seller}')" 
+                                            class="order-btn text-white px-6 py-3 rounded-2xl text-xs font-black flex items-center gap-2 active:scale-90">
+                                        اطلب <i class="fab fa-whatsapp text-base"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>`;
-                    }
-                });
-            }
+                }
+            });
+        }
 
-            function searchData() {
-                const val = document.getElementById('searchInput').value.toLowerCase();
-                const filtered = allItems.filter(i => i.name.toLowerCase().includes(val));
-                render(filtered);
-            }
+        function filterItems() {
+            const q = document.getElementById('searchField').value.toLowerCase();
+            const result = storeData.filter(i => 
+                i.name.toLowerCase().includes(q) || 
+                i.seller.toLowerCase().includes(q)
+            );
+            updateUI(result);
+        }
 
-            function orderNow(name, price, owner) {
-                const msg = مرحباً LUX_VAIP 💨\nأريد طلب المنتج: ${ name }\nالسعر: ${ price } د.ع\nالمخزن: ${ owner };
-                window.open(`https://wa.me/9647807483170?text=${encodeURIComponent(msg)}`);
-            }
-        </script>
-    </body>
-
+        function orderViaWA(name, price, seller) {
+            const msg = `مرحباً LUX_VAIP 💨\n\nأريد طلب المنتج التالي:\n━━━━━━━━━━━━\n📦 الاسم: ${name}\n💰 السعر: ${price} د.ع\n📍 المخزن: ${seller}\n━━━━━━━━━━━━`;
+            window.open(`https://wa.me/9647807483170?text=${encodeURIComponent(msg)}`);
+        }
+    </script>
+</body>
 </html>
