@@ -3,139 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUX_VAIP | المتجر الرسمي</title>
+    <title>LUX_VAIP | Premium Store</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap');
         
         body { 
             font-family: 'Tajawal', sans-serif; 
-            background: radial-gradient(circle at top, #1e293b 0%, #020617 100%); 
+            background-color: #020617; 
             color: white; 
-            min-height: screen;
+            overflow-x: hidden;
         }
 
-        /* تأثير الزجاج - Glassmorphism */
-        .glass-nav {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        /* الكتابة العملاقة خلف المنتجات */
+        .bg-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-10deg);
+            font-size: 25vw;
+            font-weight: 900;
+            color: rgba(99, 102, 241, 0.03);
+            z-index: -1;
+            white-space: nowrap;
+            user-select: none;
+            pointer-events: none;
+            text-transform: uppercase;
         }
 
-        .product-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 2rem;
-            transition: all 0.4s ease;
+            border-radius: 2.5rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .product-card:hover {
-            transform: translateY(-10px);
-            background: rgba(255, 255, 255, 0.07);
+        .glass-card:hover {
+            transform: scale(1.03);
             border-color: #6366f1;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.2);
         }
 
-        .img-box {
-            height: 250px;
+        .img-container {
+            height: 280px;
             overflow: hidden;
-            border-radius: 1.5rem;
-            margin: 10px;
+            border-radius: 2rem;
+            margin: 12px;
+            background: #0f172a;
         }
 
         .product-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: 0.5s;
+            width: 100%; height: 100%; object-fit: cover; transition: 0.6s;
         }
 
-        .product-card:hover .product-img {
-            scale: 1.1;
-        }
+        .glass-card:hover .product-img { transform: scale(1.15); }
 
-        /* عداد الكمية الذكي */
-        .qty-tag {
-            font-size: 11px;
-            background: rgba(99, 102, 241, 0.2);
-            color: #a5b4fc;
-            padding: 4px 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(99, 102, 241, 0.3);
-        }
-
-        /* قسم الإنستا الفخم */
-        .insta-glass {
-            background: linear-gradient(135deg, rgba(240, 148, 51, 0.1), rgba(188, 24, 136, 0.1));
+        .insta-box {
+            background: linear-gradient(45deg, rgba(240, 148, 51, 0.05), rgba(188, 24, 136, 0.05));
+            border: 1px solid rgba(255,255,255,0.05);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 2.5rem;
+            border-radius: 3rem;
         }
 
         .insta-btn {
             background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-            transition: 0.3s;
-        }
-
-        .insta-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(220, 39, 67, 0.4);
+            box-shadow: 0 15px 30px rgba(220, 39, 67, 0.3);
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen">
 
-    <nav class="sticky top-0 z-50 glass-nav px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="bg-text">LUX VAIP</div>
+
+    <nav class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/5 px-6 py-5 flex flex-col md:flex-row justify-between items-center gap-6">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/50">
-                <i class="fas fa-wind text-white text-lg"></i>
+            <div class="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-500/40">
+                <i class="fas fa-bolt text-white text-2xl"></i>
             </div>
-            <h1 class="text-2xl font-black italic tracking-tighter">LUX<span class="text-indigo-500">_</span>VAIP</h1>
+            <h1 class="text-3xl font-black italic tracking-tighter">LUX<span class="text-indigo-500 underline">_</span>VAIP</h1>
         </div>
         
-        <div class="relative w-full md:w-96">
-            <input type="text" id="searchBox" oninput="filterProducts()" 
-                   class="w-full bg-slate-900/50 border border-white/10 rounded-xl py-2.5 px-10 text-sm outline-none focus:border-indigo-500 transition-all" 
-                   placeholder="ابحث عن نكهتك المفضلة...">
-            <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+        <div class="relative w-full md:w-[450px]">
+            <input type="text" id="search" oninput="search()" 
+                   class="w-full bg-white/5 border border-white/10 rounded-2xl py-3.5 px-12 text-sm outline-none focus:ring-2 ring-indigo-500/50 transition-all" 
+                   placeholder="ابحث عن نكهتك أو جهازك...">
+            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
         </div>
     </nav>
 
-    <main class="container mx-auto px-6 py-10">
-        <div id="loading" class="text-center py-20">
-            <div class="inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-            <p class="mt-4 text-slate-400 font-bold italic">جاري تحميل المتجر...</p>
+    <main class="container mx-auto px-6 py-16">
+        <div id="loader" class="text-center py-20 font-black italic text-slate-600 text-2xl animate-pulse">
+            LOADING LUXURY...
         </div>
-
-        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10"></div>
     </main>
 
-    <section class="container mx-auto px-6 mb-20">
-        <div class="insta-glass p-10 text-center">
-            <i class="fab fa-instagram text-5xl mb-4 bg-gradient-to-tr from-yellow-400 to-purple-600 bg-clip-text text-transparent font-black"></i>
-            <h2 class="text-2xl font-black italic mb-2">تابعنا للحصول على العروض</h2>
-            <p class="text-slate-400 text-sm mb-6">أحدث النكهات والأجهزة توصل للديوانية أول بأول</p>
-            <a href="https://www.instagram.com/lux_vape.iq?igsh=YTU0cWVpNDh5eHBh" target="_blank" 
-               class="insta-btn text-white px-10 py-3 rounded-2xl font-black inline-flex items-center gap-2">
-                @lux_vape.iq <i class="fas fa-external-link-alt text-xs"></i>
-            </a>
+    <section class="container mx-auto px-6 mb-24">
+        <div class="insta-box p-12 text-center relative overflow-hidden">
+            <div class="relative z-10">
+                <i class="fab fa-instagram text-6xl mb-6 bg-gradient-to-tr from-yellow-400 to-fuchsia-600 bg-clip-text text-transparent"></i>
+                <h2 class="text-3xl font-black italic mb-4">انضم لعائلتنا على إنستقرام</h2>
+                <p class="text-slate-400 mb-8 max-w-md mx-auto">كن أول من يعرف بالوجبات الجديدة والعروض الحصرية في الديوانية</p>
+                <a href="https://www.instagram.com/lux_vape.iq?igsh=YTU0cWVpNDh5eHBh" target="_blank" 
+                   class="insta-btn text-white px-12 py-4 rounded-2xl font-black inline-flex items-center gap-3 hover:scale-105 transition-all">
+                    @lux_vape.iq <i class="fas fa-external-link-alt"></i>
+                </a>
+            </div>
         </div>
     </section>
 
-    <footer class="py-10 text-center border-t border-white/5">
-        <p class="text-slate-500 text-[10px] font-bold tracking-widest uppercase mb-2">LUX_VAIP Store &copy; 2026</p>
-        <p class="text-white text-xs font-black italic tracking-tighter">
-            DEVELOPED BY <span class="text-indigo-500 underline">Abdullah-Abd-Alsalam</span> 🌟
+    <footer class="py-12 text-center border-t border-white/5 bg-black/20">
+        <p class="text-slate-600 text-[10px] font-black tracking-[0.3em] uppercase mb-4">Official Store Diwaniyah</p>
+        <p class="text-white text-sm font-black italic">
+            POWERED & DEVELOPED BY <span class="text-indigo-500">Abdullah-Abd-Alsalam</span> 🌟
         </p>
     </footer>
 
     <script>
-        // إعدادات Firebase الخاصة بك
         const firebaseConfig = {
             apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc",
             authDomain: "lux-vaip.firebaseapp.com",
@@ -148,45 +137,45 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let allProducts = [];
+        let storeData = [];
 
-        // جلب البيانات
-        db.ref('luxVaipData').on('value', (snapshot) => {
-            const data = snapshot.val();
-            allProducts = [];
-            document.getElementById('loading').style.display = 'none';
-
+        db.ref('luxVaipData').on('value', (snap) => {
+            const data = snap.val();
+            storeData = [];
+            document.getElementById('loader').style.display = 'none';
             if(data) {
-                if(data.mustafa && data.mustafa.products) data.mustafa.products.forEach(p => allProducts.push(p));
-                if(data.hussouni && data.hussouni.products) data.hussouni.products.forEach(p => allProducts.push(p));
-                render(allProducts);
+                if(data.mustafa?.products) data.mustafa.products.forEach(p => storeData.push(p));
+                if(data.hussouni?.products) data.hussouni.products.forEach(p => storeData.push(p));
+                display(storeData);
             }
         });
 
-        function render(list) {
-            const grid = document.getElementById('productsGrid');
+        function display(list) {
+            const grid = document.getElementById('grid');
             grid.innerHTML = '';
             list.forEach(p => {
                 if(p.qty > 0) {
                     grid.innerHTML += `
-                        <div class="product-card flex flex-col h-full">
-                            <div class="img-box">
-                                <img src="${p.img}" class="product-img" onerror="this.src='https://via.placeholder.com/400'">
+                        <div class="glass-card flex flex-col h-full group">
+                            <div class="img-container">
+                                <img src="${p.img}" class="product-img" loading="lazy">
                             </div>
-                            <div class="p-6 pt-2 flex flex-col flex-grow text-right">
-                                <div class="flex justify-between items-start mb-2">
-                                    <span class="qty-tag font-bold italic">متوفر: ${p.qty} قطعة</span>
+                            <div class="p-8 pt-2 flex flex-col flex-grow text-right">
+                                <div class="mb-3">
+                                    <span class="bg-indigo-500/10 text-indigo-400 text-[10px] font-black px-3 py-1 rounded-full border border-indigo-500/20 italic">
+                                        STOCK: ${p.qty} PCS
+                                    </span>
                                 </div>
-                                <h3 class="text-xl font-black mb-4 italic line-clamp-1">${p.name}</h3>
+                                <h3 class="text-2xl font-black mb-6 italic group-hover:text-indigo-400 transition-colors">${p.name}</h3>
                                 
-                                <div class="mt-auto flex justify-between items-center border-t border-white/10 pt-4">
+                                <div class="mt-auto flex justify-between items-center border-t border-white/5 pt-6">
                                     <div class="flex flex-col">
-                                        <span class="text-indigo-400 text-[10px] font-bold uppercase tracking-tighter">السعر</span>
-                                        <span class="text-xl font-black">${Number(p.sell).toLocaleString()} <small class="text-[10px] text-slate-500 italic">د.ع</small></span>
+                                        <span class="text-slate-500 text-[10px] font-bold uppercase">Price</span>
+                                        <span class="text-2xl font-black text-white">${Number(p.sell).toLocaleString()} <small class="text-[10px] text-indigo-500">IQD</small></span>
                                     </div>
-                                    <button onclick="orderWA('${p.name}', '${p.sell}')" 
-                                            class="bg-green-600 hover:bg-green-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-lg shadow-green-500/20">
-                                        اطلب الآن <i class="fab fa-whatsapp ml-1"></i>
+                                    <button onclick="sendOrder('${p.name}', '${p.sell}')" 
+                                            class="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-2xl font-black text-xs transition-all active:scale-90 shadow-xl shadow-indigo-600/20">
+                                        ORDER <i class="fab fa-whatsapp ml-1"></i>
                                     </button>
                                 </div>
                             </div>
@@ -195,14 +184,14 @@
             });
         }
 
-        function filterProducts() {
-            const q = document.getElementById('searchBox').value.toLowerCase();
-            render(allProducts.filter(p => p.name.toLowerCase().includes(q)));
+        function search() {
+            const val = document.getElementById('search').value.toLowerCase();
+            display(storeData.filter(p => p.name.toLowerCase().includes(val)));
         }
 
-        function orderWA(name, price) {
-            const msg = `مرحباً LUX_VAIP 💨\n\nأريد طلب المنتج التالي:\n📦 الاسم: ${name}\n💰 السعر: ${Number(price).toLocaleString()} د.ع\n\nيرجى تأكيد الحجز.`;
-            window.open(`https://wa.me/9647807483170?text=${encodeURIComponent(msg)}`);
+        function sendOrder(n, p) {
+            const m = `مرحباً LUX_VAIP 💨\nطلب جديد:\n📦 المنتج: ${n}\n💰 السعر: ${Number(p).toLocaleString()} د.ع\n---`;
+            window.open(`https://wa.me/9647807483170?text=${encodeURIComponent(m)}`);
         }
     </script>
 </body>
