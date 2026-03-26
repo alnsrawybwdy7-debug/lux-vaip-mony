@@ -3,58 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة LUX_VAIP | نظام المبيعات</title>
+    <title>إدارة LUX_VAIP | نظام الأرباح الذكي</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap');
-        body { font-family: 'Tajawal', sans-serif; background-color: #f1f5f9; color: #1e293b; }
-        .stat-card { background: white; border-radius: 1rem; padding: 20px; border-bottom: 4px solid #6366f1; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        input, select, textarea { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; outline-color: #6366f1; width: 100%; font-size: 14px; background: #fff; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        th { padding: 15px; text-align: right; font-size: 12px; color: #64748b; text-transform: uppercase; }
-        td { background: white; padding: 15px; font-size: 14px; border-top: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; }
-        td:first-child { border-right: 1px solid #f1f5f9; border-radius: 0 1rem 1rem 0; }
-        td:last-child { border-left: 1px solid #f1f5f9; border-radius: 1rem 0 0 1rem; }
-        .btn-sell { background: #22c55e; color: white; padding: 6px 12px; border-radius: 0.5rem; font-weight: bold; font-size: 12px; transition: 0.2s; }
-        .btn-sell:hover { background: #16a34a; transform: scale(1.05); }
-        .btn-sell:disabled { background: #cbd5e1; cursor: not-allowed; }
-        #imgPreview { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; display: none; border: 2px solid #6366f1; }
+        body { font-family: 'Tajawal', sans-serif; background-color: #f8fafc; }
+        .stat-card { background: white; border-radius: 1rem; padding: 15px; border-right: 5px solid #6366f1; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .bg-cash { border-right-color: #22c55e; } /* لون أرباح البيع */
+        input, select, textarea { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; width: 100%; font-size: 14px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 5px; }
+        td { background: white; padding: 12px; }
+        .btn-sell { background: #22c55e; color: white; padding: 5px 10px; border-radius: 8px; font-weight: bold; font-size: 12px; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4">
 
     <div id="loginSection" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-6">
-        <div class="bg-white p-10 rounded-3xl w-full max-w-sm text-center shadow-2xl">
-            <h2 class="text-2xl font-black mb-6 italic text-indigo-600 underline">LUX ADMIN</h2>
+        <div class="bg-white p-8 rounded-2xl w-full max-w-sm text-center">
+            <h2 class="text-xl font-black mb-4 italic">LUX_VAIP LOGIN</h2>
             <input type="password" id="passInput" class="text-center mb-4" placeholder="رمز الدخول">
-            <button onclick="login()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-black">تسجيل الدخول</button>
+            <button onclick="login()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-black">دخول</button>
         </div>
     </div>
 
     <div id="mainSection" style="display:none;">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-            <h1 class="text-3xl font-black italic">لوحة الإدارة <span class="text-indigo-600">والبيع</span></h1>
-            <button onclick="location.reload()" class="bg-slate-200 text-slate-600 px-4 py-2 rounded-lg font-bold text-xs italic">تسجيل الخروج</button>
+        <h1 class="text-2xl font-black italic mb-6">لوحة التحكم <span class="text-indigo-600">المالية</span></h1>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="stat-card">
+                <p class="text-gray-400 text-[10px] font-bold uppercase">بضاعة المخزن</p>
+                <h2 id="totalQty" class="text-xl font-black text-indigo-600">0</h2>
+            </div>
+            <div class="stat-card">
+                <p class="text-gray-400 text-[10px] font-bold uppercase">قيمة المخزن (بيع)</p>
+                <h2 id="totalValue" class="text-xl font-black text-slate-700">0</h2>
+            </div>
+            <div class="stat-card bg-cash">
+                <p class="text-green-600 text-[10px] font-bold uppercase">أرباح المبيعات (بجيبك)</p>
+                <h2 id="soldProfit" class="text-xl font-black text-green-600">0</h2>
+            </div>
+            <div class="stat-card !border-amber-500">
+                <p class="text-amber-600 text-[10px] font-bold uppercase">أرباح المخزن المتبقية</p>
+                <h2 id="totalProfit" class="text-xl font-black text-amber-600">0</h2>
+            </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            <div class="stat-card"> <p class="text-slate-400 text-xs font-bold mb-1">إجمالي القطع</p> <h2 id="totalQty" class="text-3xl font-black text-indigo-600">0</h2> </div>
-            <div class="stat-card !border-green-500"> <p class="text-slate-400 text-xs font-bold mb-1">صافي الربح المتوقع</p> <h2 id="totalProfit" class="text-3xl font-black text-green-600">0</h2> </div>
-            <div class="stat-card !border-amber-500"> <p class="text-slate-400 text-xs font-bold mb-1">قيمة المخزن (بيع)</p> <h2 id="totalValue" class="text-3xl font-black text-amber-600">0</h2> </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-slate-200">
-            <h3 class="font-black mb-6 flex items-center gap-2"><i class="fas fa-plus-circle text-indigo-600"></i> إضافة بضاعة جديدة</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-8 border">
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 <input type="text" id="p_name" placeholder="اسم المنتج">
-                <div class="flex items-center gap-3">
-                    <label for="p_file" class="bg-slate-100 p-2.5 rounded-xl flex-grow text-center text-xs font-bold cursor-pointer hover:bg-slate-200 transition">📸 ارفع صورة</label>
-                    <input type="file" id="p_file" accept="image/*" class="hidden" onchange="previewImage(this)">
-                    <img id="imgPreview" src="#">
-                </div>
+                <input type="file" id="p_file" accept="image/*" class="hidden" onchange="previewImage(this)">
+                <label for="p_file" class="bg-slate-100 p-2.5 rounded-xl text-center text-xs cursor-pointer">📸 صورة</label>
                 <input type="number" id="p_cost" placeholder="سعر الكلفة">
                 <input type="number" id="p_sell" placeholder="سعر البيع">
                 <input type="number" id="p_qty" placeholder="الكمية">
@@ -62,31 +63,25 @@
                     <option value="mustafa">مخزن مصطفى</option>
                     <option value="hussouni">مخزن حسوني</option>
                 </select>
-                <textarea id="p_desc" class="lg:col-span-2 h-12" placeholder="وصف المنتج (اختياري)..."></textarea>
-                <button onclick="saveProduct()" id="saveBtn" class="lg:col-span-2 bg-indigo-600 text-white py-3 rounded-xl font-black shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition">حفظ وإضافة للمخزن</button>
+                <textarea id="p_desc" class="md:col-span-3 lg:col-span-5" placeholder="الوصف..."></textarea>
+                <button onclick="saveProduct()" class="bg-indigo-600 text-white font-black rounded-xl">حفظ</button>
             </div>
         </div>
 
         <div class="overflow-x-auto">
             <table>
                 <thead>
-                    <tr>
-                        <th>المنتج</th>
-                        <th>المخزن</th>
-                        <th>الكمية</th>
-                        <th>الربح/قطعة</th>
-                        <th>البيع</th>
-                        <th>إجراءات البيع</th>
-                        <th>حذف</th>
+                    <tr class="text-xs text-gray-400 uppercase">
+                        <th>المنتج</th> <th>الكمية</th> <th>البيع</th> <th>الربح/ق</th> <th>المخزن</th> <th>البيع اليومي</th> <th>حذف</th>
                     </tr>
                 </thead>
                 <tbody id="pTableBody"></tbody>
             </table>
         </div>
 
-        <footer class="mt-20 text-center py-10 border-t border-slate-200">
-            <p class="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-2">Developed By</p>
-            <p class="text-indigo-600 font-black italic">Abdullah-Abd-Alsalam 🌟</p>
+        <footer class="mt-10 text-center py-6 text-[10px] font-bold text-gray-400 italic">
+            Developed by Abdullah-Abd-Alsalam
+            <button onclick="resetSales()" class="block mx-auto mt-4 text-red-400 underline">تصفير أرباح المبيعات اليومية</button>
         </footer>
     </div>
 
@@ -105,11 +100,11 @@
         const db = firebase.database();
         let base64Img = "";
 
-        function login() { if(document.getElementById('passInput').value === "1234") { document.getElementById('loginSection').style.display='none'; document.getElementById('mainSection').style.display='block'; fetchData(); } }
+        function login() { if(document.getElementById('passInput').value==="1234"){document.getElementById('loginSection').style.display='none';document.getElementById('mainSection').style.display='block';fetchData();}}
 
         function previewImage(input) {
             const reader = new FileReader();
-            reader.onload = (e) => { base64Img = e.target.result; document.getElementById('imgPreview').src = base64Img; document.getElementById('imgPreview').style.display = 'block'; };
+            reader.onload = (e) => base64Img = e.target.result;
             reader.readAsDataURL(input.files[0]);
         }
 
@@ -119,76 +114,75 @@
                 const tbody = document.getElementById('pTableBody');
                 tbody.innerHTML = '';
                 let tQty = 0, tProfit = 0, tValue = 0;
+                let sProfit = data?.salesProfit || 0; // جلب الأرباح التي تم بيعها فعلياً
 
                 if(data) {
                     ['mustafa', 'hussouni'].forEach(owner => {
                         if(data[owner]?.products) {
                             data[owner].products.forEach((p, idx) => {
-                                const profit = p.sell - (p.cost || 0);
-                                tQty += Number(p.qty); tValue += (p.sell * p.qty); tProfit += (profit * p.qty);
-
-                                const isOut = p.qty <= 0;
+                                const profitPerPiece = p.sell - (p.cost || 0);
+                                tQty += Number(p.qty); 
+                                tValue += (p.sell * p.qty); 
+                                tProfit += (profitPerPiece * p.qty);
 
                                 tbody.innerHTML += `
                                     <tr>
-                                        <td>
-                                            <div class="flex items-center gap-3 text-right">
-                                                <img src="${p.img}" class="w-10 h-10 rounded-lg object-cover shadow-sm">
-                                                <div><div class="font-bold text-slate-800">${p.name}</div><div class="text-[10px] text-slate-400 italic">${p.desc || ''}</div></div>
-                                            </div>
-                                        </td>
-                                        <td class="uppercase font-bold text-[10px] text-slate-400">${owner}</td>
-                                        <td class="font-black ${isOut ? 'text-red-500':'text-indigo-600'}">${isOut ? 'نفذت' : p.qty}</td>
-                                        <td class="text-green-600 font-bold text-xs">+${profit.toLocaleString()}</td>
-                                        <td class="font-black text-slate-700">${Number(p.sell).toLocaleString()}</td>
-                                        <td>
-                                            <button onclick="sellItem('${owner}', ${idx}, ${p.qty})" ${isOut ? 'disabled':''} class="btn-sell">
-                                                ${isOut ? 'خلصت' : '<i class="fas fa-check-circle ml-1"></i> تم البيع'}
-                                            </button>
-                                        </td>
-                                        <td><button onclick="delItem('${owner}', ${idx})" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-trash"></i></button></td>
+                                        <td class="flex items-center gap-2 font-bold"><img src="${p.img}" class="w-8 h-8 rounded">${p.name}</td>
+                                        <td class="font-black text-indigo-600">${p.qty}</td>
+                                        <td>${Number(p.sell).toLocaleString()}</td>
+                                        <td class="text-green-600 font-bold text-xs">+${profitPerPiece.toLocaleString()}</td>
+                                        <td class="text-[10px] text-gray-400 uppercase font-bold">${owner}</td>
+                                        <td><button onclick="sellPiece('${owner}', ${idx}, ${p.qty}, ${profitPerPiece})" class="btn-sell" ${p.qty<=0?'disabled':''}>تم البيع</button></td>
+                                        <td><button onclick="delItem('${owner}', ${idx})" class="text-red-300"><i class="fas fa-trash text-xs"></i></button></td>
                                     </tr>`;
                             });
                         }
                     });
                 }
                 document.getElementById('totalQty').innerText = tQty;
-                document.getElementById('totalValue').innerText = tValue.toLocaleString() + " د.ع";
-                document.getElementById('totalProfit').innerText = tProfit.toLocaleString() + " د.ع";
+                document.getElementById('totalValue').innerText = tValue.toLocaleString();
+                document.getElementById('totalProfit').innerText = tProfit.toLocaleString();
+                document.getElementById('soldProfit').innerText = sProfit.toLocaleString();
             });
         }
 
-        // دالة البيع الجديدة - تنقص قطعة واحدة
-        function sellItem(owner, idx, currentQty) {
+        function sellPiece(owner, idx, currentQty, profit) {
             if(currentQty > 0) {
-                const newQty = currentQty - 1;
-                db.ref(`luxVaipData/${owner}/products/${idx}/qty`).set(newQty);
-                // تأثير بسيط للتأكيد
-                console.log(`تم بيع قطعة من ${owner}, المتبقي: ${newQty}`);
+                // 1. تنقيص الكمية من المخزن
+                db.ref(`luxVaipData/${owner}/products/${idx}/qty`).set(currentQty - 1);
+                
+                // 2. إضافة الربح لسجل المبيعات الكلي (بجيبك)
+                db.ref(`luxVaipData/salesProfit`).once('value', (s) => {
+                    const currentSalesProfit = s.val() || 0;
+                    db.ref(`luxVaipData/salesProfit`).set(currentSalesProfit + profit);
+                });
+            }
+        }
+
+        function resetSales() {
+            if(confirm("هل تريد تصفير سجل أرباح المبيعات اليوم؟")) {
+                db.ref(`luxVaipData/salesProfit`).set(0);
             }
         }
 
         function saveProduct() {
             const owner = document.getElementById('p_owner').value;
-            const name = document.getElementById('p_name').value;
-            const desc = document.getElementById('p_desc').value;
-            const cost = Number(document.getElementById('p_cost').value);
-            const sell = Number(document.getElementById('p_sell').value);
-            const qty = Number(document.getElementById('p_qty').value);
-
-            if(!name || !sell || !qty || !base64Img) { alert("املي المعلومات واختار صورة!"); return; }
-
+            const newItem = {
+                name: document.getElementById('p_name').value,
+                desc: document.getElementById('p_desc').value,
+                img: base64Img,
+                cost: Number(document.getElementById('p_cost').value),
+                sell: Number(document.getElementById('p_sell').value),
+                qty: Number(document.getElementById('p_qty').value)
+            };
             db.ref(`luxVaipData/${owner}/products`).once('value', (snap) => {
                 let list = snap.val() || [];
-                list.push({ name, desc, img: base64Img, cost, sell, qty });
-                db.ref(`luxVaipData/${owner}/products`).set(list).then(() => { 
-                    alert("تمت الإضافة للمخزن!");
-                    location.reload(); 
-                });
+                list.push(newItem);
+                db.ref(`luxVaipData/${owner}/products`).set(list).then(()=>location.reload());
             });
         }
 
-        function delItem(owner, idx) { if(confirm("حذف المنتج نهائياً؟")) { db.ref(`luxVaipData/${owner}/products`).once('value', (snap) => { let list = snap.val(); list.splice(idx, 1); db.ref(`luxVaipData/${owner}/products`).set(list); }); } }
+        function delItem(owner, idx) { if(confirm("حذف؟")) { db.ref(`luxVaipData/${owner}/products`).once('value', (snap) => { let list = snap.val(); list.splice(idx, 1); db.ref(`luxVaipData/${owner}/products`).set(list); }); } }
     </script>
 </body>
 </html>
