@@ -17,62 +17,45 @@
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 0.5rem; overflow: hidden; }
         th { background: #1e293b; color: white; padding: 12px; text-align: right; font-size: 12px; }
         td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px; }
-        tr:hover { background: #f8fafc; }
-        /* ستايل زر الرفع المصغر */
-        .file-upload-btn { background: #e2e8f0; color: #475569; padding: 8px; border-radius: 0.5rem; font-size: 11px; font-weight: bold; cursor: pointer; display: block; text-align: center; border: 1px solid #cbd5e1; transition: 0.3s; }
-        .file-upload-btn:hover { background: #cbd5e1; }
-        #imgPreview { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; display: none; border: 2px solid #e2e8f0; }
+        .file-upload-btn { background: #e2e8f0; color: #475569; padding: 8px; border-radius: 0.5rem; font-size: 11px; font-weight: bold; cursor: pointer; display: block; text-align: center; border: 1px solid #cbd5e1; }
+        #imgPreview { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; display: none; border: 2px solid #6366f1; }
     </style>
 </head>
 <body class="p-2 md:p-5">
 
     <div id="loginSection" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-6">
         <div class="login-box p-8 w-full max-w-sm text-center">
-            <i class="fas fa-lock text- indigo-600 text-4xl mb-4"></i>
             <h2 class="text-xl font-black mb-1">نظام الإدارة LUX</h2>
-            <p class="text-gray-400 text-xs mb-5 italic">المطور: Abdullah-Abd-Alsalam</p>
+            <p class="text-gray-400 text-xs mb-5 italic">بصمة المطور: Abdullah-Abd-Alsalam</p>
             <input type="password" id="passInput" class="text-center mb-4" placeholder="رمز الدخول">
-            <button onclick="login()" class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-bold uppercase active:scale-95 transition-all">دخول</button>
+            <button onclick="login()" class="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-bold">دخول</button>
         </div>
     </div>
 
     <div id="mainSection" style="display:none;">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 border-b pb-5">
-            <div class="flex items-center gap-3">
-                <div class="p-2.5 bg-indigo-600 rounded-xl text-white shadow-lg shadow-indigo-500/30">
-                    <i class="fas fa-wind text-xl"></i>
-                </div>
-                <h1 class="text-2xl font-black italic">لوحة التحكم <span class="text-indigo-600 underline decoration-indigo-200">LUX_VAIP</span></h1>
-            </div>
-            <button onclick="location.reload()" class="bg-red-100 text-red-600 px-5 py-2 rounded-lg text-xs font-bold hover:bg-red-200 transition-all">تسجيل خروج <i class="fas fa-sign-out-alt ml-1"></i></button>
-        </div>
-
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div class="stat-card">
-                <p class="text-gray-500 text-xs italic">عدد قطع المخزن الكلي</p>
-                <h2 id="totalQty" class="text-3xl font-black text-indigo-600">0</h2>
+                <p class="text-gray-500 text-[10px] uppercase">قطع المخزن</p>
+                <h2 id="totalQty" class="text-2xl font-black">0</h2>
             </div>
             <div class="stat-card !border-green-500">
-                <p class="text-gray-500 text-xs italic">صافي الربح المتوقع</p>
-                <h2 id="totalProfit" class="text-3xl font-black text-green-600">0 <small class="text-xs">د.ع</small></h2>
+                <p class="text-gray-500 text-[10px] uppercase">الربح المتوقع</p>
+                <h2 id="totalProfit" class="text-2xl font-black text-green-600">0</h2>
             </div>
             <div class="stat-card !border-yellow-500">
-                <p class="text-gray-500 text-xs italic">قيمة البيع الكلية</p>
-                <h2 id="totalValue" class="text-3xl font-black text-yellow-600">0 <small class="text-xs">د.ع</small></h2>
+                <p class="text-gray-500 text-[10px] uppercase">قيمة البضاعة</p>
+                <h2 id="totalValue" class="text-2xl font-black text-yellow-600">0</h2>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow-sm mb-8 border border-gray-100">
-            <h3 class="font-black mb-5 border-b pb-3 italic text-sm text-indigo-800"><i class="fas fa-plus-circle ml-1"></i> إضافة منتج جديد للمخازن</h3>
+        <div class="bg-white p-5 rounded-xl shadow-sm mb-8 border">
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 items-end">
                 <input type="text" id="p_name" placeholder="اسم المنتج">
                 
                 <div class="flex items-center gap-2">
-                    <label for="p_file" class="file-upload-btn flex-grow">
-                        <i class="fas fa-image ml-1"></i> ارفع صورة
-                    </label>
+                    <label for="p_file" class="file-upload-btn flex-grow">📸 اختر صورة</label>
                     <input type="file" id="p_file" accept="image/*" class="hidden" onchange="previewImage(this)">
-                    <img id="imgPreview" src="#" alt="Preview">
+                    <img id="imgPreview" src="#">
                 </div>
 
                 <input type="number" id="p_cost" placeholder="سعر الكلفة">
@@ -82,11 +65,11 @@
                     <option value="mustafa">مخزن مصطفى</option>
                     <option value="hussouni">مخزن حسوني</option>
                 </select>
-                <button onclick="saveProduct()" id="saveBtn" class="lg:col-span-6 bg-indigo-600 text-white py-3 rounded-lg font-black hover:bg-indigo-700 transition-all active:scale-98">حفظ وإضافة للموقع <i class="fas fa-cloud-upload-alt mr-1"></i></button>
+                <button onclick="saveProduct()" id="saveBtn" class="lg:col-span-6 bg-indigo-600 text-white py-3 rounded-lg font-black">حفظ وإضافة للموقع</button>
             </div>
         </div>
 
-        <div class="overflow-x-auto shadow-sm rounded-xl border border-gray-100">
+        <div class="overflow-x-auto shadow-sm rounded-xl">
             <table>
                 <thead>
                     <tr>
@@ -99,19 +82,13 @@
                         <th>حذف</th>
                     </tr>
                 </thead>
-                <tbody id="pTableBody">
-                    </tbody>
+                <tbody id="pTableBody"></tbody>
             </table>
         </div>
-
-        <footer class="mt-12 text-center py-6 border-t border-gray-100">
-            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-1">System Developed & Designed By</p>
-            <p class="text-indigo-600 font-black italic text-sm">Abdullah-Abd-Alsalam 🌟Branch-Diwaniyah</p>
-        </footer>
+        <footer class="text-center py-10 opacity-50 text-[10px] font-bold">DEVELOPED BY ABDULLAH-ABD-ALSALAM</footer>
     </div>
 
     <script>
-        // إعدادات Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc",
             authDomain: "lux-vaip.firebaseapp.com",
@@ -124,63 +101,54 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        let base64Image = "";
 
-        let base64Image = ""; // متغير لخزن الصورة المرفوعة
-
-        // نظام تسجيل الدخول (1234)
         function login() {
             if(document.getElementById('passInput').value === "1234") {
                 document.getElementById('loginSection').style.display = 'none';
                 document.getElementById('mainSection').style.display = 'block';
                 fetchData();
-            } else { alert("الرمز غلط!"); }
+            } else { alert("غلط!"); }
         }
 
-        // دالة معاينة وقراءة الصورة من الجهاز (لمسة عبد الله البرمجية)
+        // الدالة المصححة لقراءة الصورة 
         function previewImage(input) {
             const file = input.files[0];
-            const preview = document.getElementById('imgPreview');
-            
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    base64Image = e.target.result; // خزن كود الصورة
+                    base64Image = e.target.result; // هذا هو السطر المهم
+                    const preview = document.getElementById('imgPreview');
                     preview.src = base64Image;
-                    preview.style.display = 'block'; // إظهار المعاينة
-                }
-                reader.readAsDataBuffer(file); // قراءة الملف كـ Base64
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file); // تم تغييرها من readAsDataBuffer إلى readAsDataURL
             }
         }
 
-        // جلب البيانات وعرضها بالجدول الكلاسيكي
         function fetchData() {
             db.ref('luxVaipData').on('value', (snap) => {
                 const data = snap.val();
                 const tbody = document.getElementById('pTableBody');
                 tbody.innerHTML = '';
                 let tQty = 0, tProfit = 0, tValue = 0;
-
                 if(data) {
                     ['mustafa', 'hussouni'].forEach(owner => {
                         if(data[owner] && data[owner].products) {
                             data[owner].products.forEach((p, index) => {
-                                const profit = (p.sell - (p.cost || 0));
+                                const profit = p.sell - (p.cost || 0);
                                 tQty += Number(p.qty);
                                 tValue += (p.sell * p.qty);
                                 tProfit += (profit * p.qty);
-
                                 tbody.innerHTML += `
-                                    <tr class="align-middle">
-                                        <td class="flex items-center gap-3">
-                                            <img src="${p.img}" class="w-10 h-10 rounded-lg object-cover border border-gray-100" onerror="this.src='https://via.placeholder.com/50'">
-                                            <span class="font-bold">${p.name}</span>
-                                        </td>
-                                        <td class="text-indigo-600 font-black cursor-pointer underline text-base" onclick="editQty('${owner}', ${index}, ${p.qty})">${p.qty}</td>
-                                        <td class="text-gray-400 text-xs">${Number(p.cost).toLocaleString()}</td>
-                                        <td class="font-bold text-sm">${Number(p.sell).toLocaleString()}</td>
-                                        <td class="text-green-600 font-black text-sm">+${profit.toLocaleString()}</td>
-                                        <td class="text-[10px] uppercase font-bold text-gray-400">${owner}</td>
-                                        <td><button onclick="delItem('${owner}', ${index})" class="text-red-400 hover:text-red-600"><i class="fas fa-trash-alt"></i></button></td>
+                                    <tr>
+                                        <td class="flex items-center gap-2"><img src="${p.img}" class="w-8 h-8 rounded-md object-cover"><b>${p.name}</b></td>
+                                        <td class="font-black text-indigo-600 underline cursor-pointer" onclick="editQty('${owner}', ${index}, ${p.qty})">${p.qty}</td>
+                                        <td>${Number(p.cost).toLocaleString()}</td>
+                                        <td>${Number(p.sell).toLocaleString()}</td>
+                                        <td class="text-green-600 font-bold">+${profit.toLocaleString()}</td>
+                                        <td class="text-[10px] text-gray-400 uppercase font-bold">${owner}</td>
+                                        <td><button onclick="delItem('${owner}', ${index})" class="text-red-400"><i class="fas fa-trash"></i></button></td>
                                     </tr>`;
                             });
                         }
@@ -192,59 +160,40 @@
             });
         }
 
-        // حفظ المنتج الجديد مع الصورة المرفوعة
         function saveProduct() {
             const owner = document.getElementById('p_owner').value;
             const name = document.getElementById('p_name').value;
             const cost = Number(document.getElementById('p_cost').value);
             const sell = Number(document.getElementById('p_sell').value);
             const qty = Number(document.getElementById('p_qty').value);
-            const btn = document.getElementById('saveBtn');
 
-            // التحقق من الحقول الأساسية والصورة
             if(!name || !sell || !qty || !base64Image) {
-                alert("الرجاء ملء الاسم، السعر، الكمية، واختيار صورة!");
+                alert("املي الحقول واختار صورة!");
                 return;
             }
 
-            btn.innerText = "جاري الحفظ..."; // تغيير حالة الزر
-            btn.disabled = true;
-
-            const newItem = {
-                name: name,
-                img: base64Image, // حفظ كود الصورة المرفوعة
-                cost: cost,
-                sell: sell,
-                qty: qty
-            };
+            const newItem = { name, img: base64Image, cost, sell, qty };
 
             db.ref(`luxVaipData/${owner}/products`).once('value', (snap) => {
                 let list = snap.val() || [];
                 list.push(newItem);
                 db.ref(`luxVaipData/${owner}/products`).set(list).then(() => {
-                    alert("تمت الإضافة بنجاح للمخزن والموقع!");
-                    // تصفير الحقول بعد الحفظ
-                    document.querySelectorAll('input:not([type=password])').forEach(i => i.value = '');
-                    document.getElementById('imgPreview').style.display = 'none';
-                    base64Image = ""; // تصفير متغير الصورة
-                    btn.innerText = "حفظ وإضافة للموقع +";
-                    btn.disabled = false;
+                    alert("تم!");
+                    location.reload();
                 });
             });
         }
 
-        // تعديل الكمية السريع بالجدول القديم
         function editQty(owner, idx, curr) {
-            const n = prompt("تعديل الكمية:", curr);
-            if(n !== null && n !== "") db.ref(`luxVaipData/${owner}/products/${idx}/qty`).set(Number(n));
+            const n = prompt("الكمية الجديدة:", curr);
+            if(n !== null) db.ref(`luxVaipData/${owner}/products/${idx}/qty`).set(Number(n));
         }
 
-        // حذف منتج
         function delItem(owner, idx) {
-            if(confirm("هل أنت متأكد من حذف هذا المنتج؟")) {
+            if(confirm("حذف؟")) {
                 db.ref(`luxVaipData/${owner}/products`).once('value', (snap) => {
                     let list = snap.val();
-                    list.splice(idx, 1); // حذف العنصر من المصفوفة
+                    list.splice(idx, 1);
                     db.ref(`luxVaipData/${owner}/products`).set(list);
                 });
             }
