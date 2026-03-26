@@ -16,112 +16,59 @@
                 background-color: #f1f5f9;
             }
 
-            .stat-card {
-                transition: all 0.3s ease;
+            .out-of-stock {
+                filter: grayscale(1);
+                opacity: 0.7;
             }
 
-            .stat-card:hover {
-                transform: scale(1.02);
-            }
-
-            input::-webkit-inner-spin-button {
-                display: none;
+            .badge-red {
+                background-color: #ef4444;
+                color: white;
+                padding: 2px 8px;
+                border-radius: 10px;
+                font-size: 10px;
             }
         </style>
     </head>
 
     <body class="pb-24">
 
-        <header class="bg-slate-900 text-white p-6 shadow-2xl text-center relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-2 opacity-20 text-xs italic">Cloud Active V3</div>
-            <h1 class="text-2xl font-bold tracking-wide">تصفيه وجرد حساب lux_vaip ☁️</h1>
-            <p class="text-indigo-400 text-sm mt-1 font-bold italic underline">تطوير أبو نجم - نظام المزامنة والوصف</p>
-
+        <header class="bg-slate-900 text-white p-6 shadow-2xl text-center">
+            <h1 class="text-2xl font-bold">إدارة lux_vaip ☁️</h1>
             <div class="flex justify-center gap-3 mt-5">
                 <button onclick="switchStore('hussouni')" id="btn-h"
-                    class="px-5 py-2 rounded-full bg-indigo-600 text-white font-bold shadow-lg transition-all">حسوني
-                    الوائلي</button>
+                    class="px-5 py-2 rounded-full bg-indigo-600 text-white font-bold shadow-lg">حسوني</button>
                 <button onclick="switchStore('mustafa')" id="btn-m"
-                    class="px-5 py-2 rounded-full bg-white text-gray-700 font-bold shadow-lg transition-all">مصطفى
-                    ديوانية</button>
+                    class="px-5 py-2 rounded-full bg-white text-gray-700 font-bold shadow-lg">مصطفى</button>
             </div>
         </header>
 
         <main class="container mx-auto px-4 mt-8">
-            <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
-                <div class="stat-card bg-white p-4 rounded-2xl shadow-sm border-b-4 border-blue-500 text-center">
-                    <span class="text-[10px] text-gray-400 font-bold block mb-1">إجمالي البضاعة</span>
-                    <input type="number" id="main-total" oninput="updateFinance()"
-                        class="w-full font-bold text-center text-lg outline-none bg-transparent" placeholder="0">
-                </div>
-                <div class="stat-card bg-white p-4 rounded-2xl shadow-sm border-b-4 border-green-500 text-center">
-                    <span class="text-[10px] text-gray-400 font-bold block mb-1">المبيعات (كاش)</span>
-                    <input type="number" id="main-sold" oninput="updateFinance()"
-                        class="w-full font-bold text-center text-lg outline-none bg-transparent" placeholder="0">
-                </div>
-                <div class="stat-card bg-white p-4 rounded-2xl shadow-sm border-b-4 border-red-500 text-center">
-                    <span class="text-[10px] text-gray-400 font-bold block mb-1">إجمالي الديون</span>
-                    <p id="total-debt-display" class="font-bold text-lg text-red-600">0</p>
-                </div>
-                <div
-                    class="stat-card bg-indigo-900 p-4 rounded-2xl shadow-lg border-b-4 border-yellow-400 text-center text-white">
-                    <span class="text-[10px] text-yellow-400 font-bold block mb-1 text-center">صافي الربح 💰</span>
-                    <p id="profit-display" class="font-bold text-lg text-white">0</p>
-                </div>
-                <div
-                    class="stat-card bg-slate-100 p-4 rounded-2xl shadow-sm border-b-4 border-slate-500 text-center lg:col-span-1 col-span-2">
-                    <span class="text-[10px] text-slate-500 font-bold block mb-1">المبلغ المتبقي</span>
-                    <p id="final-rem" class="font-bold text-lg text-slate-800">0</p>
-                </div>
-            </div>
-
             <section class="bg-white p-6 rounded-3xl shadow-sm mb-8">
-                <h3 class="font-bold text-red-700 mb-4 flex items-center gap-2 italic">📝 إضافة مديون</h3>
-                <div class="flex flex-col gap-3">
-                    <input type="text" id="debtor-name" placeholder="اسم الشخص"
-                        class="border-2 p-3 rounded-xl text-sm outline-none focus:border-red-400 transition-all">
-                    <div class="flex gap-2"><input type="number" id="debtor-amount" placeholder="المبلغ"
-                            class="flex-1 border-2 p-3 rounded-xl text-sm outline-none focus:border-red-400 transition-all">
-                        <button onclick="addDebtor()"
-                            class="bg-red-600 text-white px-8 rounded-xl font-bold text-2xl shadow-md active:scale-95">+</button>
-                    </div>
-                </div>
-                <div id="debtors-list" class="mt-6 space-y-2"></div>
-            </section>
-
-            <section class="bg-white p-6 rounded-3xl shadow-sm">
-                <h3 class="font-bold text-indigo-700 mb-4 text-center italic underline">📦 إضافة بضاعة (مع وصف المنتج)
-                </h3>
-                <div class="space-y-3 bg-indigo-50 p-5 rounded-2xl mb-6 border border-indigo-100">
+                <h3 class="font-bold text-indigo-700 mb-4 text-center italic underline">📦 إضافة بضاعة جديدة</h3>
+                <div class="space-y-3 bg-indigo-50 p-5 rounded-2xl mb-6">
                     <input type="file" id="prod-img" accept="image/*" class="text-xs mb-2">
-                    <input type="text" id="prod-name" placeholder="اسم المنتج (مثال: فيب سحبة 8000)"
+                    <input type="text" id="prod-name" placeholder="اسم المنتج"
                         class="w-full border p-3 rounded-xl text-sm outline-none">
-
-                    <textarea id="prod-desc" placeholder="وصف المنتج (مثال: نكهة عنب، اللون أسود، ضمان اسبوع)"
-                        class="w-full border p-3 rounded-xl text-sm outline-none h-20 resize-none"></textarea>
-
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="number" id="cost-price" placeholder="سعر التكلفة"
+                    <textarea id="prod-desc" placeholder="وصف المنتج"
+                        class="w-full border p-3 rounded-xl text-sm outline-none h-16"></textarea>
+                    <div class="grid grid-cols-3 gap-2">
+                        <input type="number" id="prod-qty" placeholder="الكمية"
                             class="border p-3 rounded-xl text-sm outline-none">
-                        <input type="number" id="sell-price" placeholder="سعر البيع"
+                        <input type="number" id="cost-price" placeholder="التكلفة"
+                            class="border p-3 rounded-xl text-sm outline-none">
+                        <input type="number" id="sell-price" placeholder="البيع"
                             class="border p-3 rounded-xl text-sm outline-none">
                     </div>
                     <button onclick="addProduct()"
-                        class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-md active:scale-95 transition-all hover:bg-indigo-700">إضافة
-                        للمخزن</button>
+                        class="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold">إضافة للمخزن</button>
                 </div>
+
                 <div id="products-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
             </section>
         </main>
 
-        <footer class="mt-10 text-center pb-10">
-            <div class="bg-slate-800 inline-block px-8 py-2 rounded-full text-white shadow-lg border border-slate-700">
-                <span class="text-yellow-400 font-bold italic text-sm">برمجة وتطوير أبو نجم 🌟</span>
-            </div>
-        </footer>
-
         <script>
-            // إعدادات Firebase الخاصة بك
             const firebaseConfig = {
                 apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc",
                 authDomain: "lux-vaip.firebaseapp.com",
@@ -135,49 +82,19 @@
 
             firebase.initializeApp(firebaseConfig);
             const rtdb = firebase.database();
-
             let currentStore = 'hussouni';
-            let storeData = {
-                hussouni: { total: 0, sold: 0, debtors: [], products: [] },
-                mustafa: { total: 0, sold: 0, debtors: [], products: [] }
-            };
+            let storeData = { hussouni: { total: 0, sold: 0, debtors: [], products: [] }, mustafa: { total: 0, sold: 0, debtors: [], products: [] } };
 
-            // الربط السحابي المباشر
             rtdb.ref('luxVaipData').on('value', (snapshot) => {
-                if (snapshot.exists()) {
-                    storeData = snapshot.val();
-                    render();
-                }
+                if (snapshot.exists()) { storeData = snapshot.val(); render(); }
             });
 
-            function switchStore(s) {
-                currentStore = s;
-                document.getElementById('btn-h').className = s === 'hussouni' ? "px-5 py-2 rounded-full bg-indigo-600 text-white font-bold shadow-lg" : "px-5 py-2 rounded-full bg-white text-gray-700 font-bold shadow-lg";
-                document.getElementById('btn-m').className = s === 'mustafa' ? "px-5 py-2 rounded-full bg-indigo-600 text-white font-bold shadow-lg" : "px-5 py-2 rounded-full bg-white text-gray-700 font-bold shadow-lg";
-                render();
-            }
-
-            function updateFinance() {
-                storeData[currentStore].total = document.getElementById('main-total').value;
-                storeData[currentStore].sold = document.getElementById('main-sold').value;
-                sync();
-            }
-
-            function addDebtor() {
-                const name = document.getElementById('debtor-name').value;
-                const amount = parseFloat(document.getElementById('debtor-amount').value) || 0;
-                if (name && amount > 0) {
-                    if (!storeData[currentStore].debtors) storeData[currentStore].debtors = [];
-                    storeData[currentStore].debtors.push({ name, amount });
-                    document.getElementById('debtor-name').value = '';
-                    document.getElementById('debtor-amount').value = '';
-                    sync();
-                }
-            }
+            function switchStore(s) { currentStore = s; render(); }
 
             function addProduct() {
                 const name = document.getElementById('prod-name').value;
-                const desc = document.getElementById('prod-desc').value; // جلب الوصف
+                const desc = document.getElementById('prod-desc').value;
+                const qty = parseInt(document.getElementById('prod-qty').value) || 0;
                 const cost = parseFloat(document.getElementById('cost-price').value) || 0;
                 const sell = parseFloat(document.getElementById('sell-price').value) || 0;
                 const file = document.getElementById('prod-img').files[0];
@@ -186,66 +103,42 @@
                     const reader = new FileReader();
                     reader.onload = function (e) {
                         if (!storeData[currentStore].products) storeData[currentStore].products = [];
-                        // حفظ الوصف في المصفوفة
-                        storeData[currentStore].products.push({ name, desc, cost, sell, img: e.target.result });
-                        document.getElementById('prod-name').value = '';
-                        document.getElementById('prod-desc').value = '';
-                        document.getElementById('cost-price').value = '';
-                        document.getElementById('sell-price').value = '';
-                        document.getElementById('prod-img').value = '';
+                        storeData[currentStore].products.push({ name, desc, qty, cost, sell, img: e.target.result });
                         sync();
                     };
                     reader.readAsDataURL(file);
-                } else {
-                    alert("يرجى إدخال الاسم والصورة على الأقل");
+                }
+            }
+
+            // دالة لتقليل الكمية عند البيع
+            function reduceQty(index) {
+                if (storeData[currentStore].products[index].qty > 0) {
+                    storeData[currentStore].products[index].qty--;
+                    sync();
                 }
             }
 
             function deleteItem(type, index) {
-                if (confirm("هل تريد الحذف نهائياً؟")) {
-                    storeData[currentStore][type].splice(index, 1);
-                    sync();
-                }
+                if (confirm("حذف؟")) { storeData[currentStore][type].splice(index, 1); sync(); }
             }
 
             function sync() { rtdb.ref('luxVaipData').set(storeData); }
 
             function render() {
                 const s = storeData[currentStore];
-                document.getElementById('main-total').value = s.total || '';
-                document.getElementById('main-sold').value = s.sold || '';
-
-                let totalD = 0;
-                const dList = document.getElementById('debtors-list');
-                dList.innerHTML = '';
-                (s.debtors || []).forEach((d, i) => {
-                    totalD += d.amount;
-                    dList.innerHTML += `
-                <div class="flex justify-between items-center bg-red-50 p-3 rounded-xl border border-red-100 shadow-sm">
-                    <span class="font-bold text-gray-700 text-xs italic">${d.name}: <span class="text-red-600">${d.amount.toLocaleString()}</span></span>
-                    <button onclick="deleteItem('debtors', ${i})" class="text-red-500 font-bold text-[10px] underline">حذف</button>
-                </div>`;
-                });
-                document.getElementById('total-debt-display').innerText = totalD.toLocaleString();
-
-                let totalProfit = 0;
-                (s.products || []).forEach(p => totalProfit += (p.sell - p.cost));
-                document.getElementById('profit-display').innerText = totalProfit.toLocaleString() + " د.ع";
-
-                const rem = (parseFloat(s.total) || 0) - ((parseFloat(s.sold) || 0) + totalD);
-                document.getElementById('final-rem').innerText = rem.toLocaleString();
-
                 const pGrid = document.getElementById('products-grid');
                 pGrid.innerHTML = '';
                 (s.products || []).forEach((p, i) => {
+                    const isOut = p.qty <= 0;
                     pGrid.innerHTML += `
-                <div class="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 p-2 relative group transition-all hover:shadow-lg">
-                    <img src="${p.img}" class="w-full h-24 object-cover rounded-lg shadow-inner">
-                    <h4 class="font-bold text-[10px] mt-2 truncate text-indigo-900">${p.name}</h4><p class="text-[8px] text-gray-500 mt-1 h-8 overflow-hidden line-clamp-2 leading-tight">${p.desc ? p.desc : 'لا يوجد وصف'}</p>
-                    
-                    <div class="flex justify-between items-center mt-2 border-t pt-2 border-gray-50">
-                        <p class="text-[9px] text-green-600 font-bold italic">ربح: ${p.sell - p.cost}</p>
-                        <button onclick="deleteItem('products', ${i})" class="text-red-500 text-[9px] font-bold italic underline">حذف</button>
+                <div class="bg-white rounded-2xl overflow-hidden shadow-md border p-2 ${isOut ? 'out-of-stock' : ''} relative">
+                    ${isOut ? '<span class="absolute top-2 right-2 badge-red z-10">نفدت الكمية ❌</span>' : ''}
+                    <img src="${p.img}" class="w-full h-24 object-cover rounded-lg">
+                    <h4 class="font-bold text-[10px] mt-2">${p.name}</h4>
+                    <p class="text-[9px] text-blue-600 font-bold">المتوفر: ${p.qty} قطعة</p>
+                    <div class="flex gap-1 mt-2">
+                        <button onclick="reduceQty(${i})" class="flex-1 bg-green-100 text-green-700 text-[9px] py-1 rounded font-bold">- بيع قطعة</button>
+                        <button onclick="deleteItem('products', ${i})" class="bg-red-50 text-red-500 p-1 rounded"><i class="text-[9px]">حذف</i></button>
                     </div>
                 </div>`;
                 });
