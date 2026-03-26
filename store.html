@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LUX_VAIP | Premium Store</title>
+    <title>LUX_VAIP | المتجر الرسمي</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,65 +12,130 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;800&display=swap');
         
-        body { font-family: 'Tajawal', sans-serif; background-color: #020617; color: white; margin: 0; overflow-x: hidden; }
-        
-        /* تأثير الزجاج الفاخر */
-        .glass-header { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.08); }
-        .product-card { background: rgba(30, 41, 59, 0.4); border: 1px solid rgba(255,255,255,0.05); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-radius: 2.5rem; overflow: hidden; position: relative; }
-        .product-card:hover { transform: translateY(-12px); border-color: #6366f1; box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.3); }
-        
-        .img-container { height: 260px; overflow: hidden; border-radius: 2rem; margin: 10px; position: relative; }
-        .product-img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
-        .product-card:hover .product-img { scale: 1.1; }
+        body { 
+            font-family: 'Tajawal', sans-serif; 
+            background: radial-gradient(circle at top, #1e293b 0%, #020617 100%); 
+            color: white; 
+            min-height: screen;
+        }
 
-        .order-btn { background: #22c55e; transition: 0.3s; box-shadow: 0 10px 20px -5px rgba(34, 197, 94, 0.4); }
-        .order-btn:hover { background: #16a34a; transform: scale(1.05); }
+        /* تأثير الزجاج - Glassmorphism */
+        .glass-nav {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-        .loader { width: 50px; height: 50px; border: 5px solid #1e293b; border-top-color: #6366f1; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .product-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 2rem;
+            transition: all 0.4s ease;
+        }
 
-        /* ستايل العداد */
-        .qty-badge { font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; }
-        .qty-badge.in-stock { background: rgba(99, 102, 241, 0.1); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.2); }
-        .qty-badge.low-stock { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); animate: pulse 1s infinite; }
-        
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        .product-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.07);
+            border-color: #6366f1;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .img-box {
+            height: 250px;
+            overflow: hidden;
+            border-radius: 1.5rem;
+            margin: 10px;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+        }
+
+        .product-card:hover .product-img {
+            scale: 1.1;
+        }
+
+        /* عداد الكمية الذكي */
+        .qty-tag {
+            font-size: 11px;
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+            padding: 4px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        /* قسم الإنستا الفخم */
+        .insta-glass {
+            background: linear-gradient(135deg, rgba(240, 148, 51, 0.1), rgba(188, 24, 136, 0.1));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 2.5rem;
+        }
+
+        .insta-btn {
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            transition: 0.3s;
+        }
+
+        .insta-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(220, 39, 67, 0.4);
+        }
     </style>
 </head>
-<body class="min-h-screen">
+<body>
 
-    <nav class="sticky top-0 z-50 glass-header px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-5">
+    <nav class="sticky top-0 z-50 glass-nav px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="flex items-center gap-3">
-            <div class="w-11 h-11 bg-indigo-600 rounded-2xl flex items-center justify-center">
-                <i class="fas fa-wind text-white text-xl"></i>
+            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/50">
+                <i class="fas fa-wind text-white text-lg"></i>
             </div>
-            <h1 class="text-2xl font-black italic tracking-tighter text-white underline decoration-indigo-500/30">LUX<span class="text-indigo-500">_</span>VAIP</h1>
+            <h1 class="text-2xl font-black italic tracking-tighter">LUX<span class="text-indigo-500">_</span>VAIP</h1>
         </div>
-
-        <div class="relative w-full md:w-[450px]">
-            <input type="text" id="searchBox" oninput="filterData()" 
-                   class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-3.5 px-12 text-sm outline-none focus:ring-2 ring-indigo-500/50 text-white" 
-                   placeholder="ابحث عن نكهة أو جهاز ڤيب...">
+        
+        <div class="relative w-full md:w-96">
+            <input type="text" id="searchBox" oninput="filterProducts()" 
+                   class="w-full bg-slate-900/50 border border-white/10 rounded-xl py-2.5 px-10 text-sm outline-none focus:border-indigo-500 transition-all" 
+                   placeholder="ابحث عن نكهتك المفضلة...">
             <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
         </div>
     </nav>
 
-    <main class="container mx-auto px-6 py-16">
-        <div id="loading" class="flex flex-col items-center justify-center py-20">
-            <div class="loader mb-4"></div>
-            <p class="text-slate-500 font-bold italic">جاري تحميل أحدث المنتجات...</p>
+    <main class="container mx-auto px-6 py-10">
+        <div id="loading" class="text-center py-20">
+            <div class="inline-block w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            <p class="mt-4 text-slate-400 font-bold italic">جاري تحميل المتجر...</p>
         </div>
 
-        <div id="mainGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
+        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </main>
 
-    <footer class="py-12 text-center border-t border-slate-900/50">
-        <p class="text-slate-600 text-[10px] font-bold italic tracking-widest mb-1">LUX_VAIP PREMIUM STORE &copy; 2026</p>
-        <p class="text-white text-xs font-black italic tracking-tighter border-t border-indigo-500/20 inline-block pt-2">DEVELOPED & DESIGNED BY <span class="text-indigo-500">Abdullah-Abd-Alsalam</span> 🌟</p>
+    <section class="container mx-auto px-6 mb-20">
+        <div class="insta-glass p-10 text-center">
+            <i class="fab fa-instagram text-5xl mb-4 bg-gradient-to-tr from-yellow-400 to-purple-600 bg-clip-text text-transparent font-black"></i>
+            <h2 class="text-2xl font-black italic mb-2">تابعنا للحصول على العروض</h2>
+            <p class="text-slate-400 text-sm mb-6">أحدث النكهات والأجهزة توصل للديوانية أول بأول</p>
+            <a href="https://www.instagram.com/lux_vape.iq?igsh=YTU0cWVpNDh5eHBh" target="_blank" 
+               class="insta-btn text-white px-10 py-3 rounded-2xl font-black inline-flex items-center gap-2">
+                @lux_vape.iq <i class="fas fa-external-link-alt text-xs"></i>
+            </a>
+        </div>
+    </section>
+
+    <footer class="py-10 text-center border-t border-white/5">
+        <p class="text-slate-500 text-[10px] font-bold tracking-widest uppercase mb-2">LUX_VAIP Store &copy; 2026</p>
+        <p class="text-white text-xs font-black italic tracking-tighter">
+            DEVELOPED BY <span class="text-indigo-500 underline">Abdullah-Abd-Alsalam</span> 🌟
+        </p>
     </footer>
 
     <script>
-        // إعدادات Firebase
+        // إعدادات Firebase الخاصة بك
         const firebaseConfig = {
             apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc",
             authDomain: "lux-vaip.firebaseapp.com",
@@ -81,50 +146,47 @@
             measurementId: "G-NET3PPRG11",
             databaseURL: "https://lux-vaip-default-rtdb.firebaseio.com/"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let allItems = [];
+        let allProducts = [];
 
-        // مزامنة البيانات من مخزن مصطفى وحسوني
+        // جلب البيانات
         db.ref('luxVaipData').on('value', (snapshot) => {
             const data = snapshot.val();
-            allItems = [];
+            allProducts = [];
             document.getElementById('loading').style.display = 'none';
 
             if(data) {
-                if(data.mustafa && data.mustafa.products) data.mustafa.products.forEach(p => allItems.push(p));
-                if(data.hussouni && data.hussouni.products) data.hussouni.products.forEach(p => allItems.push(p));
-                render(allItems);
+                if(data.mustafa && data.mustafa.products) data.mustafa.products.forEach(p => allProducts.push(p));
+                if(data.hussouni && data.hussouni.products) data.hussouni.products.forEach(p => allProducts.push(p));
+                render(allProducts);
             }
         });
 
         function render(list) {
-            const grid = document.getElementById('mainGrid');
+            const grid = document.getElementById('productsGrid');
             grid.innerHTML = '';
             list.forEach(p => {
                 if(p.qty > 0) {
-                    const qtyStatus = p.qty <= 3 ? 'low-stock' : 'in-stock';
-                    const qtyText = p.qty <= 3 ? `🔥 متوفر ${p.qty} فقط!` : `💎 متوفر ${p.qty} قطع`;
-                    
                     grid.innerHTML += `
-                        <div class="product-card flex flex-col h-full relative group">
-                            <div class="img-container">
-                                <img src="${p.img}" class="product-img" onerror="this.src='https://via.placeholder.com/400x400?text=No+Image'">
+                        <div class="product-card flex flex-col h-full">
+                            <div class="img-box">
+                                <img src="${p.img}" class="product-img" onerror="this.src='https://via.placeholder.com/400'">
                             </div>
                             <div class="p-6 pt-2 flex flex-col flex-grow text-right">
-                                <h3 class="text-xl font-bold mb-1 italic line-clamp-1">${p.name}</h3>
-                                <div class="mb-5 flex justify-end">
-                                    <span class="qty-badge ${qtyStatus}">${qtyText}</span>
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="qty-tag font-bold italic">متوفر: ${p.qty} قطعة</span>
                                 </div>
-                                <div class="mt-auto flex justify-between items-center border-t border-slate-800 pt-5 pb-1">
+                                <h3 class="text-xl font-black mb-4 italic line-clamp-1">${p.name}</h3>
+                                
+                                <div class="mt-auto flex justify-between items-center border-t border-white/10 pt-4">
                                     <div class="flex flex-col">
-                                        <span class="text-xs text-indigo-400 font-bold tracking-tighter">السعر</span>
-                                        <span class="text-xl font-black text-white">${Number(p.sell).toLocaleString()} <small class="text-[10px] text-slate-500 italic">د.ع</small></span>
+                                        <span class="text-indigo-400 text-[10px] font-bold uppercase tracking-tighter">السعر</span>
+                                        <span class="text-xl font-black">${Number(p.sell).toLocaleString()} <small class="text-[10px] text-slate-500 italic">د.ع</small></span>
                                     </div>
                                     <button onclick="orderWA('${p.name}', '${p.sell}')" 
-                                            class="order-btn text-white px-6 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 active:scale-95">
-                                        اطلب <i class="fab fa-whatsapp"></i>
+                                            class="bg-green-600 hover:bg-green-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-lg shadow-green-500/20">
+                                        اطلب الآن <i class="fab fa-whatsapp ml-1"></i>
                                     </button>
                                 </div>
                             </div>
@@ -133,16 +195,14 @@
             });
         }
 
-        function filterData() {
+        function filterProducts() {
             const q = document.getElementById('searchBox').value.toLowerCase();
-            const filtered = allItems.filter(i => i.name.toLowerCase().includes(q));
-            render(filtered);
+            render(allProducts.filter(p => p.name.toLowerCase().includes(q)));
         }
 
         function orderWA(name, price) {
-            const phone = "9647807483170";
-            const msg = `مرحباً LUX_VAIP 💨\n\nأريد طلب المنتج التالي:\n━━━━━━━━━━━━\n📦 الاسم: ${name}\n💰 السعر: ${Number(price).toLocaleString()} د.ع\n━━━━━━━━━━━━`;
-            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`);
+            const msg = `مرحباً LUX_VAIP 💨\n\nأريد طلب المنتج التالي:\n📦 الاسم: ${name}\n💰 السعر: ${Number(price).toLocaleString()} د.ع\n\nيرجى تأكيد الحجز.`;
+            window.open(`https://wa.me/9647807483170?text=${encodeURIComponent(msg)}`);
         }
     </script>
 </body>
