@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة LUX_VAIP | تحكم كامل</title>
+    <title>إدارة LUX_VAIP | الديون والمنتجات</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,17 +15,16 @@
         input, select, textarea { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; }
         table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
         td { background: white; padding: 12px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
-        .edit-badge { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
-        .edit-badge:hover { background: #c7d2fe; }
-        .btn-sell { background: #22c55e; color: white; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; transition: 0.2s; }
-        .btn-sell:disabled { background: #cbd5e1; cursor: not-allowed; opacity: 0.5; }
+        .edit-badge { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-block; margin-top: 4px; }
+        .btn-sell { background: #22c55e; color: white; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; }
+        .debt-card { background: #fff1f2; border-right: 5px solid #e11d48; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <div id="loginSection" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-6 text-center">
+    <div id="loginSection" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center text-center">
         <div class="bg-white p-8 rounded-3xl w-full max-w-sm">
-            <h2 class="text-2xl font-black mb-4 italic text-indigo-600">LUX ADMIN</h2>
+            <h2 class="text-2xl font-black mb-4 italic text-indigo-600 underline">LUX ADMIN</h2>
             <input type="password" id="passInput" class="text-center mb-4" placeholder="رمز الدخول">
             <button onclick="login()" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-black">دخول</button>
         </div>
@@ -33,13 +32,33 @@
 
     <div id="mainSection" style="display:none;">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">بضاعة المخزن</p> <h2 id="totalQty" class="text-xl font-black">0</h2> </div>
-            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المبيعات (بجيبك)</p> <h2 id="soldProfit" class="text-xl font-black text-green-600">0</h2> </div>
-            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">قيمة المخزن</p> <h2 id="totalValue" class="text-xl font-black">0</h2> </div>
+            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المبيعات</p> <h2 id="soldProfit" class="text-xl font-black text-green-600">0</h2> </div>
+            <div class="stat-card debt-card"> <p class="text-rose-600 text-[10px] font-bold">إجمالي الديون</p> <h2 id="totalDebts" class="text-xl font-black text-rose-600">0</h2> </div>
+            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">قطع المخزن</p> <h2 id="totalQty" class="text-xl font-black">0</h2> </div>
             <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المخزن</p> <h2 id="totalProfit" class="text-xl font-black text-amber-600">0</h2> </div>
         </div>
 
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-8 border border-rose-100">
+            <h3 class="font-black mb-4 text-rose-600"><i class="fas fa-user-minus"></i> إضافة سجل دين جديد</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input type="text" id="debt_name" placeholder="اسم الشخص">
+                <input type="number" id="debt_amount" placeholder="المبلغ (د.ع)">
+                <button onclick="addDebt()" class="bg-rose-600 text-white font-black rounded-xl py-2">تسجيل الدين</button>
+            </div>
+        </div>
+
+        <div class="mb-10 overflow-x-auto">
+            <h3 class="font-black mb-4"><i class="fas fa-book text-rose-600"></i> قائمة الأشخاص المديونين</h3>
+            <table class="min-w-full">
+                <thead><tr class="text-xs text-slate-400"><th>الاسم</th> <th>المبلغ</th> <th>تحكم بالمبلغ</th> <th>حذف</th></tr></thead>
+                <tbody id="debtTableBody"></tbody>
+            </table>
+        </div>
+
+        <hr class="my-10 border-slate-200">
+
         <div class="bg-white p-6 rounded-2xl shadow-sm mb-8 border">
+            <h3 class="font-black mb-4 text-indigo-600 italic">إضافة بضاعة</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 <input type="text" id="p_name" placeholder="اسم المنتج">
                 <label class="bg-slate-100 p-2.5 rounded-xl text-center text-xs cursor-pointer">📸 صورة <input type="file" id="p_file" accept="image/*" class="hidden" onchange="previewImage(this)"></label>
@@ -53,18 +72,14 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table>
+            <table class="min-w-full">
                 <thead>
-                    <tr class="text-xs text-slate-400 uppercase">
-                        <th>المنتج</th> <th>المخزن</th> <th>الكمية</th> <th>السعر (بيع)</th> <th>الربح/ق</th> <th>إجراء</th> <th>حذف</th>
+                    <tr class="text-xs text-slate-400 uppercase text-right">
+                        <th>المنتج والوصف</th> <th>المخزن</th> <th>الكمية</th> <th>السعر</th> <th>إجراء</th> <th>حذف</th>
                     </tr>
                 </thead>
                 <tbody id="pTableBody"></tbody>
             </table>
-        </div>
-        
-        <div class="mt-10 text-center">
-            <button onclick="resetSales()" class="text-red-500 text-xs underline font-bold">تصفير أرباح المبيعات اليوم</button>
         </div>
     </div>
 
@@ -94,69 +109,99 @@
         function fetchData() {
             db.ref('luxVaipData').on('value', (snap) => {
                 const data = snap.val();
-                const tbody = document.getElementById('pTableBody');
-                tbody.innerHTML = '';
-                let tQty = 0, tProfit = 0, tValue = 0;
-                let sProfit = data?.salesProfit || 0;
-
-                if(data) {
-                    ['mustafa', 'hussouni'].forEach(owner => {
-                        if(data[owner]?.products) {
-                            data[owner].products.forEach((p, idx) => {
-                                const profitPerPiece = p.sell - (p.cost || 0);
-                                tQty += Number(p.qty); tValue += (p.sell * p.qty); tProfit += (profitPerPiece * p.qty);
-
-                                tbody.innerHTML += `
-                                    <tr>
-                                        <td>
-                                            <div class="flex items-center gap-2">
-                                                <img src="${p.img}" class="w-8 h-8 rounded object-cover">
-                                                <div class="font-bold text-sm">${p.name}</div>
-                                            </div>
-                                        </td>
-                                        <td class="text-[10px] font-bold text-slate-400 uppercase">${owner}</td>
-                                        <td>
-                                            <div class="flex flex-col items-center">
-                                                <span class="font-black ${p.qty <= 0 ? 'text-red-500':'text-indigo-600'}">${p.qty}</span>
-                                                <span onclick="editField('${owner}', ${idx}, 'qty', ${p.qty})" class="edit-badge">تعديل</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="flex flex-col items-center text-sm">
-                                                <span class="font-bold">${Number(p.sell).toLocaleString()}</span>
-                                                <span onclick="editField('${owner}', ${idx}, 'sell', ${p.sell})" class="edit-badge">تعديل</span>
-                                            </div>
-                                        </td>
-                                        <td class="text-green-600 font-bold text-xs">+${profitPerPiece.toLocaleString()}</td>
-                                        <td><button onclick="sellPiece('${owner}', ${idx}, ${p.qty}, ${profitPerPiece})" class="btn-sell" ${p.qty <= 0 ? 'disabled':''}>تم البيع</button></td>
-                                        <td><button onclick="delItem('${owner}', ${idx})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash text-xs"></i></button></td>
-                                    </tr>`;
-                            });
-                        }
-                    });
-                }
-                document.getElementById('totalQty').innerText = tQty;
-                document.getElementById('totalValue').innerText = tValue.toLocaleString();
-                document.getElementById('totalProfit').innerText = tProfit.toLocaleString();
-                document.getElementById('soldProfit').innerText = sProfit.toLocaleString();
+                renderProducts(data);
+                renderDebts(data?.debts);
             });
         }
 
-        // دالة التعديل المباشر (للكتلة، السعر، أو أي حقل)
+        function renderProducts(data) {
+            const tbody = document.getElementById('pTableBody');
+            tbody.innerHTML = '';
+            let tQty = 0, tProfit = 0;
+            if(data) {
+                ['mustafa', 'hussouni'].forEach(owner => {
+                    if(data[owner]?.products) {
+                        data[owner].products.forEach((p, idx) => {
+                            tQty += Number(p.qty); tProfit += (p.sell - p.cost) * p.qty;
+                            tbody.innerHTML += `
+                                <tr>
+                                    <td>
+                                        <div class="flex items-center gap-2">
+                                            <img src="${p.img}" class="w-8 h-8 rounded object-cover">
+                                            <div>
+                                                <div class="font-bold text-xs">${p.name}</div>
+                                                <div class="text-[10px] text-slate-400 italic">${p.desc || 'لا يوجد وصف'}</div>
+                                                <span onclick="editField('${owner}', ${idx}, 'desc', '${p.desc || ''}')" class="edit-badge">تعديل الوصف</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-[10px] font-bold text-slate-400">${owner}</td>
+                                    <td class="text-center font-black"><span class="${p.qty<=0?'text-red-500':'text-indigo-600'}">${p.qty}</span><br><span onclick="editField('${owner}', ${idx}, 'qty', ${p.qty})" class="edit-badge">تعديل</span></td>
+                                    <td class="text-center text-xs font-bold">${Number(p.sell).toLocaleString()}<br><span onclick="editField('${owner}', ${idx}, 'sell', ${p.sell})" class="edit-badge">تعديل</span></td>
+                                    <td><button onclick="sellPiece('${owner}', ${idx}, ${p.qty}, ${p.sell-p.cost})" class="btn-sell" ${p.qty<=0?'disabled':''}>بيع</button></td>
+                                    <td><button onclick="delItem('${owner}', ${idx})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash"></i></button></td>
+                                </tr>`;
+                        });
+                    }
+                });
+            }
+            document.getElementById('totalQty').innerText = tQty;
+            document.getElementById('totalProfit').innerText = tProfit.toLocaleString();
+            document.getElementById('soldProfit').innerText = (data?.salesProfit || 0).toLocaleString();
+        }
+
+        function renderDebts(debts) {
+            const tbody = document.getElementById('debtTableBody');
+            tbody.innerHTML = '';
+            let total = 0;
+            if(debts) {
+                Object.keys(debts).forEach(id => {
+                    total += Number(debts[id].amount);
+                    tbody.innerHTML += `
+                        <tr class="text-right">
+                            <td class="font-bold text-slate-700">${debts[id].name}</td>
+                            <td class="font-black text-rose-600">${Number(debts[id].amount).toLocaleString()} د.ع</td>
+                            <td>
+                                <button onclick="updateDebt('${id}', ${debts[id].amount}, 5000)" class="bg-green-100 text-green-700 px-2 rounded text-xs">+5</button>
+                                <button onclick="updateDebt('${id}', ${debts[id].amount}, -5000)" class="bg-rose-100 text-rose-700 px-2 rounded text-xs">-5</button>
+                                <button onclick="customDebt('${id}', ${debts[id].amount})" class="bg-slate-100 text-slate-700 px-2 rounded text-xs">رقم مخصص</button>
+                            </td>
+                            <td><button onclick="deleteDebt('${id}')" class="text-slate-300 hover:text-red-500"><i class="fas fa-times-circle"></i></button></td>
+                        </tr>`;
+                });
+            }
+            document.getElementById('totalDebts').innerText = total.toLocaleString();
+        }
+
+        // دوال التحكم بالديون
+        function addDebt() {
+            const name = document.getElementById('debt_name').value;
+            const amount = Number(document.getElementById('debt_amount').value);
+            if(name && amount) {
+                db.ref('luxVaipData/debts').push({ name, amount });
+                document.getElementById('debt_name').value = ''; document.getElementById('debt_amount').value = '';
+            }
+        }
+        function updateDebt(id, current, change) { db.ref(`luxVaipData/debts/${id}/amount`).set(current + change); }
+        function customDebt(id, current) {
+            const val = prompt("أدخل المبلغ الجديد كلياً:", current);
+            if(val !== null) db.ref(`luxVaipData/debts/${id}/amount`).set(Number(val));
+        }
+        function deleteDebt(id) { if(confirm("حذف سجل الدين؟")) db.ref(`luxVaipData/debts/${id}`).remove(); }
+
+        // تعديل حقول المنتجات (كمية، سعر، وصف)
         function editField(owner, idx, field, currentVal) {
-            const label = field === 'qty' ? 'الكمية الجديدة' : 'سعر البيع الجديد';
-            const newVal = prompt(`تعديل ${label}:`, currentVal);
-            if(newVal !== null && newVal !== "") {
-                db.ref(`luxVaipData/${owner}/products/${idx}/${field}`).set(Number(newVal));
+            const newVal = prompt(`تعديل ${field}:`, currentVal);
+            if(newVal !== null) {
+                const finalVal = (field === 'qty' || field === 'sell') ? Number(newVal) : newVal;
+                db.ref(`luxVaipData/${owner}/products/${idx}/${field}`).set(finalVal);
             }
         }
 
         function sellPiece(owner, idx, currentQty, profit) {
             if(currentQty > 0) {
                 db.ref(`luxVaipData/${owner}/products/${idx}/qty`).set(currentQty - 1);
-                db.ref(`luxVaipData/salesProfit`).once('value', (s) => {
-                    db.ref(`luxVaipData/salesProfit`).set((s.val() || 0) + profit);
-                });
+                db.ref(`luxVaipData/salesProfit`).once('value', (s) => db.ref(`luxVaipData/salesProfit`).set((s.val() || 0) + profit));
             }
         }
 
@@ -176,8 +221,6 @@
                 db.ref(`luxVaipData/${owner}/products`).set(list).then(() => location.reload());
             });
         }
-
-        function resetSales() { if(confirm("تصفير أرباح اليوم؟")) db.ref(`luxVaipData/salesProfit`).set(0); }
         function delItem(owner, idx) { if(confirm("حذف؟")) { db.ref(`luxVaipData/${owner}/products`).once('value', (snap) => { let list = snap.val(); list.splice(idx, 1); db.ref(`luxVaipData/${owner}/products`).set(list); }); } }
     </script>
 </body>
