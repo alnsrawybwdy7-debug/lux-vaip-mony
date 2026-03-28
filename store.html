@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر LUX_VAIP | الفخامة في كل سحبة</title>
+    <title>Lux Vape | الفخامة في كل سحبة</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,101 +19,70 @@
             overflow-x: hidden;
         }
 
-        /* النص المائي الخلفي */
         .bg-text {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-10deg);
-            font-size: 20vw;
-            font-weight: 900;
-            color: rgba(99, 102, 241, 0.03);
-            z-index: -1;
-            white-space: nowrap;
-            user-select: none;
-            pointer-events: none;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg);
+            font-size: 18vw; font-weight: 900; color: rgba(99, 102, 241, 0.03);
+            z-index: -1; white-space: nowrap; user-select: none; pointer-events: none; text-transform: uppercase;
         }
 
         .glass-card {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 2.5rem;
-            transition: all 0.4s ease;
-        }
-
-        .glass-card:hover {
-            transform: translateY(-10px);
-            border-color: #6366f1;
-            box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.2);
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 2.5rem; transition: 0.4s ease;
         }
 
         .img-container {
-            height: 260px;
-            overflow: hidden;
-            border-radius: 2rem;
-            margin: 12px;
-            background: #0f172a;
+            height: 260px; overflow: hidden; border-radius: 2rem; margin: 12px; background: #0f172a; cursor: zoom-in;
         }
 
-        .product-img {
-            width: 100%; height: 100%; object-fit: cover; transition: 0.6s;
-        }
-
+        .product-img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
         .glass-card:hover .product-img { transform: scale(1.1); }
 
-        .insta-btn {
-            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+        /* ستايل نافذة تكبير الصورة */
+        #imageModal {
+            display: none; position: fixed; inset: 0; z-index: 100;
+            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px);
+            align-items: center; justify-content: center; padding: 20px;
         }
+        #modalImg { max-width: 100%; max-height: 90vh; border-radius: 1rem; box-shadow: 0 0 50px rgba(99, 102, 241, 0.3); }
+
+        .insta-btn { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <div class="bg-text">لوكس فيب</div>
+    <div class="bg-text">Lux Vape</div>
+
+    <div id="imageModal" onclick="closeImg()">
+        <button class="absolute top-5 right-5 text-white text-3xl"><i class="fas fa-times"></i></button>
+        <img id="modalImg" src="" alt="Full View">
+    </div>
 
     <nav class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/5 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/50">
                 <i class="fas fa-wind text-white"></i>
             </div>
-            <h1 class="text-2xl font-black italic">LUX<span class="text-indigo-500">_</span>VAIP</h1>
+            <h1 class="text-2xl font-black italic tracking-tighter">Lux <span class="text-indigo-500">Vape</span></h1>
         </div>
-        
         <div class="relative w-full md:w-96">
             <input type="text" id="search" oninput="doSearch()" 
-                   class="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 px-10 text-sm outline-none focus:border-indigo-500 transition-all text-right" 
+                   class="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 px-10 text-sm outline-none focus:border-indigo-500 text-right" 
                    placeholder="ابحث عن نكهة أو جهاز...">
             <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
         </div>
     </nav>
 
     <main class="container mx-auto px-6 py-12">
-        <div id="loader" class="text-center py-20 font-bold italic text-slate-500 text-xl">
-            جاري تحميل المنتجات الفاخرة...
-        </div>
+        <div id="loader" class="text-center py-20 font-bold italic text-slate-500 text-xl">جاري تحميل منتجات Lux Vape...</div>
         <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 text-right"></div>
     </main>
 
-    <section class="container mx-auto px-6 mb-20">
-        <div class="bg-white/5 backdrop-blur-md p-10 rounded-[3rem] text-center border border-white/5">
-            <i class="fab fa-instagram text-5xl mb-4 text-pink-500"></i>
-            <h2 class="text-2xl font-black mb-2 italic text-white">تابعنا على إنستقرام</h2>
-            <p class="text-slate-400 text-sm mb-6">أحدث العروض والمنتجات توصلك أول بأول</p>
-            <a href="https://www.instagram.com/lux_vape.iq" target="_blank" 
-               class="insta-btn text-white px-10 py-3 rounded-2xl font-black inline-flex items-center gap-2">
-                @lux_vape.iq <i class="fas fa-external-link-alt text-xs"></i>
-            </a>
-        </div>
-    </section>
-
     <footer class="py-10 text-center border-t border-white/5">
-        <p class="text-white text-xs font-black italic">
-            تصميم وتطوير: <span class="text-indigo-500 underline">عبد الله عبد السلام</span> 🌟
-        </p>
+        <a href="https://www.instagram.com/lux_vape.iq" target="_blank" class="insta-btn text-white px-8 py-2 rounded-xl font-black text-xs inline-flex items-center gap-2 mb-6">@lux_vape.iq</a>
+        <p class="text-white text-[10px] font-black italic">تصميم وتطوير: <span class="text-indigo-500 underline">عبد الله عبد السلام</span></p>
     </footer>
 
     <script>
-        // إعدادات Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc",
             authDomain: "lux-vaip.firebaseapp.com",
@@ -143,38 +112,44 @@
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
             list.forEach(p => {
-                if(p.qty > 0) {
-                    grid.innerHTML += `
-                        <div class="glass-card flex flex-col h-full overflow-hidden">
-                            <div class="img-container">
-                                <img src="${p.img}" class="product-img">
-                            </div>
-                            <div class="p-6 pt-2 flex flex-col flex-grow">
-                                <div class="mb-3">
-                                    <span class="bg-indigo-500/10 text-indigo-400 text-[10px] font-bold px-3 py-1 rounded-lg border border-indigo-500/20">
-                                        المتوفر: ${p.qty} قطعة
-                                    </span>
+                const isOut = p.qty <= 0;
+                grid.innerHTML += `
+                    <div class="glass-card flex flex-col h-full overflow-hidden">
+                        <div class="img-container" onclick="openImg('${p.img}')">
+                            <img src="${p.img}" class="product-img">
+                        </div>
+                        <div class="p-6 pt-2 flex flex-col flex-grow">
+                            <span class="text-[10px] font-bold px-3 py-1 rounded-lg border mb-3 inline-block w-fit ${isOut ? 'text-red-400 border-red-500/20' : 'text-indigo-400 border-indigo-500/20'}">
+                                ${isOut ? 'نفذت الكمية' : 'المتوفر: ' + p.qty}
+                            </span>
+                            <h3 class="text-xl font-black mb-1 italic text-white">${p.name}</h3>
+                            <p class="text-slate-400 text-xs mb-6 italic">${p.desc || 'نكهة فاخرة من Lux Vape'}</p>
+                            <div class="mt-auto flex justify-between items-center border-t border-white/5 pt-5">
+                                <div class="text-right">
+                                    <span class="text-slate-500 text-[10px] font-bold uppercase">السعر</span>
+                                    <div class="text-xl font-black text-white">${Number(p.sell).toLocaleString()} <small class="text-indigo-500 text-[10px]">IQD</small></div>
                                 </div>
-                                <h3 class="text-xl font-black mb-1 italic text-white">${p.name}</h3>
-                                
-                                <p class="text-slate-400 text-xs mb-6 italic leading-relaxed">
-                                    ${p.desc ? p.desc : 'نكهة فاخرة وجودة عالية من لوكس فيب'}
-                                </p>
-                                
-                                <div class="mt-auto flex justify-between items-center border-t border-white/5 pt-5">
-                                    <div class="flex flex-col">
-                                        <span class="text-slate-500 text-[10px] font-bold">السعر</span>
-                                        <span class="text-xl font-black text-white">${Number(p.sell).toLocaleString()} <small class="text-[10px] text-indigo-500">د.ع</small></span>
-                                    </div>
-                                    <button onclick="orderWA('${p.name}', '${p.sell}')" 
-                                            class="bg-green-600 hover:bg-green-500 text-white px-5 py-2.5 rounded-xl text-xs font-black transition-all shadow-lg shadow-green-600/20">
-                                        اطلب الآن <i class="fab fa-whatsapp mr-1"></i>
-                                    </button>
-                                </div>
+                                <button onclick="${isOut ? '' : `orderWA('${p.name}', '${p.sell}')`}" 
+                                        class="${isOut ? 'bg-slate-800' : 'bg-green-600 hover:scale-105'} text-white px-5 py-2.5 rounded-xl text-xs font-black transition-all">
+                                    ${isOut ? 'قريباً' : 'اطلب الآن'}
+                                </button>
                             </div>
-                        </div>`;
-                }
+                        </div>
+                    </div>`;
             });
+        }
+
+        // دالة فتح الصورة الكبيرة
+        function openImg(src) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImg');
+            modalImg.src = src;
+            modal.style.display = 'flex';
+        }
+
+        // دالة إغلاق الصورة
+        function closeImg() {
+            document.getElementById('imageModal').style.display = 'none';
         }
 
         function doSearch() {
@@ -183,8 +158,8 @@
         }
 
         function orderWA(n, p) {
-            const m = `مرحباً LUX_VAIP 💨\n\nأريد طلب:\n📦 المنتج: ${n}\n💰 السعر: ${Number(p).toLocaleString()} د.ع\n---`;
-            window.open(`https://wa.me/9647708587628?text=${encodeURIComponent(m)}`);
+            const m = `مرحباً Lux Vape 💨\n\nأريد طلب:\n📦 المنتج: ${n}\n💰 السعر: ${Number(p).toLocaleString()} د.ع`;
+            window.open(`https://wa.me/9647807483170?text=${encodeURIComponent(m)}`);
         }
     </script>
 </body>
