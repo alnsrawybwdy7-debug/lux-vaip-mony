@@ -3,144 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة متجر Lux Vape</title>
+    <title>نظام إدارة Lux Vape</title>
     <style>
-        :root { --primary: #ff9800; --dark: #1a1a1a; --text: #ffffff; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--dark); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; }
-        h1 { text-align: center; color: var(--primary); }
+        :root { --primary: #ff9800; --dark: #121212; --card: #1e1e1e; --text: #e0e0e0; }
+        body { font-family: 'Cairo', sans-serif; background: var(--dark); color: var(--text); margin: 0; padding: 10px; }
+        .nav-bar { display: flex; justify-content: space-around; background: var(--card); padding: 10px; border-radius: 10px; margin-bottom: 20px; position: sticky; top: 0; z-index: 100; }
+        .nav-item { cursor: pointer; padding: 8px 15px; border-radius: 5px; font-weight: bold; transition: 0.3s; }
+        .nav-item.active { background: var(--primary); color: #000; }
         
-        /* أقسام الإدارة */
-        .admin-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .card { background: #2a2a2a; padding: 15px; border-radius: 10px; border-bottom: 4px solid var(--primary); text-align: center; }
-        .card h3 { margin: 0; font-size: 14px; color: #bbb; }
-        .card p { font-size: 20px; font-weight: bold; margin: 10px 0; }
+        .section { display: none; }
+        .section.active { display: block; }
 
-        /* قائمة المنتجات */
-        .product-item { background: #2a2a2a; padding: 15px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .product-info { flex-grow: 1; }
-        .product-info h4 { margin: 0; color: var(--primary); }
-        .description-box { width: 100%; background: #333; color: #fff; border: 1px solid #444; border-radius: 5px; padding: 5px; margin-top: 5px; height: 50px; }
+        .card { background: var(--card); padding: 15px; border-radius: 10px; margin-bottom: 15px; border-right: 5px solid var(--primary); }
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none; background: #333; color: #fff; box-sizing: border-box; }
         
-        /* أزرار البيع */
-        .btn-group { display: flex; gap: 5px; }
-        button { cursor: pointer; border: none; border-radius: 5px; padding: 8px 12px; font-weight: bold; transition: 0.3s; }
-        .btn-cash { background-color: #4caf50; color: white; }
-        .btn-debt { background-color: #f44336; color: white; }
-        .btn-save { background-color: var(--primary); color: white; margin-top: 5px; width: 100%; }
-        button:hover { opacity: 0.8; transform: scale(1.05); }
+        button { width: 100%; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-add { background: #4caf50; color: white; }
+        .btn-pay { background: #2196f3; color: white; margin-top: 5px; }
+        .btn-del { background: #f44336; color: white; padding: 5px; width: auto; }
 
-        .log-section { margin-top: 40px; background: #222; padding: 15px; border-radius: 10px; font-size: 13px; }
+        .debt-item { display: flex; justify-content: space-between; align-items: center; background: #252525; padding: 10px; margin-top: 5px; border-radius: 5px; }
+        .balance-tag { color: var(--primary); font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>LUX VAPE - لوحة الإدارة</h1>
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="showSection('home')">الرئيسية</div>
+        <div class="nav-item" onclick="showSection('hassouni')">حسوني</div>
+        <div class="nav-item" onclick="showSection('mustafa')">مصطفى</div>
+        <div class="nav-item" onclick="showSection('debts')">الديون</div>
+    </div>
 
-    <div class="admin-dashboard">
+    <div id="home" class="section active">
         <div class="card">
-            <h3>قسم النقدي (الأرباح)</h3>
-            <p id="cashBalance">0 د.ع</p>
-        </div>
-        <div class="card">
-            <h3>قسم الديون</h3>
-            <p id="debtBalance">0 د.ع</p>
-        </div>
-        <div class="card">
-            <h3>حساب حسوني</h3>
-            <p id="hassouniBalance">0 د.ع</p>
-        </div>
-        <div class="card">
-            <h3>حساب مصطفى</h3>
-            <p id="mustafaBalance">0 د.ع</p>
+            <h3>إضافة منتج جديد</h3>
+            <input type="text" id="pName" placeholder="اسم المنتج">
+            <input type="number" id="pPrice" placeholder="سعر البيع">
+            <input type="number" id="pProfit" placeholder="الربح الصافي">
+            <select id="pOwner">
+                <option value="hassouni">تابع لحسوني</option>
+                <option value="mustafa">تابع لمصطفى</option>
+            </select>
+            <textarea id="pDesc" placeholder="وصف المنتج"></textarea>
+            <button class="btn-add" onclick="addProduct()">إضافة للمخزن</button>
         </div>
     </div>
 
-    <div id="productList">
-        <h2>المنتجات والبيع</h2>
-        </div>
-
-    <div class="log-section">
-        <h3>سجل العمليات الأخيرة</h3>
-        <ul id="transactionLog"></ul>
+    <div id="hassouni" class="section">
+        <h2>منتجات حسوني</h2>
+        <div id="hassouniList"></div>
     </div>
-</div>
+
+    <div id="mustafa" class="section">
+        <h2>منتجات مصطفى</h2>
+        <div id="mustafaList"></div>
+    </div>
+
+    <div id="debts" class="section">
+        <div class="card">
+            <h3>إضافة دين جديد</h3>
+            <input type="text" id="debtorName" placeholder="اسم الشخص">
+            <input type="number" id="debtAmount" placeholder="المبلغ">
+            <button class="btn-add" onclick="addDebt()">تسجيل الدين</button>
+        </div>
+        <h3>سجل المديونين</h3>
+        <div id="debtsList"></div>
+    </div>
 
 <script>
-    // بيانات المنتجات التجريبية (يمكنك تغييرها لاحقاً)
-    let products = [
-        { id: 1, name: "فيب مود 200 واط", price: 75000, profit: 10000, desc: "وصف المنتج هنا..." },
-        { id: 2, name: "نكهة ناستي 60 مل", price: 15000, profit: 3000, desc: "وصف النكهة..." }
-    ];
-
-    // جلب البيانات المخزنة
-    let accounts = JSON.parse(localStorage.getItem('vapeAccounts')) || {
-        cash: 0, debt: 0, hassouni: 0, mustafa: 0, logs: []
+    let data = JSON.parse(localStorage.getItem('luxData')) || {
+        products: [],
+        debts: []
     };
 
-    function updateUI() {
-        document.getElementById('cashBalance').innerText = accounts.cash.toLocaleString() + " د.ع";
-        document.getElementById('debtBalance').innerText = accounts.debt.toLocaleString() + " د.ع";
-        document.getElementById('hassouniBalance').innerText = accounts.hassouni.toLocaleString() + " د.ع";
-        document.getElementById('mustafaBalance').innerText = accounts.mustafa.toLocaleString() + " د.ع";
+    function showSection(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+        renderData();
+    }
+
+    function addProduct() {
+        const name = document.getElementById('pName').value;
+        const price = document.getElementById('pPrice').value;
+        const profit = document.getElementById('pProfit').value;
+        const owner = document.getElementById('pOwner').value;
+        const desc = document.getElementById('pDesc').value;
+
+        if(!name || !price) return alert("امسح الحقول الفارغة!");
+
+        data.products.push({ id: Date.now(), name, price, profit, owner, desc });
+        saveAndRefresh();
+        alert("تمت الإضافة!");
+    }
+
+    function addDebt() {
+        const name = document.getElementById('debtorName').value;
+        const amount = parseFloat(document.getElementById('debtAmount').value);
+        if(!name || !amount) return alert("اكمل البيانات");
+
+        data.debts.push({ id: Date.now(), name, amount });
+        saveAndRefresh();
+    }
+
+    function payDebt(id) {
+        const amount = parseFloat(prompt("كم المبلغ الذي تريد تنزيله؟"));
+        if(isNaN(amount)) return;
         
-        const logUl = document.getElementById('transactionLog');
-        logUl.innerHTML = accounts.logs.slice(-5).reverse().map(log => `<li>${log}</li>`).join('');
-
-        renderProducts();
+        const debt = data.debts.find(d => d.id === id);
+        if(debt) {
+            debt.amount -= amount;
+            if(debt.amount <= 0) data.debts = data.debts.filter(d => d.id !== id);
+            saveAndRefresh();
+        }
     }
 
-    function renderProducts() {
-        const list = document.getElementById('productList');
-        list.innerHTML = '<h2>المنتجات والبيع</h2>';
-        products.forEach(p => {
-            list.innerHTML += `
-                <div class="product-item">
-                    <div class="product-info">
-                        <h4>${p.name} - ${p.price.toLocaleString()} د.ع</h4>
-                        <textarea class="description-box" id="desc-${p.id}" onchange="updateDesc(${p.id}, this.value)">${p.desc}</textarea>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn-cash" onclick="makeSale(${p.id}, 'cash')">بيع نقدي</button>
-                        <button class="btn-debt" onclick="makeSale(${p.id}, 'debt')">بيع بالدين</button>
-                    </div>
+    function renderData() {
+        // رندر منتجات حسوني
+        const hList = document.getElementById('hassouniList');
+        hList.innerHTML = data.products.filter(p => p.owner === 'hassouni').map(p => `
+            <div class="card">
+                <h4>${p.name} <span style="float:left">${p.price} د.ع</span></h4>
+                <p>${p.desc}</p>
+                <small>الربح المتوقع: ${p.profit}</small>
+            </div>
+        `).join('');
+
+        // رندر منتجات مصطفى
+        const mList = document.getElementById('mustafaList');
+        mList.innerHTML = data.products.filter(p => p.owner === 'mustafa').map(p => `
+            <div class="card">
+                <h4>${p.name} <span style="float:left">${p.price} د.ع</span></h4>
+                <p>${p.desc}</p>
+                <small>الربح المتوقع: ${p.profit}</small>
+            </div>
+        `).join('');
+
+        // رندر الديون
+        const dList = document.getElementById('debtsList');
+        dList.innerHTML = data.debts.map(d => `
+            <div class="debt-item">
+                <div>
+                    <b>${d.name}</b> <br>
+                    <span class="balance-tag">${d.amount.toLocaleString()} د.ع</span>
                 </div>
-            `;
-        });
+                <button class="btn-pay" onclick="payDebt(${d.id})">تنزيل مبلغ</button>
+            </div>
+        `).join('');
     }
 
-    function updateDesc(id, newDesc) {
-        let p = products.find(prod => prod.id === id);
-        if(p) {
-            p.desc = newDesc;
-            alert("تم تحديث الوصف بنجاح!");
-        }
+    function saveAndRefresh() {
+        localStorage.setItem('luxData', JSON.stringify(data));
+        renderData();
     }
 
-    function makeSale(productId, type) {
-        const p = products.find(prod => prod.id === productId);
-        const profitEach = p.profit / 2; // تقسيم الربح بين حسوني ومصطفى
-
-        if (type === 'cash') {
-            accounts.cash += p.price;
-            accounts.hassouni += profitEach;
-            accounts.mustafa += profitEach;
-            accounts.logs.push(`بيع نقدي: ${p.name} (+${p.price})`);
-        } else {
-            accounts.debt += p.price;
-            // في الدين، الأرباح لا تضاف للحسابات إلا عند السداد (أو حسب رغبتك)
-            accounts.logs.push(`بيع بالدين: ${p.name} (${p.price})`);
-        }
-
-        localStorage.setItem('vapeAccounts', JSON.stringify(accounts));
-        updateUI();
-        alert("تمت العملية بنجاح!");
-    }
-
-    // التشغيل الأول
-    updateUI();
+    renderData();
 </script>
-
 </body>
 </html>
