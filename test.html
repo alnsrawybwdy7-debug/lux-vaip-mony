@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة LUX_VAIP | النسخة الاحترافية</title>
+    <title>إدارة LUX_VAIP | النسخة الكاملة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -14,29 +14,28 @@
         input, select, textarea { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline-color: #6366f1; }
         table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
         td { background: white; padding: 12px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; text-align: right; }
+        .edit-badge { background: #f0f4ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; cursor: pointer; display: inline-block; margin-top: 5px; border: 1px solid #dbeafe; }
         .paid-full { color: #16a34a; font-weight: 900; font-size: 12px; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div id="mainSection">
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-2xl font-black italic">لوحة إدارة <span class="text-indigo-600">LUX_VAIP</span></h1>
-        </div>
+        <h1 class="text-2xl font-black italic mb-8 text-center">لوحة إدارة <span class="text-indigo-600">LUX_VAIP</span></h1>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المبيعات</p> <h2 id="soldProfit" class="text-xl font-black text-green-600 tracking-tighter">0</h2> </div>
-            <div class="stat-card debt-card"> <p class="text-rose-600 text-[10px] font-bold">إجمالي الديون</p> <h2 id="totalDebts" class="text-xl font-black text-rose-600 tracking-tighter">0</h2> </div>
-            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">قطع المخزن</p> <h2 id="totalQty" class="text-xl font-black">0</h2> </div>
-            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المخزن المتوقعة</p> <h2 id="totalProfit" class="text-xl font-black text-amber-600 tracking-tighter">0</h2> </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 text-center">
+            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold uppercase">أرباح المبيعات</p> <h2 id="soldProfit" class="text-xl font-black text-green-600">0</h2> </div>
+            <div class="stat-card debt-card"> <p class="text-rose-600 text-[10px] font-bold uppercase">إجمالي الديون</p> <h2 id="totalDebts" class="text-xl font-black text-rose-600">0</h2> </div>
+            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold uppercase">قطع المخزن</p> <h2 id="totalQty" class="text-xl font-black text-slate-700">0</h2> </div>
+            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold uppercase">أرباح المخزن</p> <h2 id="totalProfit" class="text-xl font-black text-amber-600">0</h2> </div>
         </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-rose-100">
-            <h3 class="font-black mb-4 text-rose-600"><i class="fas fa-hand-holding-usd ml-1"></i> سجل الديون المطور</h3>
+            <h3 class="font-black mb-4 text-rose-600 italic"><i class="fas fa-hand-holding-usd ml-1"></i> سجل الديون والتحصيل</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
                 <input type="text" id="debt_name" placeholder="اسم الشخص المديون">
-                <input type="number" id="debt_amount" placeholder="المبلغ بالدنانير">
-                <button onclick="addDebtManual()" class="bg-rose-600 text-white font-black rounded-xl py-2">تسجيل دين يدوي</button>
+                <input type="number" id="debt_amount" placeholder="المبلغ المستحق">
+                <button onclick="addDebtManual()" class="bg-rose-600 text-white font-black rounded-xl py-2 hover:bg-rose-700 transition">تسجيل دين يدوي</button>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full">
@@ -46,25 +45,25 @@
         </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-slate-200">
-            <h3 class="font-black mb-4 text-indigo-600 italic"><i class="fas fa-box-open ml-1"></i> إضافة بضاعة للمخزن</h3>
+            <h3 class="font-black mb-4 text-indigo-600 italic"><i class="fas fa-box-open ml-1"></i> إضافة منتج جديد</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 <input type="text" id="p_name" placeholder="اسم المنتج">
-                <label class="bg-slate-100 p-2.5 rounded-xl text-center text-xs cursor-pointer border hover:bg-slate-200 text-slate-500 font-bold">📸 صورة <input type="file" accept="image/*" class="hidden" onchange="previewImage(this)"></label>
+                <label class="bg-slate-50 p-2.5 rounded-xl text-center text-xs cursor-pointer border border-dashed border-slate-300 text-slate-500 font-bold">📸 اختر صورة <input type="file" accept="image/*" class="hidden" onchange="previewImage(this)"></label>
                 <input type="number" id="p_cost" placeholder="سعر الكلفة">
                 <input type="number" id="p_sell" placeholder="سعر البيع">
                 <input type="number" id="p_qty" placeholder="الكمية">
                 <select id="p_owner"><option value="mustafa">مخزن مصطفى</option><option value="hussouni">مخزن حسوني</option></select>
-                <textarea id="p_desc" class="md:col-span-3 lg:col-span-6" placeholder="وصف المنتج..."></textarea>
-                <button onclick="saveProduct()" class="bg-indigo-600 text-white font-black rounded-xl py-3 md:col-span-6 mt-2 hover:bg-indigo-700 transition">حفظ في المخزن</button>
+                <textarea id="p_desc" class="md:col-span-3 lg:col-span-6" placeholder="اكتب وصف المنتج هنا..."></textarea>
+                <button onclick="saveProduct()" class="bg-indigo-600 text-white font-black rounded-xl py-3 md:col-span-6 mt-2 shadow-lg shadow-indigo-200">إضافة للمخزن</button>
             </div>
         </div>
 
-        <div class="overflow-x-auto bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-            <h3 class="font-black mb-4 italic text-slate-500 underline">المخزن الحالي</h3>
+        <div class="overflow-x-auto bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-10">
+            <h3 class="font-black mb-4 italic text-slate-500 underline">المخزون الحالي</h3>
             <table class="min-w-full">
                 <thead>
                     <tr class="text-[10px] text-slate-400 uppercase">
-                        <th>المنتج</th> <th>المخزن</th> <th>الكمية</th> <th>سعر البيع</th> <th>إجراء</th>
+                        <th>المنتج والوصف</th> <th>المخزن</th> <th>الكمية</th> <th>السعر</th> <th>إجراء</th>
                     </tr>
                 </thead>
                 <tbody id="pTableBody"></tbody>
@@ -73,12 +72,11 @@
     </div>
 
     <script>
-        let localData = JSON.parse(localStorage.getItem('lux_v4_test')) || {
+        let localData = JSON.parse(localStorage.getItem('lux_v5_final')) || {
             mustafa: [], hussouni: [], debts: [], salesProfit: 0
         };
         let base64Img = "";
 
-        // دالة تحويل الرقم لعملة عراقية
         const irqPrice = (num) => new Intl.NumberFormat('ar-IQ').format(num) + " د.ع";
 
         function previewImage(input) {
@@ -88,7 +86,7 @@
         }
 
         function saveData() {
-            localStorage.setItem('lux_v4_test', JSON.stringify(localData));
+            localStorage.setItem('lux_v5_final', JSON.stringify(localData));
             renderAll();
         }
 
@@ -104,20 +102,21 @@
                     tbody.innerHTML += `
                         <tr>
                             <td>
-                                <div class="flex items-center gap-2">
-                                    <img src="${p.img || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded shadow-sm object-cover">
+                                <div class="flex items-center gap-3">
+                                    <img src="${p.img || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded-lg object-cover shadow-sm">
                                     <div>
-                                        <div class="font-bold text-sm">${p.name}</div>
-                                        <div class="text-[9px] text-slate-400">${p.desc || ''}</div>
+                                        <div class="font-black text-slate-800 text-sm">${p.name}</div>
+                                        <div class="text-[10px] text-slate-400 max-w-[150px] truncate">${p.desc || 'لا يوجد وصف'}</div>
+                                        <span onclick="editDesc('${owner}', ${idx}, '${p.desc || ''}')" class="edit-badge"><i class="fas fa-edit ml-1"></i>تعديل الوصف</span>
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-[10px] font-bold text-slate-400 uppercase">${owner}</td>
-                            <td class="text-center font-black text-indigo-600">${p.qty}</td>
-                            <td class="text-center font-bold text-sm text-slate-700">${irqPrice(p.sell)}</td>
-                            <td class="flex gap-1 justify-end">
-                                <button onclick="sellPiece('${owner}', ${idx})" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold shadow-sm">بيع</button>
-                                <button onclick="deleteProduct('${owner}', ${idx})" class="text-slate-300 px-2 py-1 hover:text-red-500 transition"><i class="fas fa-trash"></i></button>
+                            <td class="text-[10px] font-bold text-indigo-500 uppercase">${owner}</td>
+                            <td class="text-center font-black text-slate-700">${p.qty}</td>
+                            <td class="text-center font-bold text-sm text-green-600">${irqPrice(p.sell)}</td>
+                            <td class="flex gap-2 justify-end">
+                                <button onclick="sellPiece('${owner}', ${idx})" class="bg-green-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-md">بيع</button>
+                                <button onclick="deleteProduct('${owner}', ${idx})" class="text-slate-300 hover:text-red-500 transition px-2"><i class="fas fa-trash"></i></button>
                             </td>
                         </tr>`;
                 });
@@ -129,7 +128,6 @@
             localData.debts.forEach((d, idx) => {
                 const isPaid = d.amount <= 0;
                 if(!isPaid) totalD += d.amount;
-                
                 dtbody.innerHTML += `
                     <tr>
                         <td class="font-bold text-slate-700">${d.name}</td>
@@ -159,15 +157,24 @@
                 qty: Number(document.getElementById('p_qty').value),
                 desc: document.getElementById('p_desc').value
             };
-            if(!item.name || !item.sell) return alert("اكمل البيانات!");
+            if(!item.name || !item.sell) return alert("اكمل البيانات الأساسية!");
             localData[owner].push(item);
-            base64Img = "";
+            base64Img = ""; 
             saveData();
+            alert("تم حفظ المنتج ✅");
+        }
+
+        function editDesc(owner, idx, currentDesc) {
+            const newVal = prompt("عدل وصف المنتج هنا:", currentDesc);
+            if(newVal !== null) {
+                localData[owner][idx].desc = newVal;
+                saveData();
+            }
         }
 
         function sellPiece(owner, idx) {
             const p = localData[owner][idx];
-            if(p.qty <= 0) return alert("خلصت القطع بالمخزن!");
+            if(p.qty <= 0) return alert("الكمية غير كافية!");
             const choice = prompt("للبيع نقداً اكتب (1) \n للبيع بالدين اكتب (اسم الشخص):");
             if (!choice) return;
 
@@ -178,14 +185,14 @@
             } else {
                 p.qty -= 1;
                 localData.debts.push({ name: choice, amount: p.sell });
-                alert(`تم تسجيل ${irqPrice(p.sell)} دين على ${choice}`);
+                alert(`تم تسجيل دين بمبلغ ${irqPrice(p.sell)} على ${choice}`);
             }
             saveData();
         }
 
         function payDebt(idx) {
             const current = localData.debts[idx].amount;
-            const val = prompt(`المبلغ الحالي: ${irqPrice(current)} \n ادخل المبلغ الذي استلمته كاش:`);
+            const val = prompt(`المبلغ المتبقي: ${irqPrice(current)} \n ادخل المبلغ الواصل كاش:`);
             if (val && !isNaN(val)) {
                 const received = Number(val);
                 localData.salesProfit += received;
@@ -205,8 +212,8 @@
             }
         }
 
-        function deleteProduct(owner, idx) { if(confirm("حذف المنتج نهائياً من المخزن؟")) { localData[owner].splice(idx, 1); saveData(); } }
-        function deleteDebtManual(idx) { if(confirm("إزالة هذا القيد من السجل؟")) { localData.debts.splice(idx, 1); saveData(); } }
+        function deleteProduct(owner, idx) { if(confirm("حذف المنتج؟")) { localData[owner].splice(idx, 1); saveData(); } }
+        function deleteDebtManual(idx) { if(confirm("مسح سجل الدين؟")) { localData.debts.splice(idx, 1); saveData(); } }
 
         renderAll();
     </script>
