@@ -3,116 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة LUX_VAIP | نسخة سجل الديون التفصيلي</title>
+    <title>LUX_VAIP | نظام إدارة النكهات</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap');
-        body { font-family: 'Tajawal', sans-serif; background-color: #f1f5f9; color: #1e293b; }
-        .stat-card { background: white; border-radius: 1rem; padding: 12px; border-right: 5px solid #6366f1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .debt-card { border-right-color: #e11d48; background: #fff1f2; }
-        .cash-card { border-right-color: #22c55e; background: #f0fdf4; }
-        input, select, textarea { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline-color: #6366f1; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        td { background: white; padding: 12px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; text-align: right; }
-        .product-tag { background: #fee2e2; color: #991b1b; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; display: inline-block; margin-top: 4px; }
+        body { font-family: 'Tajawal', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .stat-card { background: white; border-radius: 1rem; padding: 12px; border-right: 5px solid #6366f1; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        input, select, textarea { border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 10px; width: 100%; outline-color: #6366f1; font-size: 14px; }
+        .flavor-badge { background: #e0e7ff; color: #4338ca; padding: 2px 6px; border-radius: 5px; font-size: 10px; margin: 2px; display: inline-block; }
+        .debt-detail { color: #64748b; font-size: 11px; margin-top: 4px; display: block; border-right: 2px solid #e11d48; padding-right: 5px; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div id="mainSection">
-        <h1 class="text-2xl font-black mb-8 text-center text-slate-800 italic underline decoration-indigo-500 decoration-4">لوحة LUX_VAIP الماركت</h1>
+        <h1 class="text-2xl font-black text-center mb-8 italic text-indigo-600">LUX_VAIP FLAVORS SYSTEM</h1>
 
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-10 text-center">
-            <div class="stat-card cash-card"> <p class="text-green-600 text-[10px] font-bold uppercase italic">الكاش الكلي</p> <h2 id="totalCash" class="text-lg font-black text-green-700">0</h2> </div>
-            <div class="stat-card"> <p class="text-indigo-600 text-[10px] font-bold uppercase italic">صافي الأرباح</p> <h2 id="soldProfit" class="text-lg font-black text-indigo-700">0</h2> </div>
-            <div class="stat-card debt-card"> <p class="text-rose-600 text-[10px] font-bold uppercase italic">إجمالي الدين</p> <h2 id="totalDebts" class="text-lg font-black text-rose-700">0</h2> </div>
-            <div class="stat-card"> <p class="text-slate-400 text-[10px] font-bold">القطع</p> <h2 id="totalQty" class="text-lg font-black text-slate-700">0</h2> </div>
-            <div class="stat-card"> <p class="text-amber-500 text-[10px] font-bold uppercase italic">أرباح المخزن</p> <h2 id="totalProfit" class="text-lg font-black text-amber-600">0</h2> </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div class="stat-card border-green-500"> <p class="text-gray-400 text-[10px] font-bold">الكاش الكلي</p> <h2 id="totalCash" class="font-black text-green-600">0</h2> </div>
+            <div class="stat-card border-indigo-500"> <p class="text-gray-400 text-[10px] font-bold">صافي الأرباح</p> <h2 id="soldProfit" class="font-black text-indigo-600">0</h2> </div>
+            <div class="stat-card border-rose-500"> <p class="text-gray-400 text-[10px] font-bold">إجمالي الديون</p> <h2 id="totalDebts" class="font-black text-rose-600">0</h2> </div>
+            <div class="stat-card border-amber-500"> <p class="text-gray-400 text-[10px] font-bold">قطع المخزن</p> <h2 id="totalQty" class="font-black text-amber-600">0</h2> </div>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl shadow-sm mb-10 border border-rose-100">
-            <h3 class="font-black mb-4 text-rose-600 italic"><i class="fas fa-file-invoice-dollar ml-1"></i> سجل الديون (الأسماء والبضائع)</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-                <input type="text" id="debt_name" placeholder="اسم الشخص">
-                <input type="number" id="debt_amount" placeholder="المبلغ">
-                <button onclick="addDebtManual()" class="bg-rose-600 text-white font-black rounded-xl py-2">تسجيل دين مباشر</button>
-            </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-8 border border-rose-100">
+            <h3 class="font-black mb-4 text-rose-600"><i class="fas fa-users-cog ml-1"></i> مديونيات العملاء</h3>
             <div class="overflow-x-auto">
-                <table>
+                <table class="w-full text-right text-sm">
                     <tbody id="debtTableBody"></tbody>
                 </table>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-3xl shadow-sm mb-10 border border-slate-200">
-            <h3 class="font-black mb-4 text-indigo-600 italic"><i class="fas fa-box-open ml-1"></i> إضافة منتج جديد</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 text-sm">
-                <input type="text" id="p_name" placeholder="المنتج">
-                <label class="bg-slate-50 p-2.5 rounded-xl text-center text-xs cursor-pointer border border-dashed border-slate-300 text-slate-500 font-bold">📸 صورة <input type="file" accept="image/*" class="hidden" onchange="previewImage(this)"></label>
-                <input type="number" id="p_cost" placeholder="الكلفة">
-                <input type="number" id="p_sell" placeholder="البيع">
-                <input type="number" id="p_qty" placeholder="الكمية">
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-8 border border-slate-200">
+            <h3 class="font-black mb-4 text-indigo-600 italic"><i class="fas fa-plus-circle ml-1"></i> توريد بضاعة جديدة</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
+                <input type="text" id="p_name" placeholder="اسم الجهاز (مثلاً: سحبة Vuse)">
+                <input type="number" id="p_cost" placeholder="سعر الكلفة">
+                <input type="number" id="p_sell" placeholder="سعر البيع">
                 <select id="p_owner"><option value="mustafa">مخزن مصطفى</option><option value="hussouni">مخزن حسوني</option></select>
-                <textarea id="p_desc" class="md:col-span-3 lg:col-span-6" placeholder="وصف إضافي..."></textarea>
-                <button onclick="saveProduct()" class="bg-indigo-600 text-white font-black rounded-xl py-3 md:col-span-6 mt-2 shadow-lg shadow-indigo-100">إضافة للمتجر</button>
+                <input type="text" id="p_flavors" class="md:col-span-2" placeholder="النكهات (افصل بينها بفاصلة , مثلاً: علكة, رقي, نعناع)">
             </div>
+            <button onclick="saveProduct()" class="w-full bg-indigo-600 text-white font-black py-3 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition">حفظ المنتج والنكهات</button>
         </div>
 
-        <div class="overflow-x-auto bg-white p-4 rounded-3xl shadow-sm border border-slate-200">
-            <h3 class="font-black mb-4 italic text-slate-500 underline">المخزون المتوفر</h3>
-            <table>
-                <thead>
-                    <tr class="text-[10px] text-slate-400 uppercase">
-                        <th>المنتج</th> <th>المخزن</th> <th>العدد</th> <th>سعر البيع</th> <th>إجراء</th>
-                    </tr>
-                </thead>
-                <tbody id="pTableBody"></tbody>
-            </table>
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+            <h3 class="font-black mb-4 text-slate-500 underline italic text-sm">المخزن الحالي</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-right text-sm">
+                    <thead>
+                        <tr class="text-slate-400 text-[10px] uppercase">
+                            <th class="pb-2">المنتج والنكهات المتوفرة</th> <th>المخزن</th> <th>السعر</th> <th>إجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pTableBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
-        let localData = JSON.parse(localStorage.getItem('lux_v7_debt_details')) || {
+        let localData = JSON.parse(localStorage.getItem('lux_v8_flavors')) || {
             mustafa: [], hussouni: [], debts: [], salesProfit: 0, totalCashReceived: 0
         };
-        let base64Img = "";
 
         const irqPrice = (num) => new Intl.NumberFormat('ar-IQ').format(num) + " د.ع";
 
-        function previewImage(input) {
-            const reader = new FileReader();
-            reader.onload = (e) => base64Img = e.target.result;
-            reader.readAsDataURL(input.files[0]);
-        }
-
         function saveData() {
-            localStorage.setItem('lux_v7_debt_details', JSON.stringify(localData));
+            localStorage.setItem('lux_v8_flavors', JSON.stringify(localData));
             renderAll();
         }
 
         function renderAll() {
             const tbody = document.getElementById('pTableBody');
             tbody.innerHTML = '';
-            let tQty = 0, tProfit = 0;
+            let tQty = 0;
 
             ['mustafa', 'hussouni'].forEach(owner => {
                 localData[owner].forEach((p, idx) => {
-                    tQty += Number(p.qty); tProfit += (p.sell - p.cost) * p.qty;
+                    tQty += p.flavors.length;
+                    let flavorBadges = p.flavors.map(f => `<span class="flavor-badge">${f}</span>`).join('');
                     tbody.innerHTML += `
-                        <tr>
-                            <td>
-                                <div class="flex items-center gap-2">
-                                    <img src="${p.img || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded object-cover shadow-sm">
-                                    <div><div class="font-black text-sm text-slate-800">${p.name}</div><div class="text-[9px] text-slate-400">${p.desc || ''}</div></div>
-                                </div>
+                        <tr class="border-t">
+                            <td class="py-4">
+                                <div class="font-black text-slate-800">${p.name}</div>
+                                <div class="mt-1">${flavorBadges || '<span class="text-red-400 text-[10px]">نفذت النكهات</span>'}</div>
                             </td>
-                            <td class="text-[10px] font-bold text-indigo-500 uppercase">${owner}</td>
-                            <td class="text-center font-black text-slate-700">${p.qty}</td>
-                            <td class="text-center font-bold text-sm text-green-600">${irqPrice(p.sell)}</td>
-                            <td class="flex gap-1 justify-end">
-                                <button onclick="sellPiece('${owner}', ${idx})" class="bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-bold">بيع</button>
-                                <button onclick="deleteProduct('${owner}', ${idx})" class="text-slate-200 hover:text-red-500 transition"><i class="fas fa-trash"></i></button>
+                            <td class="text-xs font-bold text-indigo-500">${owner}</td>
+                            <td class="font-bold text-green-600">${irqPrice(p.sell)}</td>
+                            <td>
+                                <div class="flex gap-2">
+                                    <button onclick="sellFlow('${owner}', ${idx})" class="bg-green-500 text-white px-4 py-1 rounded-lg text-xs font-bold shadow-sm">بيع</button>
+                                    <button onclick="deleteProduct('${owner}', ${idx})" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                                </div>
                             </td>
                         </tr>`;
                 });
@@ -125,91 +109,98 @@
                 const isPaid = d.amount <= 0;
                 if(!isPaid) totalD += d.amount;
                 dtbody.innerHTML += `
-                    <tr>
-                        <td>
-                            <div class="font-bold text-slate-800">${d.name}</div>
-                            <div class="product-tag italic">${d.details || 'تسجيل يدوي'}</div>
+                    <tr class="border-t">
+                        <td class="py-3">
+                            <div class="font-black text-slate-800">${d.name}</div>
+                            <span class="debt-detail italic">${d.itemDetails || 'تسجيل يدوي'}</span>
                         </td>
-                        <td class="font-black text-center ${isPaid ? 'text-green-600 text-xs' : 'text-rose-600'}">
-                            ${isPaid ? 'تم دفع الدين كامل ✅' : irqPrice(d.amount)}
+                        <td class="font-black ${isPaid ? 'text-green-600' : 'text-rose-600'} text-center">
+                            ${isPaid ? 'تم التسديد ✅' : irqPrice(d.amount)}
                         </td>
                         <td class="text-left">
-                            ${!isPaid ? `<button onclick="payDebt(${idx})" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-xs font-bold">تحصيل</button>` : ''}
-                            <button onclick="deleteDebtManual(${idx})" class="text-slate-200 mr-2"><i class="fas fa-times-circle"></i></button>
+                            ${!isPaid ? `<button onclick="payDebt(${idx})" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-[10px] font-bold border border-indigo-100">تحصيل</button>` : ''}
+                            <button onclick="deleteDebt(${idx})" class="text-slate-200 mr-2"><i class="fas fa-times-circle"></i></button>
                         </td>
                     </tr>`;
             });
 
             document.getElementById('totalQty').innerText = tQty;
-            document.getElementById('totalProfit').innerText = irqPrice(tProfit);
             document.getElementById('soldProfit').innerText = irqPrice(localData.salesProfit);
-            document.getElementById('totalCash').innerText = irqPrice(localData.totalCashReceived || 0);
+            document.getElementById('totalCash').innerText = irqPrice(localData.totalCashReceived);
             document.getElementById('totalDebts').innerText = irqPrice(totalD);
         }
 
         function saveProduct() {
             const owner = document.getElementById('p_owner').value;
+            const flavorInput = document.getElementById('p_flavors').value;
+            // تحويل النص إلى قائمة نكهات
+            const flavorArray = flavorInput.split(',').map(f => f.trim()).filter(f => f !== "");
+
+            if(flavorArray.length === 0) return alert("الرجاء كتابة نكهة واحدة على الأقل!");
+
             const item = {
                 name: document.getElementById('p_name').value,
-                img: base64Img,
                 cost: Number(document.getElementById('p_cost').value),
                 sell: Number(document.getElementById('p_sell').value),
-                qty: Number(document.getElementById('p_qty').value),
-                desc: document.getElementById('p_desc').value
+                flavors: flavorArray
             };
-            if(!item.name || !item.sell) return alert("اكمل البيانات الأساسية!");
+
+            if(!item.name || !item.sell) return alert("اكمل بيانات السعر والاسم!");
+            
             localData[owner].push(item);
-            base64Img = ""; saveData();
+            document.getElementById('p_flavors').value = "";
+            document.getElementById('p_name').value = "";
+            saveData();
+            alert("تمت إضافة المنتج بـ " + flavorArray.length + " نكهات ✅");
         }
 
-        function sellPiece(owner, idx) {
+        function sellFlow(owner, idx) {
             const p = localData[owner][idx];
-            if(p.qty <= 0) return alert("المخزن فارغ!");
-            const choice = prompt("للبيع نقداً اكتب (1) \n للبيع بالدين اكتب (اسم الشخص):");
-            if (!choice) return;
+            if(p.flavors.length === 0) return alert("عذراً، هذا المنتج نفذت جميع نكهاته!");
 
-            if (choice === "1") {
-                p.qty -= 1;
+            // 1. اختيار النكهة
+            let msg = "اختار رقم النكهة المباعة:\n";
+            p.flavors.forEach((f, i) => msg += `${i + 1} - ${f}\n`);
+            const fChoice = prompt(msg);
+            const fIdx = parseInt(fChoice) - 1;
+
+            if(isNaN(fIdx) || !p.flavors[fIdx]) return alert("اختيار غير صحيح!");
+            const selectedFlavor = p.flavors[fIdx];
+
+            // 2. نوع البيع
+            const saleType = prompt("للببيع النقدي اكتب (1) \n للبيع بالدين اكتب (اسم الشخص):");
+            if(!saleType) return;
+
+            // تنفيذ الحذف من المخزن
+            p.flavors.splice(fIdx, 1);
+
+            if(saleType === "1") {
                 localData.salesProfit += (p.sell - p.cost);
-                localData.totalCashReceived = (localData.totalCashReceived || 0) + p.sell;
-                alert("تم البيع نقداً ✅");
+                localData.totalCashReceived += p.sell;
+                alert(`تم بيع نكهة (${selectedFlavor}) نقداً ✅`);
             } else {
-                p.qty -= 1;
-                // إضافة معلومات المنتج لسجل الدين
-                localData.debts.push({ 
-                    name: choice, 
-                    amount: p.sell, 
-                    details: `اشترى: ${p.name} - ${new Date().toLocaleDateString('ar-IQ')}` 
+                localData.debts.push({
+                    name: saleType,
+                    amount: p.sell,
+                    itemDetails: `المنتج: ${p.name} | النكهة: ${selectedFlavor}`
                 });
-                alert(`تم تسجيل ${p.name} دين على ${choice}`);
+                alert(`تم تسجيل (${selectedFlavor}) دين على ${saleType}`);
             }
             saveData();
         }
 
         function payDebt(idx) {
-            const current = localData.debts[idx].amount;
-            const val = prompt(`المستحق: ${irqPrice(current)} \n ادخل المبلغ المستلم كاش:`);
-            if (val && !isNaN(val)) {
-                const received = Number(val);
-                localData.totalCashReceived = (localData.totalCashReceived || 0) + received;
-                localData.debts[idx].amount -= received;
-                saveData();
-            }
-        }
-
-        function addDebtManual() {
-            const name = document.getElementById('debt_name').value;
-            const amount = Number(document.getElementById('debt_amount').value);
-            if(name && amount) {
-                localData.debts.push({ name, amount, details: "تسجيل يدوي من الإدارة" });
-                document.getElementById('debt_name').value = '';
-                document.getElementById('debt_amount').value = '';
+            const val = prompt("المبلغ المستلم كاش:");
+            if(val && !isNaN(val)) {
+                const amount = Number(val);
+                localData.totalCashReceived += amount;
+                localData.debts[idx].amount -= amount;
                 saveData();
             }
         }
 
         function deleteProduct(owner, idx) { if(confirm("حذف؟")) { localData[owner].splice(idx, 1); saveData(); } }
-        function deleteDebtManual(idx) { if(confirm("مسح السجل؟")) { localData.debts.splice(idx, 1); saveData(); } }
+        function deleteDebt(idx) { if(confirm("مسح؟")) { localData.debts.splice(idx, 1); saveData(); } }
 
         renderAll();
     </script>
