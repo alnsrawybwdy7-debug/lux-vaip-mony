@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة متجر Lux Vape</title>
+    <style>
+        :root { --primary: #ff9800; --dark: #1a1a1a; --text: #ffffff; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--dark); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        h1 { text-align: center; color: var(--primary); }
+        
+        /* أقسام الإدارة */
+        .admin-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .card { background: #2a2a2a; padding: 15px; border-radius: 10px; border-bottom: 4px solid var(--primary); text-align: center; }
+        .card h3 { margin: 0; font-size: 14px; color: #bbb; }
+        .card p { font-size: 20px; font-weight: bold; margin: 10px 0; }
+
+        /* قائمة المنتجات */
+        .product-item { background: #2a2a2a; padding: 15px; border-radius: 10px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .product-info { flex-grow: 1; }
+        .product-info h4 { margin: 0; color: var(--primary); }
+        .description-box { width: 100%; background: #333; color: #fff; border: 1px solid #444; border-radius: 5px; padding: 5px; margin-top: 5px; height: 50px; }
+        
+        /* أزرار البيع */
+        .btn-group { display: flex; gap: 5px; }
+        button { cursor: pointer; border: none; border-radius: 5px; padding: 8px 12px; font-weight: bold; transition: 0.3s; }
+        .btn-cash { background-color: #4caf50; color: white; }
+        .btn-debt { background-color: #f44336; color: white; }
+        .btn-save { background-color: var(--primary); color: white; margin-top: 5px; width: 100%; }
+        button:hover { opacity: 0.8; transform: scale(1.05); }
+
+        .log-section { margin-top: 40px; background: #222; padding: 15px; border-radius: 10px; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>LUX VAPE - لوحة الإدارة</h1>
+
+    <div class="admin-dashboard">
+        <div class="card">
+            <h3>قسم النقدي (الأرباح)</h3>
+            <p id="cashBalance">0 د.ع</p>
+        </div>
+        <div class="card">
+            <h3>قسم الديون</h3>
+            <p id="debtBalance">0 د.ع</p>
+        </div>
+        <div class="card">
+            <h3>حساب حسوني</h3>
+            <p id="hassouniBalance">0 د.ع</p>
+        </div>
+        <div class="card">
+            <h3>حساب مصطفى</h3>
+            <p id="mustafaBalance">0 د.ع</p>
+        </div>
+    </div>
+
+    <div id="productList">
+        <h2>المنتجات والبيع</h2>
+        </div>
+
+    <div class="log-section">
+        <h3>سجل العمليات الأخيرة</h3>
+        <ul id="transactionLog"></ul>
+    </div>
+</div>
+
+<script>
+    // بيانات المنتجات التجريبية (يمكنك تغييرها لاحقاً)
+    let products = [
+        { id: 1, name: "فيب مود 200 واط", price: 75000, profit: 10000, desc: "وصف المنتج هنا..." },
+        { id: 2, name: "نكهة ناستي 60 مل", price: 15000, profit: 3000, desc: "وصف النكهة..." }
+    ];
+
+    // جلب البيانات المخزنة
+    let accounts = JSON.parse(localStorage.getItem('vapeAccounts')) || {
+        cash: 0, debt: 0, hassouni: 0, mustafa: 0, logs: []
+    };
+
+    function updateUI() {
+        document.getElementById('cashBalance').innerText = accounts.cash.toLocaleString() + " د.ع";
+        document.getElementById('debtBalance').innerText = accounts.debt.toLocaleString() + " د.ع";
+        document.getElementById('hassouniBalance').innerText = accounts.hassouni.toLocaleString() + " د.ع";
+        document.getElementById('mustafaBalance').innerText = accounts.mustafa.toLocaleString() + " د.ع";
+        
+        const logUl = document.getElementById('transactionLog');
+        logUl.innerHTML = accounts.logs.slice(-5).reverse().map(log => `<li>${log}</li>`).join('');
+
+        renderProducts();
+    }
+
+    function renderProducts() {
+        const list = document.getElementById('productList');
+        list.innerHTML = '<h2>المنتجات والبيع</h2>';
+        products.forEach(p => {
+            list.innerHTML += `
+                <div class="product-item">
+                    <div class="product-info">
+                        <h4>${p.name} - ${p.price.toLocaleString()} د.ع</h4>
+                        <textarea class="description-box" id="desc-${p.id}" onchange="updateDesc(${p.id}, this.value)">${p.desc}</textarea>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn-cash" onclick="makeSale(${p.id}, 'cash')">بيع نقدي</button>
+                        <button class="btn-debt" onclick="makeSale(${p.id}, 'debt')">بيع بالدين</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function updateDesc(id, newDesc) {
+        let p = products.find(prod => prod.id === id);
+        if(p) {
+            p.desc = newDesc;
+            alert("تم تحديث الوصف بنجاح!");
+        }
+    }
+
+    function makeSale(productId, type) {
+        const p = products.find(prod => prod.id === productId);
+        const profitEach = p.profit / 2; // تقسيم الربح بين حسوني ومصطفى
+
+        if (type === 'cash') {
+            accounts.cash += p.price;
+            accounts.hassouni += profitEach;
+            accounts.mustafa += profitEach;
+            accounts.logs.push(`بيع نقدي: ${p.name} (+${p.price})`);
+        } else {
+            accounts.debt += p.price;
+            // في الدين، الأرباح لا تضاف للحسابات إلا عند السداد (أو حسب رغبتك)
+            accounts.logs.push(`بيع بالدين: ${p.name} (${p.price})`);
+        }
+
+        localStorage.setItem('vapeAccounts', JSON.stringify(accounts));
+        updateUI();
+        alert("تمت العملية بنجاح!");
+    }
+
+    // التشغيل الأول
+    updateUI();
+</script>
+
+</body>
+</html>
