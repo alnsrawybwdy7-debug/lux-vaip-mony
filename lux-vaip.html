@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة LUX_VAIP | النسخة الكاملة</title>
+    <title>إدارة LUX_VAIP | النسخة المتكاملة</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,67 +14,64 @@
         #authOverlay { position: fixed; inset: 0; background: #020617; z-index: 999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .stat-card { background: white; border-radius: 1rem; padding: 15px; border-right: 5px solid #6366f1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; position: relative; }
         .cash-card { border-right-color: #22c55e; background: #f0fdf4; }
-        .debt-card { border-right-color: #e11d48; background: #fff1f2; }
-        input, select { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline: none; }
+        input, select { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline: none; transition: 0.3s; }
+        input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
         .flavor-tag { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; margin: 2px; display: inline-block; border: 1px solid #c7d2fe; }
         table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
         td { background: white; padding: 12px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; text-align: right; }
-        .reset-btn { position: absolute; top: 5px; left: 5px; font-size: 10px; color: #ef4444; cursor: pointer; opacity: 0.5; transition: 0.3s; }
-        .reset-btn:hover { opacity: 1; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; padding: 20px; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div id="authOverlay">
-        <div class="w-12 h-12 bg-indigo-600 rounded-xl mb-6 flex items-center justify-center shadow-lg shadow-indigo-500/50"><i class="fas fa-user-shield text-white text-xl"></i></div>
-        <h2 class="text-white font-black mb-4 tracking-widest">LUX VAPE SYSTEM</h2>
-        <input type="password" id="adminPass" placeholder="رمز الدخول" class="max-w-[200px] text-center bg-white/10 border-white/20 text-white focus:border-indigo-500 mb-4">
-        <button onclick="checkAuth()" class="bg-indigo-600 text-white px-12 py-2 rounded-xl font-bold hover:bg-indigo-700 transition">دخول</button>
-        <p id="errorMsg" class="text-red-500 text-xs mt-4 hidden">الرمز خطأ!</p>
+        <div class="w-12 h-12 bg-indigo-600 rounded-xl mb-6 flex items-center justify-center shadow-lg"><i class="fas fa-user-shield text-white"></i></div>
+        <input type="password" id="adminPass" placeholder="رمز الدخول" class="max-w-[200px] text-center bg-white/10 border-white/20 text-white mb-4">
+        <button onclick="checkAuth()" class="bg-indigo-600 text-white px-12 py-2 rounded-xl font-bold">دخول</button>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="bg-white p-6 rounded-3xl w-full max-w-md shadow-2xl">
+            <h3 class="font-black text-indigo-600 mb-4 border-b pb-2">تعديل المنتج / إضافة نكهات</h3>
+            <input type="hidden" id="edit_id">
+            <div class="space-y-3">
+                <div><label class="text-[10px] font-bold text-slate-400">سعر الكلفة</label><input type="number" id="edit_cost"></div>
+                <div><label class="text-[10px] font-bold text-slate-400">سعر البيع</label><input type="number" id="edit_sell"></div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-dashed border-slate-300">
+                    <p class="text-xs font-bold mb-2">إضافة نكهة جديدة لهذا المنتج:</p>
+                    <div class="flex gap-2">
+                        <input type="text" id="new_f_name" placeholder="النكهة" class="text-xs">
+                        <input type="number" id="new_f_qty" placeholder="العدد" class="text-xs w-20">
+                        <button onclick="addNewFlavorToProduct()" class="bg-green-600 text-white px-3 rounded-lg text-xs">+</button>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-2 mt-6">
+                <button onclick="updateProductData()" class="flex-grow bg-indigo-600 text-white py-2 rounded-xl font-bold shadow-lg">حفظ التغييرات</button>
+                <button onclick="document.getElementById('editModal').style.display='none'" class="bg-slate-200 px-4 rounded-xl font-bold">إلغاء</button>
+            </div>
+        </div>
     </div>
 
     <div id="mainContent" class="opacity-0 transition-opacity duration-700">
-        <div class="flex justify-between items-center mb-8">
-            <button onclick="location.reload()" class="text-slate-400 hover:text-indigo-600"><i class="fas fa-sync-alt"></i></button>
-            <h1 class="text-2xl font-black italic text-slate-800 underline decoration-indigo-500 decoration-4 text-center">لوحة تحكم LUX_VAIP</h1>
-            <i class="fas fa-user-circle text-slate-300 text-2xl"></i>
-        </div>
+        <h1 class="text-2xl font-black italic mb-8 text-center text-slate-800 underline decoration-indigo-500 decoration-4">إدارة LUX_VAIP</h1>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 text-right">
-            <div class="stat-card cash-card"> 
-                <i class="fas fa-redo reset-btn" title="تصفير الحسابات" onclick="resetFinance()"></i>
-                <p class="text-green-600 text-[10px] font-bold uppercase">الكاش المستلم</p> 
-                <h2 id="totalCash" class="text-lg font-black text-green-700">0</h2> 
-            </div>
-            <div class="stat-card"> 
-                <p class="text-indigo-600 text-[10px] font-bold uppercase">صافي الأرباح</p> 
-                <h2 id="soldProfit" class="text-lg font-black text-indigo-700">0</h2> 
-            </div>
-            <div class="stat-card debt-card"> 
-                <p class="text-rose-600 text-[10px] font-bold uppercase">إجمالي الديون</p> 
-                <h2 id="totalDebts" class="text-lg font-black text-rose-700">0</h2> 
-            </div>
-            <div class="stat-card"> 
-                <p class="text-slate-400 text-[10px] font-bold uppercase">قطع المخزن</p> 
-                <h2 id="totalQty" class="text-lg font-black text-slate-700">0</h2> 
-            </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-rose-100 text-right">
-            <h3 class="font-black mb-4 text-rose-600 italic"><i class="fas fa-receipt ml-1"></i> مديونيات الزبائن</h3>
-            <div class="overflow-x-auto"><table class="w-full"><tbody id="debtTableBody"></tbody></table></div>
+            <div class="stat-card cash-card"> <i class="fas fa-redo absolute top-2 left-2 text-[10px] text-red-400 cursor-pointer" onclick="resetFinance()"></i> <p class="text-green-600 text-[10px] font-bold">الكاش المستلم</p> <h2 id="totalCash" class="text-lg font-black text-green-700">0</h2> </div>
+            <div class="stat-card"> <p class="text-indigo-600 text-[10px] font-bold">صافي الأرباح</p> <h2 id="soldProfit" class="text-lg font-black text-indigo-700">0</h2> </div>
+            <div class="stat-card"> <p class="text-rose-600 text-[10px] font-bold">إجمالي الديون</p> <h2 id="totalDebts" class="text-lg font-black text-rose-700">0</h2> </div>
+            <div class="stat-card"> <p class="text-slate-400 text-[10px] font-bold">قطع المخزن</p> <h2 id="totalQty" class="text-lg font-black text-slate-700">0</h2> </div>
         </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-slate-200 text-right">
-            <h3 class="font-black mb-4 text-indigo-600 italic"><i class="fas fa-plus-square ml-1"></i> إضافة بضاعة جديدة</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-4">
+            <h3 class="font-black mb-4 text-indigo-600 italic">إضافة بضاعة جديدة</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
                 <input type="text" id="p_name" placeholder="اسم الجهاز">
-                <label class="bg-slate-50 p-2.5 rounded-xl text-center text-[10px] cursor-pointer border border-dashed border-slate-300 text-slate-500 font-bold">📸 اختر صورة <input type="file" accept="image/*" class="hidden" onchange="previewImage(this)"></label>
                 <input type="number" id="p_cost" placeholder="سعر الكلفة">
                 <input type="number" id="p_sell" placeholder="سعر البيع">
-                <select id="p_owner"><option value="mustafa">مخزن مصطفى</option><option value="hussouni">مخزن حسوني</option></select>
+                <input type="file" accept="image/*" onchange="previewImage(this)" class="text-[10px]">
             </div>
-            <div class="bg-indigo-50 p-4 rounded-xl mb-4 border border-indigo-100">
+            <div class="bg-indigo-50 p-4 rounded-xl mb-4">
                 <div class="flex gap-2">
                     <input type="text" id="f_name" placeholder="اسم النكهة" class="bg-white">
                     <input type="number" id="f_qty" placeholder="العدد" class="bg-white w-20">
@@ -82,34 +79,39 @@
                 </div>
                 <div id="tempFlavors" class="mt-3 flex flex-wrap"></div>
             </div>
-            <button onclick="saveProduct()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-black transition">حفظ ورفع للمتجر 🚀</button>
+            <button onclick="saveProduct()" class="w-full bg-slate-900 text-white font-black py-3 rounded-xl shadow-xl">حفظ ورفع للمتجر</button>
         </div>
 
         <div class="overflow-x-auto bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-10">
-            <h3 class="font-black mb-4 italic text-slate-500 underline text-right">المخزون المتوفر حالياً</h3>
+            <h3 class="font-black mb-4 italic text-slate-500 underline text-right">المخزون الحالي</h3>
             <table class="min-w-full">
                 <thead>
-                    <tr class="text-[10px] text-slate-400 font-bold">
-                        <th>المنتج</th> <th>المخزن</th> <th>النكهات</th> <th>السعر</th> <th>إجراء</th>
+                    <tr class="text-[10px] text-slate-400 font-bold uppercase">
+                        <th>المنتج</th> <th>النكهات</th> <th>الكلفة</th> <th>البيع</th> <th>إجراء</th>
                     </tr>
                 </thead>
                 <tbody id="pTableBody"></tbody>
             </table>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-rose-100 text-right">
+            <h3 class="font-black mb-4 text-rose-600 italic">مديونيات الزبائن</h3>
+            <div class="overflow-x-auto"><table class="w-full"><tbody id="debtTableBody"></tbody></table></div>
         </div>
     </div>
 
     <script>
         const CORRECT_PASS = "1221"; 
         let db;
+        let base64Img = "";
+        let currentFlavors = [];
+        let allLiveProducts = {};
 
         function checkAuth() {
-            const input = document.getElementById('adminPass').value;
-            if(input === CORRECT_PASS) {
+            if(document.getElementById('adminPass').value === CORRECT_PASS) {
                 document.getElementById('authOverlay').style.display = 'none';
                 document.getElementById('mainContent').classList.remove('opacity-0');
                 initFirebase();
-            } else {
-                document.getElementById('errorMsg').classList.remove('hidden');
             }
         }
 
@@ -124,8 +126,6 @@
             loadLive();
         }
 
-        let base64Img = "";
-        let currentFlavors = [];
         const irqPrice = (num) => new Intl.NumberFormat('ar-IQ').format(num) + " د.ع";
 
         window.previewImage = (input) => {
@@ -152,13 +152,12 @@
         window.saveProduct = () => {
             const n = document.getElementById('p_name').value;
             const s = Number(document.getElementById('p_sell').value);
-            if(!n || !s || currentFlavors.length === 0) return alert("يرجى إكمال البيانات!");
+            if(!n || !s || currentFlavors.length === 0) return alert("اكمل البيانات!");
             db.ref('products').push({
                 name: n, sell: s, cost: Number(document.getElementById('p_cost').value),
-                owner: document.getElementById('p_owner').value,
                 img: base64Img, flavors: currentFlavors
             });
-            alert("تم الرفع بنجاح ✅");
+            alert("تم الرفع ✅");
             location.reload();
         };
 
@@ -166,6 +165,7 @@
             db.ref().on('value', snap => {
                 const data = snap.val() || {};
                 const prods = data.products || {};
+                allLiveProducts = prods;
                 const debts = data.debts || {};
                 const stats = data.stats || { cash: 0, profit: 0 };
 
@@ -181,13 +181,14 @@
                     let fHtml = p.flavors ? p.flavors.map(f => { pq += f.qty; return `<span class="flavor-tag">${f.name} (${f.qty})</span>` }).join('') : '';
                     tQty += pq;
                     pt.innerHTML += `<tr class="border-b">
-                        <td><div class="flex items-center gap-2"><img src="${p.img}" class="w-10 h-10 rounded-lg object-cover"><b>${p.name}</b></div></td>
-                        <td class="text-[10px] font-bold text-indigo-500">${p.owner}</td>
+                        <td><div class="flex items-center gap-2"><img src="${p.img}" class="w-8 h-8 rounded object-cover"><b>${p.name}</b></div></td>
                         <td>${fHtml}</td>
+                        <td class="text-slate-400 text-xs font-bold">${irqPrice(p.cost)}</td>
                         <td class="font-bold text-green-600 text-sm">${irqPrice(p.sell)}</td>
                         <td class="flex gap-2 justify-end">
-                            <button onclick="sellFlow('${id}')" class="bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-bold">بيع</button>
-                            <button onclick="db.ref('products/${id}').remove()" class="text-slate-200 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                            <button onclick="sellFlow('${id}')" class="bg-green-500 text-white px-3 py-1 rounded text-[10px] font-bold">بيع</button>
+                            <button onclick="openEditModal('${id}')" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded text-[10px] font-bold border border-indigo-100">تعديل</button>
+                            <button onclick="db.ref('products/${id}').remove()" class="text-slate-200 hover:text-red-500 text-xs ml-2"><i class="fas fa-trash"></i></button>
                         </td>
                     </tr>`;
                 });
@@ -198,56 +199,78 @@
                 let td = 0;
                 Object.keys(debts).forEach(id => {
                     const d = debts[id]; td += d.amount;
-                    dt.innerHTML += `<tr class="border-b">
-                        <td><b>${d.name}</b><br><small class="text-slate-400 text-[10px]">${d.details}</small></td>
-                        <td class="text-rose-600 font-black text-sm">${irqPrice(d.amount)}</td>
-                        <td class="text-left">
-                            <button onclick="payDebt('${id}', ${d.amount})" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-[10px] border border-indigo-100 font-bold">تحصيل</button>
-                        </td>
-                    </tr>`;
+                    dt.innerHTML += `<tr class="border-b"><td><b>${d.name}</b><br><small class="text-slate-400">${d.details}</small></td><td class="text-rose-600 font-black">${irqPrice(d.amount)}</td><td class="text-left"><button onclick="payDebt('${id}', ${d.amount})" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-xs font-bold border border-indigo-100">تحصيل</button></td></tr>`;
                 });
                 document.getElementById('totalDebts').innerText = irqPrice(td);
             });
         }
 
-        window.resetFinance = () => {
-            if(confirm("⚠️ هل أنت متأكد من تصفير الكاش والأرباح؟\nسيتم مسح السجل المالي فقط، ولن تتأثر البضاعة أو الديون.")) {
-                db.ref('stats').set({ cash: 0, profit: 0 });
-                alert("تم تصفير الحسابات المالية بنجاح ✅");
-            }
+        // وظيفة التعديل
+        window.openEditModal = (id) => {
+            const p = allLiveProducts[id];
+            document.getElementById('edit_id').value = id;
+            document.getElementById('edit_cost').value = p.cost;
+            document.getElementById('edit_sell').value = p.sell;
+            document.getElementById('editModal').style.display = 'flex';
         };
 
+        window.addNewFlavorToProduct = () => {
+            const id = document.getElementById('edit_id').value;
+            const n = document.getElementById('new_f_name').value;
+            const q = Number(document.getElementById('new_f_qty').value);
+            if(!n || q <= 0) return alert("أدخل بيانات النكهة!");
+
+            const p = allLiveProducts[id];
+            if(!p.flavors) p.flavors = [];
+            p.flavors.push({ name: n, qty: q });
+            
+            db.ref('products/' + id).update({ flavors: p.flavors });
+            document.getElementById('new_f_name').value = '';
+            document.getElementById('new_f_qty').value = '';
+            alert("تمت إضافة النكهة!");
+        };
+
+        window.updateProductData = () => {
+            const id = document.getElementById('edit_id').value;
+            db.ref('products/' + id).update({
+                cost: Number(document.getElementById('edit_cost').value),
+                sell: Number(document.getElementById('edit_sell').value)
+            });
+            document.getElementById('editModal').style.display = 'none';
+            alert("تم تحديث الأسعار!");
+        };
+
+        window.resetFinance = () => { if(confirm("تصفير الحسابات المالية؟")) db.ref('stats').set({ cash: 0, profit: 0 }); };
+
         window.sellFlow = async (id) => {
-            const snap = await db.ref('products/' + id).get();
-            const p = snap.val();
+            const p = allLiveProducts[id];
+            if(!p.flavors || p.flavors.length === 0) return alert("لا توجد نكهات!");
             let msg = "اختر النكهة:\n" + p.flavors.map((f, i) => `${i+1} - ${f.name} (${f.qty})`).join('\n');
             const fIdx = parseInt(prompt(msg)) - 1;
             if(isNaN(fIdx) || !p.flavors[fIdx]) return;
             
-            const buyer = prompt("للبيع كاش اكتب (1) - للدين اكتب اسم الشخص:");
+            const buyer = prompt("كاش (1) / دين (اسم الشخص):");
             if(!buyer) return;
 
             p.flavors[fIdx].qty -= 1;
-            const updated = p.flavors.filter(f => f.qty > 0);
-            await db.ref('products/' + id).update({ flavors: updated });
+            await db.ref('products/' + id).update({ flavors: p.flavors.filter(f => f.qty > 0) });
 
             if(buyer === "1") {
                 const s = (await db.ref('stats').get()).val() || { cash: 0, profit: 0 };
                 await db.ref('stats').set({ cash: s.cash + p.sell, profit: s.profit + (p.sell - p.cost) });
             } else {
-                await db.ref('debts').push({ name: buyer, amount: p.sell, details: p.name + ' | ' + p.flavors[fIdx].name + ' | ' + new Date().toLocaleDateString('ar-IQ') });
+                await db.ref('debts').push({ name: buyer, amount: p.sell, details: p.name + ' - ' + p.flavors[fIdx].name });
             }
         };
 
         window.payDebt = async (id, cur) => {
-            const amt = Number(prompt("المبلغ المستلم من الدين:"));
+            const amt = Number(prompt("المبلغ المستلم:"));
             if(!amt) return;
             const s = (await db.ref('stats').get()).val() || { cash: 0, profit: 0 };
             await db.ref('stats').update({ cash: s.cash + amt });
             if(amt >= cur) await db.ref('debts/' + id).remove();
             else await db.ref('debts/' + id).update({ amount: cur - amt });
         };
-
     </script>
 </body>
 </html>
