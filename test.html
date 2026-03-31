@@ -3,163 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة Lux Vape</title>
+    <title>تجربة LUX_VAIP | نظام محلي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #ff9800; --dark: #121212; --card: #1e1e1e; --text: #e0e0e0; }
-        body { font-family: 'Cairo', sans-serif; background: var(--dark); color: var(--text); margin: 0; padding: 10px; }
-        .nav-bar { display: flex; justify-content: space-around; background: var(--card); padding: 10px; border-radius: 10px; margin-bottom: 20px; position: sticky; top: 0; z-index: 100; }
-        .nav-item { cursor: pointer; padding: 8px 15px; border-radius: 5px; font-weight: bold; transition: 0.3s; }
-        .nav-item.active { background: var(--primary); color: #000; }
-        
-        .section { display: none; }
-        .section.active { display: block; }
-
-        .card { background: var(--card); padding: 15px; border-radius: 10px; margin-bottom: 15px; border-right: 5px solid var(--primary); }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: none; background: #333; color: #fff; box-sizing: border-box; }
-        
-        button { width: 100%; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-add { background: #4caf50; color: white; }
-        .btn-pay { background: #2196f3; color: white; margin-top: 5px; }
-        .btn-del { background: #f44336; color: white; padding: 5px; width: auto; }
-
-        .debt-item { display: flex; justify-content: space-between; align-items: center; background: #252525; padding: 10px; margin-top: 5px; border-radius: 5px; }
-        .balance-tag { color: var(--primary); font-weight: bold; }
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap');
+        body { font-family: 'Tajawal', sans-serif; background-color: #f1f5f9; color: #1e293b; }
+        .stat-card { background: white; border-radius: 1rem; padding: 15px; border-right: 5px solid #6366f1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .debt-card { border-right-color: #e11d48; background: #fff1f2; }
+        input, select, textarea { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline-color: #6366f1; background: white; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+        td { background: white; padding: 12px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; text-align: right; }
+        .edit-badge { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-block; margin-top: 4px; }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
 
-    <div class="nav-bar">
-        <div class="nav-item active" onclick="showSection('home')">الرئيسية</div>
-        <div class="nav-item" onclick="showSection('hassouni')">حسوني</div>
-        <div class="nav-item" onclick="showSection('mustafa')">مصطفى</div>
-        <div class="nav-item" onclick="showSection('debts')">الديون</div>
-    </div>
-
-    <div id="home" class="section active">
-        <div class="card">
-            <h3>إضافة منتج جديد</h3>
-            <input type="text" id="pName" placeholder="اسم المنتج">
-            <input type="number" id="pPrice" placeholder="سعر البيع">
-            <input type="number" id="pProfit" placeholder="الربح الصافي">
-            <select id="pOwner">
-                <option value="hassouni">تابع لحسوني</option>
-                <option value="mustafa">تابع لمصطفى</option>
-            </select>
-            <textarea id="pDesc" placeholder="وصف المنتج"></textarea>
-            <button class="btn-add" onclick="addProduct()">إضافة للمخزن</button>
+    <div id="mainSection">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-black italic">تجربة إدارة <span class="text-indigo-600">LUX_VAIP</span> (OFFLINE)</h1>
         </div>
-    </div>
 
-    <div id="hassouni" class="section">
-        <h2>منتجات حسوني</h2>
-        <div id="hassouniList"></div>
-    </div>
-
-    <div id="mustafa" class="section">
-        <h2>منتجات مصطفى</h2>
-        <div id="mustafaList"></div>
-    </div>
-
-    <div id="debts" class="section">
-        <div class="card">
-            <h3>إضافة دين جديد</h3>
-            <input type="text" id="debtorName" placeholder="اسم الشخص">
-            <input type="number" id="debtAmount" placeholder="المبلغ">
-            <button class="btn-add" onclick="addDebt()">تسجيل الدين</button>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المبيعات</p> <h2 id="soldProfit" class="text-xl font-black text-green-600">0</h2> </div>
+            <div class="stat-card debt-card"> <p class="text-rose-600 text-[10px] font-bold">إجمالي الديون</p> <h2 id="totalDebts" class="text-xl font-black text-rose-600">0</h2> </div>
+            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">قطع المخزن</p> <h2 id="totalQty" class="text-xl font-black">0</h2> </div>
+            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المخزن</p> <h2 id="totalProfit" class="text-xl font-black text-amber-600">0</h2> </div>
         </div>
-        <h3>سجل المديونين</h3>
-        <div id="debtsList"></div>
-    </div>
 
-<script>
-    let data = JSON.parse(localStorage.getItem('luxData')) || {
-        products: [],
-        debts: []
-    };
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-rose-100">
+            <h3 class="font-black mb-4 text-rose-600"><i class="fas fa-user-minus ml-1"></i> تسجيل دين جديد (تجريبي)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <input type="text" id="debt_name" placeholder="اسم الشخص">
+                <input type="number" id="debt_amount" placeholder="المبلغ">
+                <button onclick="addDebt()" class="bg-rose-600 text-white font-black rounded-xl py-2">إضافة للدين</button>
+            </div>
+            <div class="mt-6 overflow-x-auto">
+                <table class="min-w-full">
+                    <tbody id="debtTableBody"></tbody>
+                </table>
+            </div>
+        </div>
 
-    function showSection(id) {
-        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        event.currentTarget.classList.add('active');
-        renderData();
-    }
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-slate-200">
+            <h3 class="font-black mb-4 text-indigo-600 italic"><i class="fas fa-box-open ml-1"></i> إضافة بضاعة (تجريبي)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                <input type="text" id="p_name" placeholder="اسم المنتج">
+                <input type="number" id="p_cost" placeholder="سعر الكلفة">
+                <input type="number" id="p_sell" placeholder="سعر البيع">
+                <input type="number" id="p_qty" placeholder="الكمية">
+                <select id="p_owner"><option value="mustafa">مخزن مصطفى</option><option value="hussouni">مخزن حسوني</option></select>
+                <textarea id="p_desc" class="md:col-span-3 lg:col-span-6" placeholder="اكتب وصف المنتج..."></textarea>
+                <button onclick="saveProduct()" class="bg-indigo-600 text-white font-black rounded-xl py-3 md:col-span-6 mt-2">إضافة للمتجر المؤقت</button>
+            </div>
+        </div>
 
-    function addProduct() {
-        const name = document.getElementById('pName').value;
-        const price = document.getElementById('pPrice').value;
-        const profit = document.getElementById('pProfit').value;
-        const owner = document.getElementById('pOwner').value;
-        const desc = document.getElementById('pDesc').value;
-
-        if(!name || !price) return alert("امسح الحقول الفارغة!");
-
-        data.products.push({ id: Date.now(), name, price, profit, owner, desc });
-        saveAndRefresh();
-        alert("تمت الإضافة!");
-    }
-
-    function addDebt() {
-        const name = document.getElementById('debtorName').value;
-        const amount = parseFloat(document.getElementById('debtAmount').value);
-        if(!name || !amount) return alert("اكمل البيانات");
-
-        data.debts.push({ id: Date.now(), name, amount });
-        saveAndRefresh();
-    }
-
-    function payDebt(id) {
-        const amount = parseFloat(prompt("كم المبلغ الذي تريد تنزيله؟"));
-        if(isNaN(amount)) return;
+        <div class="overflow-x-auto bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+            <h3 class="font-black mb-4 italic text-slate-500">المخزن التجريبي</h3>
+            <table class="min-w-full text-sm">
+                <thead>
+                    <tr class="text-xs text-slate-400 uppercase">
+                        <th>المنتج</th> <th>المخزن</th> <th>الكمية</th> <th>السعر</th> <th>إجراء</th>
+                    </tr>
+                </thead>
+                <tbody id="pTableBody"></tbody>
+            </table>
+        </div>
         
-        const debt = data.debts.find(d => d.id === id);
-        if(debt) {
-            debt.amount -= amount;
-            if(debt.amount <= 0) data.debts = data.debts.filter(d => d.id !== id);
-            saveAndRefresh();
+        <button onclick="clearAllData()" class="mt-10 text-red-500 text-xs underline w-full text-center">مسح كل بيانات التجربة والبدء من جديد</button>
+    </div>
+
+    <script>
+        // نظام التخزين المحلي (LocalStorage) بدلاً من Firebase
+        let localData = JSON.parse(localStorage.getItem('luxTestStore')) || {
+            mustafa: { products: [] },
+            hussouni: { products: [] },
+            debts: [],
+            salesProfit: 0
+        };
+
+        function saveData() {
+            localStorage.setItem('luxTestStore', JSON.stringify(localData));
+            renderAll();
         }
-    }
 
-    function renderData() {
-        // رندر منتجات حسوني
-        const hList = document.getElementById('hassouniList');
-        hList.innerHTML = data.products.filter(p => p.owner === 'hassouni').map(p => `
-            <div class="card">
-                <h4>${p.name} <span style="float:left">${p.price} د.ع</span></h4>
-                <p>${p.desc}</p>
-                <small>الربح المتوقع: ${p.profit}</small>
-            </div>
-        `).join('');
+        function renderAll() {
+            const tbody = document.getElementById('pTableBody');
+            tbody.innerHTML = '';
+            let tQty = 0, tProfit = 0;
 
-        // رندر منتجات مصطفى
-        const mList = document.getElementById('mustafaList');
-        mList.innerHTML = data.products.filter(p => p.owner === 'mustafa').map(p => `
-            <div class="card">
-                <h4>${p.name} <span style="float:left">${p.price} د.ع</span></h4>
-                <p>${p.desc}</p>
-                <small>الربح المتوقع: ${p.profit}</small>
-            </div>
-        `).join('');
+            ['mustafa', 'hussouni'].forEach(owner => {
+                localData[owner].products.forEach((p, idx) => {
+                    tQty += Number(p.qty);
+                    tProfit += (p.sell - p.cost) * p.qty;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><b>${p.name}</b><br><span class="text-[10px] text-gray-400">${p.desc || ''}</span><br><span onclick="editField('${owner}', ${idx}, 'desc', '${p.desc}')" class="edit-badge">تعديل الوصف</span></td>
+                            <td class="text-[10px] font-bold text-indigo-500 uppercase">${owner}</td>
+                            <td class="text-center">${p.qty}<br><span onclick="editField('${owner}', ${idx}, 'qty', ${p.qty})" class="edit-badge">تعديل</span></td>
+                            <td>${Number(p.sell).toLocaleString()}<br><span onclick="editField('${owner}', ${idx}, 'sell', ${p.sell})" class="edit-badge">تعديل</span></td>
+                            <td><button onclick="sellPiece('${owner}', ${idx})" class="bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-bold">بيع قطعة</button></td>
+                        </tr>`;
+                });
+            });
 
-        // رندر الديون
-        const dList = document.getElementById('debtsList');
-        dList.innerHTML = data.debts.map(d => `
-            <div class="debt-item">
-                <div>
-                    <b>${d.name}</b> <br>
-                    <span class="balance-tag">${d.amount.toLocaleString()} د.ع</span>
-                </div>
-                <button class="btn-pay" onclick="payDebt(${d.id})">تنزيل مبلغ</button>
-            </div>
-        `).join('');
-    }
+            const dtbody = document.getElementById('debtTableBody');
+            dtbody.innerHTML = '';
+            let totalDebts = 0;
+            localData.debts.forEach((d, idx) => {
+                totalDebts += Number(d.amount);
+                dtbody.innerHTML += `
+                    <tr>
+                        <td class="font-bold">${d.name}</td>
+                        <td class="font-black text-rose-600 text-center">${Number(d.amount).toLocaleString()} د.ع</td>
+                        <td class="text-left">
+                            <button onclick="updateDebt(${idx})" class="bg-rose-100 text-rose-700 px-3 py-1 rounded-lg text-xs font-bold">تنزيل مبلغ</button>
+                            <button onclick="deleteDebt(${idx})" class="text-gray-300 mr-2"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+            });
 
-    function saveAndRefresh() {
-        localStorage.setItem('luxData', JSON.stringify(data));
-        renderData();
-    }
+            document.getElementById('totalQty').innerText = tQty;
+            document.getElementById('totalProfit').innerText = tProfit.toLocaleString() + " د.ع";
+            document.getElementById('soldProfit').innerText = localData.salesProfit.toLocaleString() + " د.ع";
+            document.getElementById('totalDebts').innerText = totalDebts.toLocaleString() + " د.ع";
+        }
 
-    renderData();
-</script>
+        function saveProduct() {
+            const owner = document.getElementById('p_owner').value;
+            const item = {
+                name: document.getElementById('p_name').value,
+                desc: document.getElementById('p_desc').value,
+                cost: Number(document.getElementById('p_cost').value),
+                sell: Number(document.getElementById('p_sell').value),
+                qty: Number(document.getElementById('p_qty').value)
+            };
+            if(!item.name || !item.sell) return alert("اكمل البيانات");
+            localData[owner].products.push(item);
+            saveData();
+            alert("تم الحفظ محلياً!");
+        }
+
+        function addDebt() {
+            const name = document.getElementById('debt_name').value;
+            const amount = Number(document.getElementById('debt_amount').value);
+            if(name && amount) {
+                localData.debts.push({ name, amount });
+                saveData();
+            }
+        }
+
+        function updateDebt(idx) {
+            const val = prompt("كم المبلغ المراد تنزيله؟");
+            if(val) {
+                localData.debts[idx].amount -= Number(val);
+                if(localData.debts[idx].amount <= 0) localData.debts.splice(idx, 1);
+                saveData();
+            }
+        }
+
+        function editField(owner, idx, field, current) {
+            const val = prompt("القيمة الجديدة:", current);
+            if(val !== null) {
+                localData[owner].products[idx][field] = (field === 'desc' ? val : Number(val));
+                saveData();
+            }
+        }
+
+        function sellPiece(owner, idx) {
+            if(localData[owner].products[idx].qty > 0) {
+                let profit = localData[owner].products[idx].sell - localData[owner].products[idx].cost;
+                localData[owner].products[idx].qty -= 1;
+                localData.salesProfit += profit;
+                saveData();
+            }
+        }
+
+        function deleteDebt(idx) { if(confirm("حذف؟")) { localData.debts.splice(idx, 1); saveData(); } }
+        function clearAllData() { if(confirm("هل أنت متأكد من مسح كل بيانات التجربة؟")) { localStorage.removeItem('luxTestStore'); location.reload(); } }
+
+        renderAll();
+    </script>
 </body>
 </html>
