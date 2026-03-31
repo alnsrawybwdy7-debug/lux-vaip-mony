@@ -3,180 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تجربة LUX_VAIP | النظام المتكامل</title>
+    <title>LUX_VAIP | نظام الأرباح المتطور</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap');
-        body { font-family: 'Tajawal', sans-serif; background-color: #f1f5f9; color: #1e293b; }
-        .stat-card { background: white; border-radius: 1rem; padding: 15px; border-right: 5px solid #6366f1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .debt-card { border-right-color: #e11d48; background: #fff1f2; }
-        input, select, textarea { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline-color: #6366f1; background: white; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
-        td { background: white; padding: 12px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; text-align: right; }
-        .edit-badge { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-block; margin-top: 4px; }
-        .img-preview { w-12 h-12 rounded-lg object-cover border; }
+        body { font-family: 'Tajawal', sans-serif; background-color: #f8fafc; padding: 15px; }
+        .card { background: white; border-radius: 1.2rem; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .stat-box { @apply p-4 rounded-xl text-center shadow-sm border; }
+        input, select, textarea { border: 1px solid #e2e8f0; border-radius: 0.75rem; padding: 12px; width: 100%; margin-bottom: 10px; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body>
 
-    <div id="mainSection">
-        <h1 class="text-2xl font-black mb-8 italic">إدارة <span class="text-indigo-600">LUX_VAIP</span> الماركت</h1>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المبيعات</p> <h2 id="soldProfit" class="text-xl font-black text-green-600">0</h2> </div>
-            <div class="stat-card debt-card"> <p class="text-rose-600 text-[10px] font-bold">إجمالي الديون</p> <h2 id="totalDebts" class="text-xl font-black text-rose-600">0</h2> </div>
-            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">قطع المخزن</p> <h2 id="totalQty" class="text-xl font-black">0</h2> </div>
-            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المخزن</p> <h2 id="totalProfit" class="text-xl font-black text-amber-600">0</h2> </div>
+    <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="stat-box bg-green-50 border-green-200">
+            <p class="text-green-600 text-xs font-bold">أرباح المبيعات (كاش)</p>
+            <h2 id="soldProfit" class="text-xl font-black text-green-700">0</h2>
         </div>
-
-        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-slate-200">
-            <h3 class="font-black mb-4 text-indigo-600 italic"><i class="fas fa-box-open ml-1"></i> إضافة بضاعة جديدة</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                <input type="text" id="p_name" placeholder="اسم المنتج">
-                <label class="bg-slate-100 p-2.5 rounded-xl text-center text-xs cursor-pointer border hover:bg-slate-200">📸 صورة <input type="file" id="p_file" accept="image/*" class="hidden" onchange="previewImage(this)"></label>
-                <input type="number" id="p_cost" placeholder="سعر الكلفة">
-                <input type="number" id="p_sell" placeholder="سعر البيع">
-                <input type="number" id="p_qty" placeholder="الكمية">
-                <select id="p_owner"><option value="mustafa">مخزن مصطفى</option><option value="hussouni">مخزن حسوني</option></select>
-                <textarea id="p_desc" class="md:col-span-3 lg:col-span-6" placeholder="وصف المنتج..."></textarea>
-                <button onclick="saveProduct()" class="bg-indigo-600 text-white font-black rounded-xl py-3 md:col-span-6 mt-2">حفظ المنتج</button>
-            </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-rose-100">
-            <h3 class="font-black mb-4 text-rose-600 italic"><i class="fas fa-user-minus ml-1"></i> قسم الديون والتحصيل</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
-                <input type="text" id="debt_name" placeholder="اسم الشخص المديون">
-                <input type="number" id="debt_amount" placeholder="المبلغ">
-                <button onclick="addDebt()" class="bg-rose-600 text-white font-black rounded-xl py-2">تسجيل دين يدوي</button>
-            </div>
-            <table class="min-w-full">
-                <tbody id="debtTableBody"></tbody>
-            </table>
-        </div>
-
-        <div class="overflow-x-auto bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-            <h3 class="font-black mb-4 italic text-slate-500">إدارة المخزون</h3>
-            <table class="min-w-full text-sm">
-                <thead>
-                    <tr class="text-xs text-slate-400 uppercase">
-                        <th>الصورة والمنتج</th> <th>المخزن</th> <th>الكمية</th> <th>السعر</th> <th>إجراء البيع</th>
-                    </tr>
-                </thead>
-                <tbody id="pTableBody"></tbody>
-            </table>
+        <div class="stat-box bg-rose-50 border-rose-200">
+            <p class="text-rose-600 text-xs font-bold">إجمالي الديون</p>
+            <h2 id="totalDebts" class="text-xl font-black text-rose-700">0</h2>
         </div>
     </div>
 
-    <script>
-        let localData = JSON.parse(localStorage.getItem('luxTestStoreV3')) || {
-            mustafa: { products: [] }, hussouni: { products: [] }, debts: [], salesProfit: 0
-        };
-        let base64Img = "";
+    <div class="card border-r-4 border-rose-500">
+        <h3 class="font-black mb-4 text-rose-600"><i class="fas fa-hand-holding-usd ml-1"></i> قائمة المديونين</h3>
+        <div id="debtList" class="space-y-3"></div>
+    </div>
 
-        function previewImage(input) {
-            const reader = new FileReader();
-            reader.onload = (e) => base64Img = e.target.result;
-            reader.readAsDataURL(input.files[0]);
-        }
+    <div class="card">
+        <h3 class="font-black mb-4 text-slate-500 italic">المخزن والبيع</h3>
+        <div id="inventoryList" class="space-y-4"></div>
+    </div>
+
+    <script>
+        // التخزين المحلي
+        let localData = JSON.parse(localStorage.getItem('lux_pro_test')) || {
+            mustafa: [], hussouni: [], debts: [], salesProfit: 0
+        };
 
         function saveData() {
-            localStorage.setItem('luxTestStoreV3', JSON.stringify(localData));
-            renderAll();
+            localStorage.setItem('lux_pro_test', JSON.stringify(localData));
+            render();
         }
 
-        function renderAll() {
-            const tbody = document.getElementById('pTableBody');
-            tbody.innerHTML = '';
-            let tQty = 0, tProfit = 0;
-
-            ['mustafa', 'hussouni'].forEach(owner => {
-                localData[owner].products.forEach((p, idx) => {
-                    tQty += Number(p.qty); tProfit += (p.sell - p.cost) * p.qty;
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>
-                                <div class="flex items-center gap-2">
-                                    <img src="${p.img || 'https://via.placeholder.com/50'}" class="w-10 h-10 rounded shadow-sm">
-                                    <div><b>${p.name}</b><br><span class="text-[10px] text-gray-400">${p.desc || ''}</span></div>
-                                </div>
-                            </td>
-                            <td class="text-[10px] font-bold text-indigo-500 uppercase">${owner}</td>
-                            <td class="text-center">${p.qty}</td>
-                            <td>${Number(p.sell).toLocaleString()}</td>
-                            <td><button onclick="sellFlow('${owner}', ${idx})" class="bg-green-500 text-white px-4 py-1 rounded-lg text-xs font-bold shadow-sm">بيع</button></td>
-                        </tr>`;
-                });
-            });
-
-            const dtbody = document.getElementById('debtTableBody');
-            dtbody.innerHTML = '';
-            let totalDebts = 0;
-            localData.debts.forEach((d, idx) => {
-                totalDebts += Number(d.amount);
-                dtbody.innerHTML += `<tr><td class="font-bold">${d.name}</td><td class="font-black text-rose-600">${Number(d.amount).toLocaleString()} د.ع</td><td class="text-left"><button onclick="updateDebt(${idx})" class="bg-rose-100 text-rose-700 px-3 py-1 rounded-lg text-xs">تنزيل مبلغ</button></td></tr>`;
-            });
-
-            document.getElementById('totalQty').innerText = tQty;
-            document.getElementById('totalProfit').innerText = tProfit.toLocaleString() + " د.ع";
-            document.getElementById('soldProfit').innerText = localData.salesProfit.toLocaleString() + " د.ع";
-            document.getElementById('totalDebts').innerText = totalDebts.toLocaleString() + " د.ع";
-        }
-
-        function saveProduct() {
-            const owner = document.getElementById('p_owner').value;
-            const item = {
-                name: document.getElementById('p_name').value,
-                img: base64Img,
-                desc: document.getElementById('p_desc').value,
-                cost: Number(document.getElementById('p_cost').value),
-                sell: Number(document.getElementById('p_sell').value),
-                qty: Number(document.getElementById('p_qty').value)
-            };
-            if(!item.name || !item.sell) return alert("اكمل البيانات");
-            localData[owner].products.push(item);
-            base64Img = "";
-            saveData();
-        }
-
-        function sellFlow(owner, idx) {
-            const p = localData[owner].products[idx];
-            if(p.qty <= 0) return alert("خلصت القطع!");
+        // دالة تنزيل الدين وتحويله لأرباح
+        function payDebt(idx) {
+            const currentAmount = localData.debts[idx].amount;
+            const val = prompt(`المبلغ الحالي: ${currentAmount.toLocaleString()} \n ادخل المبلغ الذي تم استلامه كاش:`);
             
-            const type = confirm("اضغط (OK) للبيع النقدي \nاضغط (Cancel) للبيع بالدين");
-            
-            if(type) { // نقدي
-                p.qty -= 1;
-                localData.salesProfit += (p.sell - p.cost);
-                alert("تم البيع نقداً");
-            } else { // دين
-                const person = prompt("اكتب اسم الشخص المطلوب:");
-                if(person) {
-                    p.qty -= 1;
-                    localData.debts.push({ name: person + " (دين بضاعة)", amount: p.sell });
-                    alert("تم تسجيل " + p.sell + " دين على " + person);
+            if (val && !isNaN(val)) {
+                const received = Number(val);
+                
+                // 1. تحديث الأرباح (تحويل الدين المقبوض إلى أرباح كاش)
+                localData.salesProfit += received;
+                
+                // 2. خصم من سجل الدين
+                localData.debts[idx].amount -= received;
+                
+                // إذا تسدد الدين بالكامل نحذفه
+                if(localData.debts[idx].amount <= 0) {
+                    alert("تم تسديد الدين بالكامل وإضافته للأرباح ✅");
+                    localData.debts.splice(idx, 1);
+                } else {
+                    alert(`تم استلام ${received.toLocaleString()} وإضافتها للأرباح. المتبقي: ${localData.debts[idx].amount.toLocaleString()}`);
                 }
-            }
-            saveData();
-        }
-
-        function addDebt() {
-            const name = document.getElementById('debt_name').value;
-            const amount = Number(document.getElementById('debt_amount').value);
-            if(name && amount) { localData.debts.push({ name, amount }); saveData(); }
-        }
-
-        function updateDebt(idx) {
-            const val = prompt("كم تم استلام مبلغ؟");
-            if(val) {
-                localData.debts[idx].amount -= Number(val);
-                if(localData.debts[idx].amount <= 0) localData.debts.splice(idx, 1);
+                
                 saveData();
             }
         }
 
-        renderAll();
+        // البيع (نقدي أو دين)
+        function sellFlow(owner, idx) {
+            const p = localData[owner][idx];
+            if(p.qty <= 0) return alert("المخزن فارغ!");
+
+            const choice = prompt("للبيع نقداً اكتب (1) \n للبيع بالدين اكتب (اسم الشخص):");
+            if (!choice) return;
+
+            if (choice === "1") {
+                p.qty -= 1;
+                localData.salesProfit += (p.sell - p.cost); // ربح البيع النقدي
+                alert("تم البيع نقداً ✅");
+            } else {
+                p.qty -= 1;
+                localData.debts.push({ name: choice, amount: p.sell });
+                alert(`تم تسجيل دين بمبلغ ${p.sell} على ${choice}`);
+            }
+            saveData();
+        }
+
+        function render() {
+            // تحديث العدادات
+            document.getElementById('soldProfit').innerText = localData.salesProfit.toLocaleString() + " د.ع";
+            
+            let totalD = 0;
+            const dDiv = document.getElementById('debtList');
+            dDiv.innerHTML = '';
+            localData.debts.forEach((d, idx) => {
+                totalD += d.amount;
+                dDiv.innerHTML += `
+                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100">
+                        <div><b class="text-slate-700">${d.name}</b><br><span class="text-rose-600 font-black text-sm">${d.amount.toLocaleString()} د.ع</span></div>
+                        <button onclick="payDebt(${idx})" class="bg-indigo-600 text-white px-4 py-1 rounded-lg text-xs font-bold shadow-sm">تحصيل مبلغ</button>
+                    </div>`;
+            });
+            document.getElementById('totalDebts').innerText = totalD.toLocaleString() + " د.ع";
+
+            // رندر المخزن (تبسيط للعرض)
+            const iDiv = document.getElementById('inventoryList');
+            iDiv.innerHTML = '';
+            ['mustafa', 'hussouni'].forEach(owner => {
+                localData[owner].forEach((p, idx) => {
+                    iDiv.innerHTML += `
+                        <div class="flex justify-between items-center border-b pb-2">
+                            <div><b>${p.name}</b> <small class="text-indigo-500">(${owner})</small></div>
+                            <div class="flex items-center gap-4">
+                                <span class="font-bold">${p.qty} ق</span>
+                                <button onclick="sellFlow('${owner}', ${idx})" class="bg-green-500 text-white px-4 py-1 rounded-md text-xs">بيع</button>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+
+        // أضفت بضاعة وهمية للتجربة إذا كان فارغاً
+        if(localData.mustafa.length === 0 && localData.hussouni.length === 0) {
+            localData.mustafa.push({name: "فيب سحبة", cost: 10000, sell: 15000, qty: 5});
+            saveData();
+        }
+
+        render();
     </script>
 </body>
 </html>
