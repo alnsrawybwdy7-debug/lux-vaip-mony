@@ -13,7 +13,7 @@
         body { font-family: 'Tajawal', sans-serif; background-color: #f1f5f9; color: #1e293b; }
         #authOverlay { position: fixed; inset: 0; background: #020617; z-index: 999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
         .stat-card { background: white; border-radius: 1rem; padding: 15px; border-right: 5px solid #6366f1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; position: relative; }
-        input, select { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline: none; transition: 0.3s; }
+        input, select { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline: none; }
         .flavor-tag { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; margin: 2px; display: inline-block; border: 1px solid #c7d2fe; }
         table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
         td { background: white; padding: 12px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; text-align: right; }
@@ -23,7 +23,7 @@
 <body class="p-4 md:p-8">
 
     <div id="authOverlay">
-        <div class="w-12 h-12 bg-indigo-600 rounded-xl mb-6 flex items-center justify-center shadow-lg"><i class="fas fa-user-shield text-white text-xl"></i></div>
+        <div class="w-12 h-12 bg-indigo-600 rounded-xl mb-6 flex items-center justify-center shadow-lg shadow-indigo-500/50"><i class="fas fa-user-shield text-white text-xl"></i></div>
         <input type="password" id="adminPass" placeholder="رمز الدخول" class="max-w-[200px] text-center bg-white/10 border-white/20 text-white mb-4 rounded-xl p-2 outline-none">
         <button onclick="checkAuth()" class="bg-indigo-600 text-white px-12 py-2 rounded-xl font-bold hover:bg-indigo-700 transition">دخول</button>
     </div>
@@ -45,7 +45,7 @@
                 </div>
             </div>
             <div class="flex gap-2 mt-6">
-                <button onclick="updateProductData()" class="flex-grow bg-indigo-600 text-white py-2 rounded-xl font-bold shadow-lg">حفظ التغييرات</button>
+                <button onclick="updateProductData()" class="flex-grow bg-indigo-600 text-white py-2 rounded-xl font-bold">حفظ التغييرات</button>
                 <button onclick="document.getElementById('editModal').style.display='none'" class="bg-slate-200 px-4 rounded-xl font-bold">إلغاء</button>
             </div>
         </div>
@@ -58,15 +58,24 @@
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 text-right">
-            <div class="stat-card"> <i class="fas fa-redo absolute top-2 left-2 text-[10px] text-red-400 cursor-pointer" onclick="resetFinance()"></i> <p class="text-green-600 text-[10px] font-bold">الكاش المستلم</p> <h2 id="totalCash" class="text-lg font-black text-green-700">0</h2> </div>
-            <div class="stat-card"> <p class="text-indigo-600 text-[10px] font-bold">صافي الأرباح</p> <h2 id="soldProfit" class="text-lg font-black text-indigo-700">0</h2> </div>
-            <div class="stat-card"> <p class="text-rose-600 text-[10px] font-bold">إجمالي الديون</p> <h2 id="totalDebts" class="text-lg font-black text-rose-700">0</h2> </div>
-            <div class="stat-card"> <p class="text-slate-400 text-[10px] font-bold">قطع المخزن</p> <h2 id="totalQty" class="text-lg font-black text-slate-700">0</h2> </div>
+            <div class="stat-card"> <i class="fas fa-redo absolute top-2 left-2 text-[10px] text-red-400 cursor-pointer" onclick="resetFinance()"></i> <p class="text-green-600 text-[10px] font-bold uppercase">الكاش المستلم</p> <h2 id="totalCash" class="text-lg font-black text-green-700">0</h2> </div>
+            <div class="stat-card"> <p class="text-indigo-600 text-[10px] font-bold uppercase">صافي الأرباح</p> <h2 id="soldProfit" class="text-lg font-black text-indigo-700">0</h2> </div>
+            <div class="stat-card"> <p class="text-rose-600 text-[10px] font-bold uppercase">إجمالي الديون</p> <h2 id="totalDebts" class="text-lg font-black text-rose-700">0</h2> </div>
+            <div class="stat-card"> <p class="text-slate-400 text-[10px] font-bold uppercase">قطع المخزن</p> <h2 id="totalQty" class="text-lg font-black text-slate-700">0</h2> </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-rose-100 text-right">
+            <h3 class="font-black mb-4 text-rose-600 italic"><i class="fas fa-receipt ml-1"></i> مديونيات الزبائن</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <tbody id="debtTableBody"></tbody>
+                </table>
+            </div>
         </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-slate-200 text-right">
-            <h3 class="font-black mb-4 text-indigo-600 italic">إضافة بضاعة جديدة</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+            <h3 class="font-black mb-4 text-indigo-600 italic uppercase">إضافة بضاعة جديدة</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
                 <input type="text" id="p_name" placeholder="اسم الجهاز">
                 <input type="number" id="p_cost" placeholder="سعر الكلفة">
                 <input type="number" id="p_sell" placeholder="سعر البيع">
@@ -87,7 +96,7 @@
             <h3 class="font-black mb-4 italic text-slate-500 underline text-right uppercase">المخزن الحالي</h3>
             <table class="min-w-full">
                 <thead>
-                    <tr class="text-[10px] text-slate-400 font-bold uppercase">
+                    <tr class="text-[10px] text-slate-400 font-bold">
                         <th>المنتج</th> <th>النكهات</th> <th>الكلفة</th> <th>البيع</th> <th>إجراء</th>
                     </tr>
                 </thead>
@@ -103,7 +112,6 @@
         let currentFlavors = [];
         let allLiveProducts = {};
 
-        // فحص الدخول عند تحميل الصفحة
         window.onload = () => {
             if (localStorage.getItem('admin_logged_in') === 'true') {
                 document.getElementById('authOverlay').style.display = 'none';
@@ -118,15 +126,10 @@
                 document.getElementById('authOverlay').style.display = 'none';
                 document.getElementById('mainContent').classList.remove('opacity-0');
                 initFirebase();
-            } else {
-                alert("الرمز خطأ!");
-            }
+            } else { alert("الرمز خطأ!"); }
         }
 
-        function logout() {
-            localStorage.removeItem('admin_logged_in');
-            location.reload();
-        }
+        function logout() { localStorage.removeItem('admin_logged_in'); location.reload(); }
 
         function initFirebase() {
             const firebaseConfig = {
@@ -169,10 +172,7 @@
             db.ref('products').push({
                 name: n, sell: s, cost: Number(document.getElementById('p_cost').value),
                 img: base64Img, flavors: currentFlavors
-            }).then(() => {
-                alert("تم الرفع بنجاح ✅");
-                location.reload();
-            });
+            }).then(() => { alert("تم الرفع بنجاح ✅"); location.reload(); });
         };
 
         function loadLive() {
@@ -186,6 +186,7 @@
                 document.getElementById('totalCash').innerText = irqPrice(stats.cash);
                 document.getElementById('soldProfit').innerText = irqPrice(stats.profit);
 
+                // تحديث جدول المنتجات
                 const pt = document.getElementById('pTableBody');
                 pt.innerHTML = '';
                 let tQty = 0;
@@ -207,6 +208,24 @@
                     </tr>`;
                 });
                 document.getElementById('totalQty').innerText = tQty;
+
+                // تحديث جدول الديون (هذا الجزء هو الذي تم إصلاحه)
+                const dt = document.getElementById('debtTableBody');
+                dt.innerHTML = '';
+                let tdSum = 0;
+                Object.keys(debts).forEach(id => {
+                    const d = debts[id];
+                    tdSum += d.amount;
+                    dt.innerHTML += `<tr class="border-b">
+                        <td><b>${d.name}</b><br><small class="text-slate-400 text-[10px]">${d.details}</small></td>
+                        <td class="text-rose-600 font-black text-sm">${irqPrice(d.amount)}</td>
+                        <td class="text-left">
+                            <button onclick="payDebt('${id}', ${d.amount})" class="bg-indigo-50 text-indigo-600 px-4 py-1 rounded-lg text-xs font-bold border border-indigo-100">تحصيل</button>
+                            <button onclick="db.ref('debts/${id}').remove()" class="text-slate-200 mr-2"><i class="fas fa-times-circle"></i></button>
+                        </td>
+                    </tr>`;
+                });
+                document.getElementById('totalDebts').innerText = irqPrice(tdSum);
             });
         }
 
@@ -225,6 +244,7 @@
                 sell: Number(document.getElementById('edit_sell').value)
             });
             document.getElementById('editModal').style.display = 'none';
+            alert("تم التحديث ✅");
         };
 
         window.addNewFlavorToProduct = () => {
@@ -258,6 +278,15 @@
             } else {
                 await db.ref('debts').push({ name: buyer, amount: p.sell, details: p.name + ' - ' + p.flavors[fIdx].name });
             }
+        };
+
+        window.payDebt = async (id, cur) => {
+            const amt = Number(prompt("المبلغ المستلم:"));
+            if(!amt) return;
+            const s = (await db.ref('stats').get()).val() || { cash: 0, profit: 0 };
+            await db.ref('stats').update({ cash: s.cash + amt });
+            if(amt >= cur) await db.ref('debts/' + id).remove();
+            else await db.ref('debts/' + id).update({ amount: cur - amt });
         };
     </script>
 </body>
