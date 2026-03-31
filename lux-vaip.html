@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة LUX_VAIP | النسخة السحابية</title>
+    <title>إدارة LUX_VAIP | النسخة الكاملة</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,245 +11,243 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap');
         body { font-family: 'Tajawal', sans-serif; background-color: #f1f5f9; color: #1e293b; }
-        .stat-card { background: white; border-radius: 1rem; padding: 15px; border-right: 5px solid #6366f1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; }
+        #authOverlay { position: fixed; inset: 0; background: #020617; z-index: 999; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .stat-card { background: white; border-radius: 1rem; padding: 15px; border-right: 5px solid #6366f1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; position: relative; }
         .cash-card { border-right-color: #22c55e; background: #f0fdf4; }
         .debt-card { border-right-color: #e11d48; background: #fff1f2; }
-        input, select, textarea { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline: none; }
+        input, select { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline: none; }
+        .flavor-tag { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; margin: 2px; display: inline-block; border: 1px solid #c7d2fe; }
         table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
         td { background: white; padding: 12px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; text-align: right; }
-        .flavor-tag { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; margin: 2px; display: inline-block; border: 1px solid #c7d2fe; }
+        .reset-btn { position: absolute; top: 5px; left: 5px; font-size: 10px; color: #ef4444; cursor: pointer; opacity: 0.5; transition: 0.3s; }
+        .reset-btn:hover { opacity: 1; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <h1 class="text-2xl font-black italic mb-8 text-center text-slate-800 underline decoration-indigo-500 decoration-4">لوحة تحكم LUX_VAIP السحابية</h1>
-
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-        <div class="stat-card cash-card"> <p class="text-green-600 text-[10px] font-bold">الكاش المستلم</p> <h2 id="totalCash" class="text-lg font-black text-green-700">0</h2> </div>
-        <div class="stat-card"> <p class="text-indigo-600 text-[10px] font-bold">صافي الأرباح</p> <h2 id="soldProfit" class="text-lg font-black text-indigo-700">0</h2> </div>
-        <div class="stat-card debt-card"> <p class="text-rose-600 text-[10px] font-bold">إجمالي الديون</p> <h2 id="totalDebts" class="text-lg font-black text-rose-700">0</h2> </div>
-        <div class="stat-card"> <p class="text-slate-400 text-[10px] font-bold">قطع المخزن</p> <h2 id="totalQty" class="text-lg font-black text-slate-700">0</h2> </div>
+    <div id="authOverlay">
+        <div class="w-12 h-12 bg-indigo-600 rounded-xl mb-6 flex items-center justify-center shadow-lg shadow-indigo-500/50"><i class="fas fa-user-shield text-white text-xl"></i></div>
+        <h2 class="text-white font-black mb-4 tracking-widest">LUX VAPE SYSTEM</h2>
+        <input type="password" id="adminPass" placeholder="رمز الدخول" class="max-w-[200px] text-center bg-white/10 border-white/20 text-white focus:border-indigo-500 mb-4">
+        <button onclick="checkAuth()" class="bg-indigo-600 text-white px-12 py-2 rounded-xl font-bold hover:bg-indigo-700 transition">دخول</button>
+        <p id="errorMsg" class="text-red-500 text-xs mt-4 hidden">الرمز خطأ!</p>
     </div>
 
-    <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-rose-100">
-        <h3 class="font-black mb-4 text-rose-600 italic"><i class="fas fa-user-clock ml-1"></i> سجل مديونيات الزبائن</h3>
-        <div class="overflow-x-auto"><table class="w-full"><tbody id="debtTableBody"></tbody></table></div>
-    </div>
-
-    <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-slate-200">
-        <h3 class="font-black mb-4 text-indigo-600 italic"><i class="fas fa-box-open ml-1"></i> إضافة جهاز جديد ونكهات</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-4">
-            <input type="text" id="p_name" placeholder="اسم الجهاز">
-            <label class="bg-slate-50 p-2.5 rounded-xl text-center text-xs cursor-pointer border border-dashed border-slate-300 text-slate-500 font-bold">📸 صورة <input type="file" accept="image/*" class="hidden" onchange="previewImage(this)"></label>
-            <input type="number" id="p_cost" placeholder="سعر الكلفة">
-            <input type="number" id="p_sell" placeholder="سعر البيع">
-            <select id="p_owner"><option value="mustafa">مخزن مصطفى</option><option value="hussouni">مخزن حسوني</option></select>
+    <div id="mainContent" class="opacity-0 transition-opacity duration-700">
+        <div class="flex justify-between items-center mb-8">
+            <button onclick="location.reload()" class="text-slate-400 hover:text-indigo-600"><i class="fas fa-sync-alt"></i></button>
+            <h1 class="text-2xl font-black italic text-slate-800 underline decoration-indigo-500 decoration-4 text-center">لوحة تحكم LUX_VAIP</h1>
+            <i class="fas fa-user-circle text-slate-300 text-2xl"></i>
         </div>
-        <div class="bg-indigo-50 p-4 rounded-xl mb-4 border border-indigo-100">
-            <p class="text-xs font-bold text-indigo-600 mb-2">إضافة النكهات والكميات:</p>
-            <div class="flex gap-2">
-                <input type="text" id="f_name" placeholder="اسم النكهة (مثلاً: رقي)" class="bg-white">
-                <input type="number" id="f_qty" placeholder="العدد" class="bg-white w-24">
-                <button onclick="addFlavorToList()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold hover:bg-indigo-700">+</button>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10 text-right">
+            <div class="stat-card cash-card"> 
+                <i class="fas fa-redo reset-btn" title="تصفير الحسابات" onclick="resetFinance()"></i>
+                <p class="text-green-600 text-[10px] font-bold uppercase">الكاش المستلم</p> 
+                <h2 id="totalCash" class="text-lg font-black text-green-700">0</h2> 
             </div>
-            <div id="tempFlavors" class="mt-3 flex flex-wrap"></div>
+            <div class="stat-card"> 
+                <p class="text-indigo-600 text-[10px] font-bold uppercase">صافي الأرباح</p> 
+                <h2 id="soldProfit" class="text-lg font-black text-indigo-700">0</h2> 
+            </div>
+            <div class="stat-card debt-card"> 
+                <p class="text-rose-600 text-[10px] font-bold uppercase">إجمالي الديون</p> 
+                <h2 id="totalDebts" class="text-lg font-black text-rose-700">0</h2> 
+            </div>
+            <div class="stat-card"> 
+                <p class="text-slate-400 text-[10px] font-bold uppercase">قطع المخزن</p> 
+                <h2 id="totalQty" class="text-lg font-black text-slate-700">0</h2> 
+            </div>
         </div>
-        <button onclick="saveProduct()" class="w-full bg-slate-800 text-white font-black py-3 rounded-xl shadow-lg hover:bg-black transition">حفظ المنتج في السيرفر 🚀</button>
-    </div>
 
-    <div class="overflow-x-auto bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-10">
-        <h3 class="font-black mb-4 italic text-slate-500 underline text-right">المخزون الحالي</h3>
-        <table class="min-w-full">
-            <thead>
-                <tr class="text-[10px] text-slate-400 font-bold uppercase">
-                    <th>المنتج</th> <th>المخزن</th> <th>النكهات المتوفرة</th> <th>سعر البيع</th> <th>إجراء</th>
-                </tr>
-            </thead>
-            <tbody id="pTableBody"></tbody>
-        </table>
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-rose-100 text-right">
+            <h3 class="font-black mb-4 text-rose-600 italic"><i class="fas fa-receipt ml-1"></i> مديونيات الزبائن</h3>
+            <div class="overflow-x-auto"><table class="w-full"><tbody id="debtTableBody"></tbody></table></div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-slate-200 text-right">
+            <h3 class="font-black mb-4 text-indigo-600 italic"><i class="fas fa-plus-square ml-1"></i> إضافة بضاعة جديدة</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-4">
+                <input type="text" id="p_name" placeholder="اسم الجهاز">
+                <label class="bg-slate-50 p-2.5 rounded-xl text-center text-[10px] cursor-pointer border border-dashed border-slate-300 text-slate-500 font-bold">📸 اختر صورة <input type="file" accept="image/*" class="hidden" onchange="previewImage(this)"></label>
+                <input type="number" id="p_cost" placeholder="سعر الكلفة">
+                <input type="number" id="p_sell" placeholder="سعر البيع">
+                <select id="p_owner"><option value="mustafa">مخزن مصطفى</option><option value="hussouni">مخزن حسوني</option></select>
+            </div>
+            <div class="bg-indigo-50 p-4 rounded-xl mb-4 border border-indigo-100">
+                <div class="flex gap-2">
+                    <input type="text" id="f_name" placeholder="اسم النكهة" class="bg-white">
+                    <input type="number" id="f_qty" placeholder="العدد" class="bg-white w-20">
+                    <button onclick="addFlavorToList()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold">+</button>
+                </div>
+                <div id="tempFlavors" class="mt-3 flex flex-wrap"></div>
+            </div>
+            <button onclick="saveProduct()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl hover:bg-black transition">حفظ ورفع للمتجر 🚀</button>
+        </div>
+
+        <div class="overflow-x-auto bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-10">
+            <h3 class="font-black mb-4 italic text-slate-500 underline text-right">المخزون المتوفر حالياً</h3>
+            <table class="min-w-full">
+                <thead>
+                    <tr class="text-[10px] text-slate-400 font-bold">
+                        <th>المنتج</th> <th>المخزن</th> <th>النكهات</th> <th>السعر</th> <th>إجراء</th>
+                    </tr>
+                </thead>
+                <tbody id="pTableBody"></tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        // إعدادات Firebase الخاصة بك
-        const firebaseConfig = {
-            apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc",
-            databaseURL: "https://lux-vaip-default-rtdb.firebaseio.com/",
-            projectId: "lux-vaip"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const CORRECT_PASS = "1221"; 
+        let db;
+
+        function checkAuth() {
+            const input = document.getElementById('adminPass').value;
+            if(input === CORRECT_PASS) {
+                document.getElementById('authOverlay').style.display = 'none';
+                document.getElementById('mainContent').classList.remove('opacity-0');
+                initFirebase();
+            } else {
+                document.getElementById('errorMsg').classList.remove('hidden');
+            }
+        }
+
+        function initFirebase() {
+            const firebaseConfig = {
+                apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc",
+                databaseURL: "https://lux-vaip-default-rtdb.firebaseio.com/",
+                projectId: "lux-vaip"
+            };
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+            loadLive();
+        }
 
         let base64Img = "";
         let currentFlavors = [];
-
         const irqPrice = (num) => new Intl.NumberFormat('ar-IQ').format(num) + " د.ع";
 
-        function previewImage(input) {
+        window.previewImage = (input) => {
             const reader = new FileReader();
             reader.onload = (e) => base64Img = e.target.result;
             reader.readAsDataURL(input.files[0]);
-        }
+        };
 
-        function addFlavorToList() {
-            const name = document.getElementById('f_name').value;
-            const qty = Number(document.getElementById('f_qty').value);
-            if(name && qty > 0) {
-                currentFlavors.push({ name, qty });
+        window.addFlavorToList = () => {
+            const n = document.getElementById('f_name').value;
+            const q = Number(document.getElementById('f_qty').value);
+            if(n && q > 0) {
+                currentFlavors.push({ name: n, qty: q });
                 document.getElementById('f_name').value = '';
                 document.getElementById('f_qty').value = '';
-                renderTempFlavors();
+                renderTemp();
             }
+        };
+
+        function renderTemp() {
+            document.getElementById('tempFlavors').innerHTML = currentFlavors.map((f, i) => `<span class="flavor-tag">${f.name} (${f.qty}) <i class="fas fa-times cursor-pointer text-red-500 mr-1" onclick="currentFlavors.splice(${i},1);renderTemp()"></i></span>`).join('');
         }
 
-        function renderTempFlavors() {
-            const div = document.getElementById('tempFlavors');
-            div.innerHTML = currentFlavors.map((f, i) => `<span class="flavor-tag">${f.name} (${f.qty} ق) <i class="fas fa-times cursor-pointer mr-1 text-red-500" onclick="currentFlavors.splice(${i},1);renderTempFlavors()"></i></span>`).join('');
-        }
-
-        // حفظ المنتج في Firebase
-        function saveProduct() {
-            const owner = document.getElementById('p_owner').value;
-            const name = document.getElementById('p_name').value;
-            const cost = Number(document.getElementById('p_cost').value);
-            const sell = Number(document.getElementById('p_sell').value);
-
-            if(currentFlavors.length === 0 || !name || !sell) return alert("اكمل البيانات الأساسية والنكهات!");
-
+        window.saveProduct = () => {
+            const n = document.getElementById('p_name').value;
+            const s = Number(document.getElementById('p_sell').value);
+            if(!n || !s || currentFlavors.length === 0) return alert("يرجى إكمال البيانات!");
             db.ref('products').push({
-                name, img: base64Img, cost, sell, owner,
-                flavors: currentFlavors,
-                timestamp: Date.now()
+                name: n, sell: s, cost: Number(document.getElementById('p_cost').value),
+                owner: document.getElementById('p_owner').value,
+                img: base64Img, flavors: currentFlavors
             });
+            alert("تم الرفع بنجاح ✅");
+            location.reload();
+        };
 
-            // تصفير الحقول
-            base64Img = ""; currentFlavors = []; 
-            document.getElementById('p_name').value = '';
-            document.getElementById('p_cost').value = '';
-            document.getElementById('p_sell').value = '';
-            renderTempFlavors();
-            alert("تم الحفظ في السيرفر ✅");
+        function loadLive() {
+            db.ref().on('value', snap => {
+                const data = snap.val() || {};
+                const prods = data.products || {};
+                const debts = data.debts || {};
+                const stats = data.stats || { cash: 0, profit: 0 };
+
+                document.getElementById('totalCash').innerText = irqPrice(stats.cash);
+                document.getElementById('soldProfit').innerText = irqPrice(stats.profit);
+
+                const pt = document.getElementById('pTableBody');
+                pt.innerHTML = '';
+                let tQty = 0;
+                Object.keys(prods).forEach(id => {
+                    const p = prods[id];
+                    let pq = 0;
+                    let fHtml = p.flavors ? p.flavors.map(f => { pq += f.qty; return `<span class="flavor-tag">${f.name} (${f.qty})</span>` }).join('') : '';
+                    tQty += pq;
+                    pt.innerHTML += `<tr class="border-b">
+                        <td><div class="flex items-center gap-2"><img src="${p.img}" class="w-10 h-10 rounded-lg object-cover"><b>${p.name}</b></div></td>
+                        <td class="text-[10px] font-bold text-indigo-500">${p.owner}</td>
+                        <td>${fHtml}</td>
+                        <td class="font-bold text-green-600 text-sm">${irqPrice(p.sell)}</td>
+                        <td class="flex gap-2 justify-end">
+                            <button onclick="sellFlow('${id}')" class="bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-bold">بيع</button>
+                            <button onclick="db.ref('products/${id}').remove()" class="text-slate-200 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                        </td>
+                    </tr>`;
+                });
+                document.getElementById('totalQty').innerText = tQty;
+
+                const dt = document.getElementById('debtTableBody');
+                dt.innerHTML = '';
+                let td = 0;
+                Object.keys(debts).forEach(id => {
+                    const d = debts[id]; td += d.amount;
+                    dt.innerHTML += `<tr class="border-b">
+                        <td><b>${d.name}</b><br><small class="text-slate-400 text-[10px]">${d.details}</small></td>
+                        <td class="text-rose-600 font-black text-sm">${irqPrice(d.amount)}</td>
+                        <td class="text-left">
+                            <button onclick="payDebt('${id}', ${d.amount})" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-[10px] border border-indigo-100 font-bold">تحصيل</button>
+                        </td>
+                    </tr>`;
+                });
+                document.getElementById('totalDebts').innerText = irqPrice(td);
+            });
         }
 
-        // الاستماع للبيانات وعرضها (مزامنة فورية)
-        db.ref().on('value', snap => {
-            const data = snap.val() || {};
-            const products = data.products || {};
-            const debts = data.debts || {};
-            const stats = data.stats || { cash: 0, profit: 0 };
+        window.resetFinance = () => {
+            if(confirm("⚠️ هل أنت متأكد من تصفير الكاش والأرباح؟\nسيتم مسح السجل المالي فقط، ولن تتأثر البضاعة أو الديون.")) {
+                db.ref('stats').set({ cash: 0, profit: 0 });
+                alert("تم تصفير الحسابات المالية بنجاح ✅");
+            }
+        };
 
-            // عرض المنتجات
-            const tbody = document.getElementById('pTableBody');
-            tbody.innerHTML = '';
-            let tQty = 0;
-
-            Object.keys(products).forEach(id => {
-                const p = products[id];
-                let pTotalQty = 0;
-                let flavorHtml = p.flavors ? p.flavors.map(f => {
-                    pTotalQty += f.qty;
-                    return `<span class="flavor-tag">${f.name} (${f.qty})</span>`;
-                }).join('') : '';
-                tQty += pTotalQty;
-
-                tbody.innerHTML += `
-                    <tr class="border-b">
-                        <td>
-                            <div class="flex items-center gap-3">
-                                <img src="${p.img || 'https://via.placeholder.com/50'}" class="w-12 h-12 rounded-lg object-cover">
-                                <div class="font-black text-slate-800 text-sm">${p.name}</div>
-                            </div>
-                        </td>
-                        <td class="text-center text-[10px] font-bold text-indigo-500 uppercase">${p.owner}</td>
-                        <td>${flavorHtml || '<span class="text-red-400 text-xs">نفذت</span>'}</td>
-                        <td class="text-center font-bold text-green-600 text-sm">${irqPrice(p.sell)}</td>
-                        <td class="text-left flex gap-2 justify-end">
-                            <button onclick="sellFlow('${id}')" class="bg-green-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold">بيع</button>
-                            <button onclick="deleteProduct('${id}')" class="text-slate-300 hover:text-red-500"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>`;
-            });
-
-            // عرض الديون
-            const dtbody = document.getElementById('debtTableBody');
-            dtbody.innerHTML = '';
-            let totalD = 0;
-            Object.keys(debts).forEach(id => {
-                const d = debts[id];
-                totalD += d.amount;
-                dtbody.innerHTML += `
-                    <tr class="border-b">
-                        <td><div class="font-black text-slate-800">${d.name}</div><span class="text-[10px] text-slate-400 italic">${d.details}</span></td>
-                        <td class="font-black text-rose-600 text-center">${irqPrice(d.amount)}</td>
-                        <td class="text-left">
-                            <button onclick="payDebt('${id}', ${d.amount})" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg text-xs font-bold border border-indigo-100">تحصيل</button>
-                            <button onclick="db.ref('debts/${id}').remove()" class="text-slate-200 mr-2"><i class="fas fa-times-circle text-lg"></i></button>
-                        </td>
-                    </tr>`;
-            });
-
-            document.getElementById('totalQty').innerText = tQty;
-            document.getElementById('totalCash').innerText = irqPrice(stats.cash || 0);
-            document.getElementById('soldProfit').innerText = irqPrice(stats.profit || 0);
-            document.getElementById('totalDebts').innerText = irqPrice(totalD);
-        });
-
-        async function sellFlow(id) {
+        window.sellFlow = async (id) => {
             const snap = await db.ref('products/' + id).get();
             const p = snap.val();
-            if(!p.flavors) return alert("لا توجد نكهات!");
-
-            let msg = "اختر رقم النكهة:\n";
-            p.flavors.forEach((f, i) => msg += `${i + 1} - ${f.name} (متوفر ${f.qty})\n`);
-            const choice = prompt(msg);
-            const fIdx = parseInt(choice) - 1;
-
-            if(isNaN(fIdx) || !p.flavors[fIdx]) return alert("اختيار خاطئ!");
-            const selF = p.flavors[fIdx];
-
-            const buyer = prompt("للبيع نقداً اكتب (1) \n للبيع بالدين اكتب (اسم الشخص):");
+            let msg = "اختر النكهة:\n" + p.flavors.map((f, i) => `${i+1} - ${f.name} (${f.qty})`).join('\n');
+            const fIdx = parseInt(prompt(msg)) - 1;
+            if(isNaN(fIdx) || !p.flavors[fIdx]) return;
+            
+            const buyer = prompt("للبيع كاش اكتب (1) - للدين اكتب اسم الشخص:");
             if(!buyer) return;
 
-            // تحديث النكهات
-            selF.qty -= 1;
-            let updatedFlavors = p.flavors.filter(f => f.qty > 0);
-            await db.ref('products/' + id).update({ flavors: updatedFlavors });
+            p.flavors[fIdx].qty -= 1;
+            const updated = p.flavors.filter(f => f.qty > 0);
+            await db.ref('products/' + id).update({ flavors: updated });
 
             if(buyer === "1") {
-                const statSnap = await db.ref('stats').get();
-                const s = statSnap.val() || { cash: 0, profit: 0 };
-                await db.ref('stats').set({
-                    cash: s.cash + p.sell,
-                    profit: s.profit + (p.sell - p.cost)
-                });
-                alert(`تم بيع نكهة ${selF.name} نقداً ✅`);
+                const s = (await db.ref('stats').get()).val() || { cash: 0, profit: 0 };
+                await db.ref('stats').set({ cash: s.cash + p.sell, profit: s.profit + (p.sell - p.cost) });
             } else {
-                await db.ref('debts').push({
-                    name: buyer,
-                    amount: p.sell,
-                    details: `الجهاز: ${p.name} | النكهة: ${selF.name} | ${new Date().toLocaleDateString('ar-IQ')}`
-                });
-                alert(`تم تسجيل دين على ${buyer} ✅`);
+                await db.ref('debts').push({ name: buyer, amount: p.sell, details: p.name + ' | ' + p.flavors[fIdx].name + ' | ' + new Date().toLocaleDateString('ar-IQ') });
             }
-        }
+        };
 
-        async function payDebt(id, currentAmt) {
-            const val = prompt("المبلغ المستلم:");
-            if(val) {
-                const amt = Number(val);
-                const statSnap = await db.ref('stats').get();
-                const s = statSnap.val() || { cash: 0, profit: 0 };
-                
-                await db.ref('stats').update({ cash: s.cash + amt });
+        window.payDebt = async (id, cur) => {
+            const amt = Number(prompt("المبلغ المستلم من الدين:"));
+            if(!amt) return;
+            const s = (await db.ref('stats').get()).val() || { cash: 0, profit: 0 };
+            await db.ref('stats').update({ cash: s.cash + amt });
+            if(amt >= cur) await db.ref('debts/' + id).remove();
+            else await db.ref('debts/' + id).update({ amount: cur - amt });
+        };
 
-                if(amt >= currentAmt) {
-                    await db.ref('debts/' + id).remove();
-                } else {
-                    await db.ref('debts/' + id).update({ amount: currentAmt - amt });
-                }
-            }
-        }
-
-        function deleteProduct(id) { if(confirm("حذف المنتج نهائياً؟")) db.ref('products/' + id).remove(); }
     </script>
 </body>
 </html>
