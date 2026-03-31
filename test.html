@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة LUX_VAIP | النظام المتكامل</title>
+    <title>إدارة LUX_VAIP | النسخة الاحترافية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -14,8 +14,7 @@
         input, select, textarea { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline-color: #6366f1; }
         table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
         td { background: white; padding: 12px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; text-align: right; }
-        .edit-badge { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-block; margin-top: 4px; }
-        .btn-sell { background: #22c55e; color: white; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; }
+        .paid-full { color: #16a34a; font-weight: 900; font-size: 12px; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -26,17 +25,17 @@
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المبيعات</p> <h2 id="soldProfit" class="text-xl font-black text-green-600">0</h2> </div>
-            <div class="stat-card debt-card"> <p class="text-rose-600 text-[10px] font-bold">إجمالي الديون</p> <h2 id="totalDebts" class="text-xl font-black text-rose-600">0</h2> </div>
+            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المبيعات</p> <h2 id="soldProfit" class="text-xl font-black text-green-600 tracking-tighter">0</h2> </div>
+            <div class="stat-card debt-card"> <p class="text-rose-600 text-[10px] font-bold">إجمالي الديون</p> <h2 id="totalDebts" class="text-xl font-black text-rose-600 tracking-tighter">0</h2> </div>
             <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">قطع المخزن</p> <h2 id="totalQty" class="text-xl font-black">0</h2> </div>
-            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المخزن</p> <h2 id="totalProfit" class="text-xl font-black text-amber-600">0</h2> </div>
+            <div class="stat-card"> <p class="text-gray-400 text-[10px] font-bold">أرباح المخزن المتوقعة</p> <h2 id="totalProfit" class="text-xl font-black text-amber-600 tracking-tighter">0</h2> </div>
         </div>
 
         <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-rose-100">
-            <h3 class="font-black mb-4 text-rose-600"><i class="fas fa-user-minus ml-1"></i> إدارة الديون وتحصيل المبالغ</h3>
+            <h3 class="font-black mb-4 text-rose-600"><i class="fas fa-hand-holding-usd ml-1"></i> سجل الديون المطور</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
                 <input type="text" id="debt_name" placeholder="اسم الشخص المديون">
-                <input type="number" id="debt_amount" placeholder="المبلغ">
+                <input type="number" id="debt_amount" placeholder="المبلغ بالدنانير">
                 <button onclick="addDebtManual()" class="bg-rose-600 text-white font-black rounded-xl py-2">تسجيل دين يدوي</button>
             </div>
             <div class="overflow-x-auto">
@@ -50,22 +49,22 @@
             <h3 class="font-black mb-4 text-indigo-600 italic"><i class="fas fa-box-open ml-1"></i> إضافة بضاعة للمخزن</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3">
                 <input type="text" id="p_name" placeholder="اسم المنتج">
-                <label class="bg-slate-100 p-2.5 rounded-xl text-center text-xs cursor-pointer border hover:bg-slate-200 text-slate-500">📸 صورة <input type="file" accept="image/*" class="hidden" onchange="previewImage(this)"></label>
+                <label class="bg-slate-100 p-2.5 rounded-xl text-center text-xs cursor-pointer border hover:bg-slate-200 text-slate-500 font-bold">📸 صورة <input type="file" accept="image/*" class="hidden" onchange="previewImage(this)"></label>
                 <input type="number" id="p_cost" placeholder="سعر الكلفة">
                 <input type="number" id="p_sell" placeholder="سعر البيع">
                 <input type="number" id="p_qty" placeholder="الكمية">
                 <select id="p_owner"><option value="mustafa">مخزن مصطفى</option><option value="hussouni">مخزن حسوني</option></select>
                 <textarea id="p_desc" class="md:col-span-3 lg:col-span-6" placeholder="وصف المنتج..."></textarea>
-                <button onclick="saveProduct()" class="bg-indigo-600 text-white font-black rounded-xl py-3 md:col-span-6 mt-2 hover:bg-indigo-700 transition">إضافة للمتجر</button>
+                <button onclick="saveProduct()" class="bg-indigo-600 text-white font-black rounded-xl py-3 md:col-span-6 mt-2 hover:bg-indigo-700 transition">حفظ في المخزن</button>
             </div>
         </div>
 
         <div class="overflow-x-auto bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-            <h3 class="font-black mb-4 italic text-slate-500">إدارة المخزون الحالي</h3>
+            <h3 class="font-black mb-4 italic text-slate-500 underline">المخزن الحالي</h3>
             <table class="min-w-full">
                 <thead>
-                    <tr class="text-xs text-slate-400 uppercase">
-                        <th>المنتج</th> <th>المخزن</th> <th>الكمية</th> <th>السعر</th> <th>إجراء</th>
+                    <tr class="text-[10px] text-slate-400 uppercase">
+                        <th>المنتج</th> <th>المخزن</th> <th>الكمية</th> <th>سعر البيع</th> <th>إجراء</th>
                     </tr>
                 </thead>
                 <tbody id="pTableBody"></tbody>
@@ -74,11 +73,13 @@
     </div>
 
     <script>
-        // التخزين المحلي (LOCAL) للتجربة
-        let localData = JSON.parse(localStorage.getItem('lux_final_test')) || {
+        let localData = JSON.parse(localStorage.getItem('lux_v4_test')) || {
             mustafa: [], hussouni: [], debts: [], salesProfit: 0
         };
         let base64Img = "";
+
+        // دالة تحويل الرقم لعملة عراقية
+        const irqPrice = (num) => new Intl.NumberFormat('ar-IQ').format(num) + " د.ع";
 
         function previewImage(input) {
             const reader = new FileReader();
@@ -87,15 +88,15 @@
         }
 
         function saveData() {
-            localStorage.setItem('lux_final_test', JSON.stringify(localData));
+            localStorage.setItem('lux_v4_test', JSON.stringify(localData));
             renderAll();
         }
 
         function renderAll() {
-            // رندر المنتجات
             const tbody = document.getElementById('pTableBody');
             tbody.innerHTML = '';
             let tQty = 0, tProfit = 0;
+
             ['mustafa', 'hussouni'].forEach(owner => {
                 localData[owner].forEach((p, idx) => {
                     tQty += Number(p.qty);
@@ -103,45 +104,49 @@
                     tbody.innerHTML += `
                         <tr>
                             <td>
-                                <div class="flex items-center gap-3">
-                                    <img src="${p.img || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded-lg object-cover">
+                                <div class="flex items-center gap-2">
+                                    <img src="${p.img || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded shadow-sm object-cover">
                                     <div>
-                                        <div class="font-bold text-sm text-slate-800">${p.name}</div>
-                                        <div class="text-[10px] text-slate-400 italic">${p.desc || ''}</div>
-                                        <span onclick="editDesc('${owner}', ${idx}, '${p.desc}')" class="edit-badge">تعديل الوصف</span>
+                                        <div class="font-bold text-sm">${p.name}</div>
+                                        <div class="text-[9px] text-slate-400">${p.desc || ''}</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="text-[10px] font-bold text-slate-400 uppercase">${owner}</td>
                             <td class="text-center font-black text-indigo-600">${p.qty}</td>
-                            <td class="text-center font-bold text-sm">${Number(p.sell).toLocaleString()}</td>
-                            <td><button onclick="sellPiece('${owner}', ${idx})" class="btn-sell">بيع</button></td>
+                            <td class="text-center font-bold text-sm text-slate-700">${irqPrice(p.sell)}</td>
+                            <td class="flex gap-1 justify-end">
+                                <button onclick="sellPiece('${owner}', ${idx})" class="bg-green-500 text-white px-3 py-1 rounded text-xs font-bold shadow-sm">بيع</button>
+                                <button onclick="deleteProduct('${owner}', ${idx})" class="text-slate-300 px-2 py-1 hover:text-red-500 transition"><i class="fas fa-trash"></i></button>
+                            </td>
                         </tr>`;
                 });
             });
 
-            // رندر الديون
             const dtbody = document.getElementById('debtTableBody');
             dtbody.innerHTML = '';
             let totalD = 0;
             localData.debts.forEach((d, idx) => {
-                totalD += d.amount;
+                const isPaid = d.amount <= 0;
+                if(!isPaid) totalD += d.amount;
+                
                 dtbody.innerHTML += `
                     <tr>
                         <td class="font-bold text-slate-700">${d.name}</td>
-                        <td class="font-black text-rose-600 text-center">${Number(d.amount).toLocaleString()} د.ع</td>
+                        <td class="font-black text-center ${isPaid ? 'paid-full' : 'text-rose-600'}">
+                            ${isPaid ? 'تم دفع الدين كامل ✅' : irqPrice(d.amount)}
+                        </td>
                         <td class="text-left">
-                            <button onclick="payDebt(${idx})" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-xs font-bold">تحصيل مبلغ</button>
-                            <button onclick="deleteDebt(${idx})" class="text-slate-300 mr-2"><i class="fas fa-trash"></i></button>
+                            ${!isPaid ? `<button onclick="payDebt(${idx})" class="bg-green-100 text-green-700 px-3 py-1 rounded-lg text-xs font-bold">تحصيل</button>` : ''}
+                            <button onclick="deleteDebtManual(${idx})" class="text-slate-200 mr-2 hover:text-slate-400"><i class="fas fa-times-circle"></i></button>
                         </td>
                     </tr>`;
             });
 
-            // تحديث العدادات
             document.getElementById('totalQty').innerText = tQty;
-            document.getElementById('totalProfit').innerText = tProfit.toLocaleString() + " د.ع";
-            document.getElementById('soldProfit').innerText = localData.salesProfit.toLocaleString() + " د.ع";
-            document.getElementById('totalDebts').innerText = totalD.toLocaleString() + " د.ع";
+            document.getElementById('totalProfit').innerText = irqPrice(tProfit);
+            document.getElementById('soldProfit').innerText = irqPrice(localData.salesProfit);
+            document.getElementById('totalDebts').innerText = irqPrice(totalD);
         }
 
         function saveProduct() {
@@ -156,15 +161,14 @@
             };
             if(!item.name || !item.sell) return alert("اكمل البيانات!");
             localData[owner].push(item);
-            base64Img = ""; // تصفير الصورة
+            base64Img = "";
             saveData();
-            alert("تمت الإضافة بنجاح!");
         }
 
         function sellPiece(owner, idx) {
             const p = localData[owner][idx];
-            if(p.qty <= 0) return alert("المخزن فارغ!");
-            const choice = prompt("للببيع النقدي اكتب (1) \n للبيع بالدين اكتب (اسم الشخص):");
+            if(p.qty <= 0) return alert("خلصت القطع بالمخزن!");
+            const choice = prompt("للبيع نقداً اكتب (1) \n للبيع بالدين اكتب (اسم الشخص):");
             if (!choice) return;
 
             if (choice === "1") {
@@ -174,21 +178,19 @@
             } else {
                 p.qty -= 1;
                 localData.debts.push({ name: choice, amount: p.sell });
-                alert(`تم تسجيل ${p.sell.toLocaleString()} دين على ${choice}`);
+                alert(`تم تسجيل ${irqPrice(p.sell)} دين على ${choice}`);
             }
             saveData();
         }
 
         function payDebt(idx) {
             const current = localData.debts[idx].amount;
-            const val = prompt(`المبلغ الحالي بذمة الشخص: ${current.toLocaleString()} \n ادخل المبلغ الذي تم استلامه كاش:`);
+            const val = prompt(`المبلغ الحالي: ${irqPrice(current)} \n ادخل المبلغ الذي استلمته كاش:`);
             if (val && !isNaN(val)) {
                 const received = Number(val);
-                localData.salesProfit += received; // تحويل المحصل لأرباح كاش
+                localData.salesProfit += received;
                 localData.debts[idx].amount -= received;
-                if(localData.debts[idx].amount <= 0) localData.debts.splice(idx, 1);
                 saveData();
-                alert("تم تحديث الأرباح والدين بنجاح ✅");
             }
         }
 
@@ -203,15 +205,8 @@
             }
         }
 
-        function editDesc(owner, idx, oldVal) {
-            const newVal = prompt("عدل وصف المنتج:", oldVal);
-            if(newVal !== null) {
-                localData[owner][idx].desc = newVal;
-                saveData();
-            }
-        }
-
-        function deleteDebt(idx) { if(confirm("حذف الدين؟")) { localData.debts.splice(idx, 1); saveData(); } }
+        function deleteProduct(owner, idx) { if(confirm("حذف المنتج نهائياً من المخزن؟")) { localData[owner].splice(idx, 1); saveData(); } }
+        function deleteDebtManual(idx) { if(confirm("إزالة هذا القيد من السجل؟")) { localData.debts.splice(idx, 1); saveData(); } }
 
         renderAll();
     </script>
