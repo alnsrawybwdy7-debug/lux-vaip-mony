@@ -8,52 +8,82 @@
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap');
         body { font-family: 'Tajawal', sans-serif; background-color: #020617; color: white; overflow-x: hidden; }
+        
+        /* نص خلفية جمالي */
         .bg-text { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-10deg); font-size: 18vw; font-weight: 900; color: rgba(99, 102, 241, 0.03); z-index: -1; white-space: nowrap; user-select: none; pointer-events: none; text-transform: uppercase; }
+        
+        /* تصميم الكارتات */
         .glass-card { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 2.5rem; transition: 0.4s ease; height: 100%; display: flex; flex-direction: column; }
         .img-container { height: 260px; overflow: hidden; border-radius: 2rem; margin: 12px; background: #0f172a; cursor: zoom-in; }
         .product-img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s; }
+        .glass-card:hover { transform: translateY(-5px); border-color: rgba(99, 102, 241, 0.2); }
         .glass-card:hover .product-img { transform: scale(1.1); }
-        .flavor-badge { background: rgba(99, 102, 241, 0.15); color: #a5b4fc; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin: 2px; display: inline-block; border: 1px solid rgba(99, 102, 241, 0.3); }
+        
+        /* أزرار النكهات والسعر */
+        .flavor-badge { background: rgba(99, 102, 241, 0.1); color: #818cf8; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; margin: 2px; display: inline-block; border: 1px solid rgba(99, 102, 241, 0.2); }
+        .insta-btn { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        
+        /* نافذة الصورة المكبرة */
         #imageModal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 20px; }
     </style>
 </head>
-<body>
+<body class="min-h-screen">
+
     <div class="bg-text">Lux Vape</div>
-    
+
     <div id="imageModal" onclick="this.style.display='none'">
-        <img id="modalImg" class="max-w-full max-h-[90vh] rounded-xl shadow-2xl border border-white/10" src="">
+        <img id="modalImg" class="max-w-full max-h-[90vh] rounded-2xl shadow-2xl border border-white/10" src="">
     </div>
 
     <nav class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-white/5 px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/50"><i class="fas fa-wind text-white"></i></div>
+            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/50">
+                <i class="fas fa-wind text-white"></i>
+            </div>
             <h1 class="text-2xl font-black italic tracking-tighter uppercase">Lux <span class="text-indigo-500">Vape</span></h1>
         </div>
-        <input type="text" id="search" oninput="doSearch()" class="w-full md:w-80 bg-white/5 border border-white/10 rounded-2xl py-2 px-6 text-sm outline-none focus:border-indigo-500 text-right" placeholder="ابحث عن نكهة أو جهاز...">
+        <div class="relative w-full md:w-96">
+            <input type="text" id="search" oninput="doSearch()" 
+                   class="w-full bg-white/5 border border-white/10 rounded-2xl py-2.5 px-10 text-sm outline-none focus:border-indigo-500 text-right text-white" 
+                   placeholder="ابحث عن نكهة أو جهاز...">
+            <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"></i>
+        </div>
     </nav>
 
     <main class="container mx-auto px-6 py-12">
-        <div id="loader" class="text-center py-20 font-bold italic text-slate-500 text-xl animate-pulse">جاري جلب أحدث النكهات...</div>
+        <div id="loader" class="text-center py-20 font-bold italic text-slate-500 text-xl animate-pulse">جاري تحميل المنتجات...</div>
         <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
     </main>
 
     <footer class="py-10 text-center border-t border-white/5">
-        <p class="text-white text-[10px] font-black italic">تصميم وتطوير: <span class="text-indigo-500">عبد الله عبد السلام</span></p>
+        <a href="https://www.instagram.com/lux_vape.iq" target="_blank" class="insta-btn text-white px-8 py-2 rounded-xl font-black text-xs inline-flex items-center gap-2 mb-6 shadow-lg">
+            <i class="fab fa-instagram"></i> @lux_vape.iq
+        </a>
+        <p class="text-white text-[10px] font-black italic">
+            تصميم وتطوير: 
+            <a href="https://t.me/u_zzf1" target="_blank" class="text-indigo-500 underline uppercase hover:text-indigo-300 transition-all">
+                عبد الله عبد السلام
+            </a>
+        </p>
     </footer>
 
     <script>
+        // إعدادات الـ Firebase - مرتبطة بقاعدة بياناتك مباشرة
         const firebaseConfig = {
             apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc",
             databaseURL: "https://lux-vaip-default-rtdb.firebaseio.com/",
             projectId: "lux-vaip"
         };
+
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         let allProds = [];
 
+        // جلب البيانات من السيرفر
         db.ref('products').on('value', snap => {
             allProds = [];
             document.getElementById('loader').style.display = 'none';
@@ -63,30 +93,37 @@
             renderProds(allProds);
         });
 
+        // عرض الكارتات في الصفحة
         function renderProds(list) {
             const grid = document.getElementById('grid');
             grid.innerHTML = '';
             list.forEach(p => {
                 let flavorsList = p.flavors ? p.flavors.map(f => `<span class="flavor-badge">${f.name}</span>`).join('') : '';
+                
                 grid.innerHTML += `
                     <div class="glass-card">
                         <div class="img-container" onclick="openImg('${p.img}')">
-                            <img src="${p.img || 'https://via.placeholder.com/300'}" class="product-img">
+                            <img src="${p.img || 'https://via.placeholder.com/300'}" class="product-img" loading="lazy">
                         </div>
                         <div class="p-6 pt-2 flex flex-col flex-grow text-right">
-                            <h3 class="text-xl font-black mb-2 italic text-white uppercase">${p.name}</h3>
+                            <h3 class="text-xl font-black mb-2 italic text-white uppercase tracking-tighter">${p.name}</h3>
                             <div class="mb-6 flex flex-wrap justify-end">${flavorsList}</div>
                             <div class="mt-auto flex justify-between items-center border-t border-white/5 pt-5">
                                 <div class="text-right">
+                                    <span class="text-slate-500 text-[10px] font-bold uppercase">السعر</span>
                                     <div class="text-xl font-black text-white">${Number(p.sell).toLocaleString()} <small class="text-indigo-500 text-[10px]">IQD</small></div>
                                 </div>
-                                <button onclick="orderWA('${p.name}', '${p.sell}')" class="bg-green-600 hover:scale-105 active:scale-95 text-white px-5 py-2.5 rounded-xl text-xs font-black transition-all">اطلب الآن</button>
+                                <button onclick="orderWA('${p.name}', '${p.sell}')" 
+                                        class="bg-green-600 hover:bg-green-500 text-white px-5 py-2.5 rounded-xl text-xs font-black transition-all shadow-lg shadow-green-900/20 active:scale-95">
+                                    اطلب الآن
+                                </button>
                             </div>
                         </div>
                     </div>`;
             });
         }
 
+        // وظائف إضافية
         function openImg(src) {
             document.getElementById('modalImg').src = src;
             document.getElementById('imageModal').style.display = 'flex';
@@ -98,8 +135,8 @@
         }
 
         function orderWA(n, p) {
-            const m = `مرحباً Lux Vape 💨\nأريد طلب:\n📦 المنتج: ${n}\n💰 السعر: ${Number(p).toLocaleString()} د.ع`;
-            window.open(`https://wa.me/9647708587628?text=${encodeURIComponent(m)}`);
+            const msg = `مرحباً Lux Vape 💨\n\nأريد طلب المنتج التالي:\n📦 المنتج: ${n}\n💰 السعر: ${Number(p).toLocaleString()} د.ع\n\nيرجى تأكيد التوفر..`;
+            window.open(`https://wa.me/9647708587628?text=${encodeURIComponent(msg)}`);
         }
     </script>
 </body>
