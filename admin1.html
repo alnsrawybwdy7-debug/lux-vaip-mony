@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم الإدارية | جامعة المستقبل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #1c1e21;
+            --primary: #4361ee;
+            --success: #06d6a0;
+            --danger: #ef233c;
+            --border: #e4e6eb;
+        }
+
+        .dark-mode {
+            --bg: #18191a;
+            --card: #242526;
+            --text: #e4e6eb;
+            --primary: #4cc9f0;
+            --border: #3e4042;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0; padding: 20px;
+            transition: 0.3s;
+        }
+
+        .container { max-width: 1200px; margin: auto; }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card);
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .btn-group { display: flex; gap: 10px; }
+
+        .theme-btn, .export-btn {
+            border: none; padding: 10px 20px; border-radius: 12px;
+            cursor: pointer; font-weight: bold; color: white; transition: 0.3s;
+        }
+        .theme-btn { background: var(--primary); }
+        .export-btn { background: #27ae60; }
+
+        /* الإحصائيات */
+        .stats-grid { display: flex; gap: 20px; margin-bottom: 30px; }
+        .stat-card {
+            flex: 1; background: var(--card); padding: 20px; border-radius: 20px;
+            text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-bottom: 5px solid var(--primary);
+        }
+        .stat-card h3 { font-size: 35px; margin: 10px 0; color: var(--primary); }
+        .stat-card p { margin: 0; font-weight: bold; color: #888; }
+
+        /* الجدول */
+        .main-table-card {
+            background: var(--card); border-radius: 20px; padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow-x: auto;
+        }
+        table { width: 100%; border-collapse: collapse; text-align: right; }
+        th { padding: 15px; border-bottom: 2px solid var(--border); color: #888; }
+        td { padding: 18px 15px; border-bottom: 1px solid var(--border); }
+
+        .urgent-row { background: rgba(239, 35, 60, 0.08) !important; border-right: 6px solid var(--danger); }
+        
+        .action-btn {
+            border: none; padding: 8px 14px; border-radius: 8px;
+            cursor: pointer; font-weight: bold; color: white; margin: 2px;
+        }
+        .btn-call { background: var(--success); }
+        .btn-done { background: var(--primary); }
+        .btn-del { background: #607d8b; }
+
+        .status-badge {
+            padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: bold;
+        }
+        .status-waiting { background: #eee; color: #666; }
+        .status-active { background: #d4edda; color: #155724; animation: blink 1.5s infinite; }
+
+        @keyframes blink { 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div>
+            <h2 style="margin:0;"><i class="fas fa-user-shield"></i> لوحة إدارة المراجعات</h2>
+            <small>نظام جامعة المستقبل الذكي</small>
+        </div>
+        <div class="btn-group">
+            <button class="export-btn" onclick="exportToExcel()">تصدير Excel <i class="fas fa-file-excel"></i></button>
+            <button class="theme-btn" onclick="toggleTheme()">الوضع الليلي <i class="fas fa-moon"></i></button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3 id="statTotal">0</h3>
+            <p>إجمالي المراجعين</p>
+        </div>
+        <div class="stat-card" style="border-color: var(--danger)">
+            <h3 id="statUrgent">0</h3>
+            <p>حالات مستعجلة</p>
+        </div>
+        <div class="stat-card" style="border-color: var(--success)">
+            <h3 id="statDone">0</h3>
+            <p>تم إنجازهم</p>
+        </div>
+    </div>
+
+    <div class="main-table-card">
+        <table id="reportsTable">
+            <thead>
+                <tr>
+                    <th>تذكرة</th>
+                    <th>الطالب</th>
+                    <th>الرقم الجامعي</th>
+                    <th>نوع المعاملة</th>
+                    <th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+    const firebaseConfig = { 
+        apiKey: "AIzaSyDj_p6Aqo7FuqEurK-yL7LFIUATA4-cG8I", 
+        authDomain: "hakthin-c6812.firebaseapp.com", 
+        databaseURL: "https://hakthin-c6812-default-rtdb.firebaseio.com/", 
+        projectId: "hakthin-c6812", 
+        appId: "1:208156149096:web:1c2676ed0eb66b8cc502dd" 
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function toggleTheme() { document.body.classList.toggle('dark-mode'); }
+
+    // دالة تصدير البيانات إلى Excel
+    function exportToExcel() {
+        let table = document.getElementById("reportsTable");
+        let html = table.outerHTML;
+        let url = 'data:application/vnd.ms-excel,' + encodeURIComponent(html);
+        let link = document.createElement("a");
+        link.download = "تقرير_المراجعات.xls";
+        link.href = url;
+        link.click();
+    }
+
+    // جلب البيانات وتحديث الإحصائيات
+    db.ref('queue/').on('value', (snap) => {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = "";
+        let total = 0, urgent = 0, done = 0;
+
+        snap.forEach(child => {
+            const d = child.val();
+            const k = child.key;
+            total++;
+            if(d.priority === 'مستعجلة') urgent++;
+            if(d.status === 'تم الإنجاز') done++;
+
+            const isUrgent = d.priority === 'مستعجلة';
+            const isActive = d.status === 'حان دورك';
+
+            tbody.innerHTML += `
+                <tr class="${isUrgent ? 'urgent-row' : ''}">
+                    <td><b style="color:var(--primary)">#${d.ticket}</b></td>
+                    <td><b>${d.name}</b></td>
+                    <td>${d.sid}</td>
+                    <td>
+                        ${d.reason} <br>
+                        <span class="status-badge ${isActive ? 'status-active' : 'status-waiting'}">
+                            ${d.status}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="action-btn btn-call" onclick="updateStatus('${k}', 'حان دورك')">نداء</button>
+                        <button class="action-btn btn-done" onclick="updateStatus('${k}', 'تم الإنجاز')">إنجاز</button>
+                        <button class="action-btn btn-del" onclick="deleteItem('${k}')"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        document.getElementById('statTotal').innerText = total;
+        document.getElementById('statUrgent').innerText = urgent;
+        document.getElementById('statDone').innerText = done;
+    });
+
+    function updateStatus(key, status) {
+        db.ref('queue/' + key).update({ status: status });
+    }
+
+    function deleteItem(key) {
+        if(confirm("هل تريد حذف هذا السجل؟")) db.ref('queue/' + key).remove();
+    }
+</script>
+</body>
+</html>
