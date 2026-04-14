@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الطالب الذكية | جامعة المستقبل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { 
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #2b2d42;
+            --input-bg: #ffffff;
+            --primary: #4361ee; 
+            --accent: #4cc9f0; 
+            --success: #06d6a0; 
+            --danger: #ef233c; 
+        }
+
+        .dark-mode {
+            --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --card-bg: rgba(25, 25, 35, 0.95);
+            --text-color: #e0e0e0;
+            --input-bg: #2d3436;
+            --primary: #4cc9f0;
+        }
+
+        body { 
+            background: var(--bg-gradient); color: var(--text-color);
+            font-family: 'Segoe UI', sans-serif; margin: 0; min-height: 100vh; 
+            display: flex; align-items: center; justify-content: center; transition: 0.5s;
+        }
+
+        .theme-toggle {
+            position: absolute; top: 20px; left: 20px;
+            background: var(--card-bg); border: none; padding: 12px;
+            border-radius: 50%; cursor: pointer; color: var(--primary); font-size: 20px; z-index: 10001;
+        }
+
+        #welcomeOverlay { 
+            position: fixed; top:0; left:0; width:100%; height:100%; 
+            background: linear-gradient(45deg, #4361ee, #4cc9f0); 
+            z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; 
+        }
+        
+        .start-btn { padding: 18px 50px; background: white; color: #4361ee; border: none; border-radius: 50px; font-size: 22px; font-weight: bold; cursor: pointer; }
+
+        .container { width: 100%; max-width: 450px; padding: 20px; box-sizing: border-box; }
+        .main-card { background: var(--card-bg); border-radius: 30px; padding: 35px 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); text-align: center; }
+        
+        .input-group { position: relative; margin-bottom: 15px; text-align: right; }
+        .input-group i { position: absolute; right: 15px; top: 40px; color: var(--primary); z-index: 5; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; }
+        
+        input, select { 
+            width: 100%; padding: 12px 40px 12px 12px; border-radius: 12px; border: 1px solid #ddd; 
+            background-color: var(--input-bg); color: var(--text-color); font-size: 15px; box-sizing: border-box;
+        }
+
+        select option { background-color: var(--input-bg); color: var(--text-color); }
+        
+        .priority-box { display: flex; gap: 10px; margin-top: 5px; }
+        .priority-opt { flex: 1; padding: 10px; border-radius: 10px; border: 2px solid #eee; cursor: pointer; background: var(--input-bg); }
+        input[type="radio"]:checked + .priority-opt { border-color: var(--primary); background: rgba(67, 97, 238, 0.1); font-weight: bold; }
+        input[type="radio"] { display: none; }
+        
+        .btn-main { width: 100%; padding: 16px; border-radius: 12px; border: none; background: linear-gradient(45deg, var(--primary), var(--accent)); color: white; font-size: 17px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+
+        #ticketOverlay, #doneOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; }
+        .ticket, .done-card { background: var(--card-bg); width: 85%; max-width: 350px; border-radius: 30px; padding: 30px; text-align: center; }
+        
+        .ticket-num { font-size: 70px; font-weight: 900; color: var(--primary); margin: 10px 0; }
+        
+        /* تنسيق النجوم */
+        .stars { margin: 20px 0; font-size: 30px; color: #ddd; cursor: pointer; }
+        .stars i:hover, .stars i.active { color: #f1c40f; }
+    </style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+
+<div id="welcomeOverlay">
+    <i class="fas fa-university" style="font-size: 80px; margin-bottom: 20px;"></i>
+    <h1 style="margin: 0;">جامعة المستقبل</h1>
+    <p>نظام المراجعة الإلكتروني الذكي</p>
+    <button class="start-btn" onclick="activateSystem()">دخول البوابة 🚀</button>
+</div>
+
+<div class="container">
+    <div class="main-card">
+        <h2>حجز تذكرة دور</h2>
+        <div class="input-group"><label>الاسم الثلاثي</label><i class="fas fa-user"></i><input type="text" id="name"></div>
+        <div class="input-group"><label>الرقم الجامعي</label><i class="fas fa-hashtag"></i><input type="text" id="stuID"></div>
+        <div class="input-group"><label>رقم الهاتف</label><i class="fas fa-phone"></i><input type="tel" id="phone"></div>
+        <div class="input-group">
+            <label>نوع المعاملة</label><i class="fas fa-info-circle"></i>
+            <select id="reason">
+                <option value="">-- اختر السبب --</option>
+                <option value="استلام هوية">استلام هوية جامعية</option>
+                <option value="تأييد استمرار">تأييد استمرار بالدراسة</option>
+                <option value="وثيقة تخرج">طلب وثيقة تخرج</option>
+                <option value="تسديد أجور">تسديد أجور دراسية</option>
+                <option value="براءة ذمة">إجراء براءة ذمة</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>الأولوية</label>
+            <div class="priority-box">
+                <label><input type="radio" name="prio" value="عادية" checked><div class="priority-opt">عادية</div></label>
+                <label><input type="radio" name="prio" value="مستعجلة"><div class="priority-opt" style="color:var(--danger)">مستعجلة 🔥</div></label>
+            </div>
+        </div>
+        <button class="btn-main" onclick="confirmBooking()">تأكيد الحجز</button>
+    </div>
+</div>
+
+<div id="ticketOverlay">
+    <div class="ticket">
+        <p>رقم تذكرتك هو</p>
+        <div class="ticket-num" id="tValue">---</div>
+        <div id="statusBadge" style="color:orange; font-weight:bold;">انتظر دورك...</div>
+    </div>
+</div>
+
+<div id="doneOverlay">
+    <div class="done-card">
+        <i class="fas fa-check-circle" style="font-size: 60px; color: var(--success);"></i>
+        <h2>تم الإنجاز!</h2>
+        <p>كيف كانت جودة الخدمة؟</p>
+        <div class="stars" id="starRating">
+            <i class="fas fa-star" onclick="rate(1)"></i>
+            <i class="fas fa-star" onclick="rate(2)"></i>
+            <i class="fas fa-star" onclick="rate(3)"></i>
+            <i class="fas fa-star" onclick="rate(4)"></i>
+            <i class="fas fa-star" onclick="rate(5)"></i>
+        </div>
+        <button class="btn-main" onclick="location.reload()">إرسال التقييم وإغلاق</button>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script>
+    const firebaseConfig = { apiKey: "AIzaSyDj_p6Aqo7FuqEurK-yL7LFIUATA4-cG8I", authDomain: "hakthin-c6812.firebaseapp.com", databaseURL: "https://hakthin-c6812-default-rtdb.firebaseio.com/", projectId: "hakthin-c6812", appId: "1:208156149096:web:1c2676ed0eb66b8cc502dd" };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const sound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+
+    function toggleTheme() { document.body.classList.toggle('dark-mode'); }
+    function activateSystem() { sound.play().then(() => { sound.pause(); document.getElementById('welcomeOverlay').style.display='none'; }); }
+
+    function confirmBooking() {
+        const name = document.getElementById('name').value;
+        const sid = document.getElementById('stuID').value;
+        const reason = document.getElementById('reason').value;
+        const priority = document.querySelector('input[name="prio"]:checked').value;
+        if(!name || !sid || !reason) return alert("أكمل البيانات");
+
+        const ticket = Math.floor(100 + Math.random() * 899);
+        const ref = db.ref('queue/').push();
+        ref.set({ name, sid, reason, ticket, priority, status: 'انتظار' });
+
+        document.getElementById('tValue').innerText = ticket;
+        document.getElementById('ticketOverlay').style.display = 'flex';
+
+        ref.on('value', (snap) => {
+            if(!snap.val()) return;
+            if(snap.val().status === 'حان دورك') {
+                sound.play();
+                document.getElementById('statusBadge').innerText = "🔔 حان دورك الآن!";
+                document.getElementById('statusBadge').style.color = "var(--success)";
+            }
+            if(snap.val().status === 'تم الإنجاز') {
+                document.getElementById('ticketOverlay').style.display = 'none';
+                document.getElementById('doneOverlay').style.display = 'flex';
+            }
+        });
+    }
+
+    function rate(n) {
+        const stars = document.querySelectorAll('#starRating i');
+        stars.forEach((s, i) => s.classList.toggle('active', i < n));
+        // هنا يمكنك إرسال التقييم لقاعدة البيانات إذا أردت
+    }
+</script>
+</body>
+</html>
