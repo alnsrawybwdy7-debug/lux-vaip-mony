@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة LUX_VAIP | النظام البرمجي المستقر</title>
+    <title>إدارة LUX_VAIP | النسخة الاحترافية</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,208 +11,222 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap');
         body { font-family: 'Tajawal', sans-serif; background-color: #f1f5f9; color: #1e293b; text-align: right; }
-        .stat-card { background: white; border-radius: 1rem; padding: 15px; border-right: 5px solid #6366f1; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); text-align: center; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .btn-choice { width: 100%; padding: 14px; border-radius: 15px; margin-bottom: 8px; font-weight: 900; text-align: center; border: 1px solid #e2e8f0; background: white; transition: 0.2s; }
-        .btn-choice:hover { background: #f8fafc; border-color: #6366f1; }
-        input { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; width: 100%; outline: none; text-align: center; }
+        .stat-card { background: white; border-radius: 1rem; padding: 15px; border-right: 5px solid #6366f1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; position: relative; }
+        input { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline: none; text-align: right; }
+        .flavor-tag { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; margin: 2px; display: inline-block; border: 1px solid #c7d2fe; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+        .btn-choice { width: 100%; padding: 14px; border-radius: 15px; margin-bottom: 8px; font-weight: 900; text-align: center; transition: 0.2s; border: 1px solid transparent; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
-    <!-- شاشة الدخول -->
     <div id="authOverlay" class="fixed inset-0 bg-slate-900 z-[999] flex flex-col items-center justify-center">
-        <div class="bg-white p-8 rounded-[2.5rem] shadow-2xl text-center w-80">
-            <div class="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto mb-4 flex items-center justify-center text-white text-2xl shadow-lg shadow-indigo-200">
-                <i class="fas fa-lock"></i>
-            </div>
-            <h2 class="mb-4 font-black text-slate-700">دخول الإدارة</h2>
-            <input type="password" id="adminPass" placeholder="الرمز السري" class="mb-4">
-            <button onclick="checkAuth()" class="bg-indigo-600 text-white px-8 py-3 rounded-xl w-full font-black shadow-lg hover:bg-indigo-700 transition">دخول</button>
-        </div>
+        <div class="w-12 h-12 bg-indigo-600 rounded-xl mb-6 flex items-center justify-center"><i class="fas fa-user-shield text-white text-xl"></i></div>
+        <input type="password" id="adminPass" placeholder="رمز الدخول" class="max-w-[200px] text-center mb-4 bg-white/10 text-white border-white/20">
+        <button onclick="checkAuth()" class="bg-indigo-600 text-white px-12 py-2 rounded-xl font-bold">دخول</button>
     </div>
 
-    <!-- نافذة العمليات (البيع والديون) -->
     <div id="sellModal" class="modal">
-        <div class="bg-white p-6 rounded-[2rem] w-full max-w-md shadow-2xl">
-            <div id="sellOptions" class="space-y-2"></div>
-            <button onclick="closeModal()" class="w-full mt-4 text-slate-400 font-bold text-xs uppercase tracking-widest">إلغاء العملية ✕</button>
+        <div class="bg-white p-6 rounded-[2rem] w-full max-w-md shadow-2xl border-t-8 border-indigo-600">
+            <div id="sellOptions" class="space-y-2 max-h-[450px] overflow-y-auto p-1"></div>
+            <button onclick="document.getElementById('sellModal').style.display='none'" class="w-full mt-4 text-slate-400 font-bold text-xs">إلغاء ✕</button>
         </div>
     </div>
 
-    <div id="mainContent" class="hidden">
-        <div class="flex justify-between items-center mb-8">
-            <button onclick="logout()" class="text-red-500 font-bold text-sm bg-red-50 px-4 py-2 rounded-xl">خروج <i class="fas fa-sign-out-alt"></i></button>
-            <h1 class="text-xl font-black text-slate-800 italic uppercase underline decoration-indigo-500 decoration-4">LUX_VAIP Dashboard</h1>
+    <div id="mainContent" class="opacity-0 transition-opacity duration-700">
+        <div class="flex justify-between items-center mb-6">
+            <button onclick="logout()" class="text-red-500 text-sm font-bold">خروج</button>
+            <h1 class="text-xl font-black italic text-slate-800 underline decoration-indigo-500">لوحة تحكم LUX_VAIP</h1>
         </div>
 
-        <!-- الإحصائيات -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div class="stat-card"><p class="text-green-600 text-[10px] font-bold">المبلغ المستلم</p><h2 id="totalCash" class="text-lg font-black text-green-700">0</h2></div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <div class="stat-card"><p class="text-green-600 text-[10px] font-bold">الكاش المستلم</p><h2 id="totalCash" class="text-lg font-black text-green-700">0</h2></div>
+            <div class="stat-card"><p class="text-indigo-600 text-[10px] font-bold">صافي الأرباح</p><h2 id="soldProfit" class="text-lg font-black text-indigo-700">0</h2></div>
             <div class="stat-card" style="border-right-color: #f43f5e;"><p class="text-rose-600 text-[10px] font-bold">إجمالي الديون</p><h2 id="totalDebts" class="text-lg font-black text-rose-700">0</h2></div>
-            <div class="stat-card" style="border-right-color: #6366f1;"><p class="text-indigo-600 text-[10px] font-bold">الأرباح الصافية</p><h2 id="soldProfit" class="text-lg font-black text-indigo-700">0</h2></div>
-            <div class="stat-card" style="border-right-color: #64748b;"><p class="text-slate-500 text-[10px] font-bold">قطع المخزن</p><h2 id="totalQty" class="text-lg font-black text-slate-700">0</h2></div>
+            <div class="stat-card" style="border-right-color: #64748b;"><p class="text-slate-400 text-[10px] font-bold">قطع المخزن</p><h2 id="totalQty" class="text-lg font-black text-slate-700">0</h2></div>
         </div>
 
-        <!-- قسم الديون (مع ميزة الإرجاع البرمجي) -->
-        <div class="bg-white p-6 rounded-3xl shadow-sm mb-8 border border-slate-100">
-            <h3 class="font-black mb-4 text-rose-600 flex items-center gap-2"><i class="fas fa-hand-holding-usd"></i> سجل الديون المستحقة</h3>
-            <div id="debtTableBody" class="space-y-3"></div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-rose-100">
+            <h3 class="font-black mb-4 text-rose-600 italic uppercase">حسابات المديونين</h3>
+            <div id="debtTableBody" class="space-y-2"></div>
         </div>
 
-        <!-- جدول المخزن -->
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
-            <h3 class="font-black mb-4 text-slate-700 flex items-center gap-2"><i class="fas fa-box"></i> حالة المخزن الحالي</h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-right">
-                    <thead>
-                        <tr class="text-[10px] text-slate-400 font-bold uppercase border-b">
-                            <th class="pb-3">المنتج</th>
-                            <th class="pb-3">النكهات المتوفرة</th>
-                            <th class="pb-3">سعر البيع</th>
-                            <th class="pb-3 text-left">إجراء</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pTableBody"></tbody>
-                </table>
+        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-slate-200">
+            <h3 class="font-black mb-4 text-indigo-600 italic uppercase">إضافة بضاعة جديدة</h3>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+                <input type="text" id="p_name" placeholder="اسم الجهاز">
+                <input type="number" id="p_cost" placeholder="سعر الكلفة">
+                <input type="number" id="p_sell" placeholder="سعر البيع">
+                <input type="file" accept="image/*" onchange="previewImage(this)" class="text-[10px] p-1 border-dashed">
             </div>
+            <div class="bg-indigo-50 p-4 rounded-xl mb-4">
+                <div class="flex gap-2">
+                    <input type="text" id="f_name" placeholder="النكهة" class="bg-white">
+                    <input type="number" id="f_qty" placeholder="العدد" class="bg-white w-20 text-center">
+                    <button onclick="addFlavorToList()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold">+</button>
+                </div>
+                <div id="tempFlavors" class="mt-3 flex flex-wrap"></div>
+            </div>
+            <button onclick="saveProduct()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-xl">حفظ المنتج ورفع للمتجر 🚀</button>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+            <h3 class="font-black mb-4 italic text-slate-500 underline uppercase">المخزن الحالي</h3>
+            <div class="overflow-x-auto"><table class="min-w-full text-right"><thead><tr class="text-[10px] text-slate-400 border-b"><th>المنتج</th><th>النكهات</th><th>البيع</th><th>إجراء</th></tr></thead><tbody id="pTableBody"></tbody></table></div>
         </div>
     </div>
 
     <script>
-        const PASS = "1221";
-        let db, allProds = {}, allDebts = {}, currentSale = {};
+        const CORRECT_PASS = "1221";
+        let db, base64Img = "", currentFlavors = [], allLiveProducts = {}, allLiveDebts = {}, currentSale = {};
 
-        // نظام الحماية
-        function checkAuth() { if(document.getElementById('adminPass').value === PASS) { localStorage.setItem('admin_logged', 'true'); location.reload(); } else { alert('الرمز غير صحيح'); } }
-        function logout() { localStorage.removeItem('admin_logged'); location.reload(); }
-        window.onload = () => { if(localStorage.getItem('admin_logged') === 'true') { document.getElementById('authOverlay').remove(); document.getElementById('mainContent').classList.remove('hidden'); init(); } };
+        window.onload = () => { if (localStorage.getItem('admin_logged_in') === 'true') { document.getElementById('authOverlay').style.display = 'none'; document.getElementById('mainContent').classList.remove('opacity-0'); initFirebase(); } };
+        function checkAuth() { if (document.getElementById('adminPass').value === CORRECT_PASS) { localStorage.setItem('admin_logged_in', 'true'); location.reload(); } else alert("خطأ!"); }
+        function logout() { localStorage.removeItem('admin_logged_in'); location.reload(); }
 
-        function init() {
-            firebase.initializeApp({ apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc", databaseURL: "https://lux-vaip-default-rtdb.firebaseio.com/" });
+        function initFirebase() {
+            const firebaseConfig = { apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc", databaseURL: "https://lux-vaip-default-rtdb.firebaseio.com/", projectId: "lux-vaip" };
+            firebase.initializeApp(firebaseConfig);
             db = firebase.database();
-            loadData();
+            loadLive();
         }
 
-        const irq = (n) => new Intl.NumberFormat('ar-IQ').format(n) + " د.ع";
+        const irqPrice = (n) => new Intl.NumberFormat('ar-IQ').format(n) + " د.ع";
 
-        function loadData() {
+        window.previewImage = (i) => { const r = new FileReader(); r.onload = (e) => base64Img = e.target.result; r.readAsDataURL(i.files[0]); };
+
+        window.addFlavorToList = () => {
+            const n = document.getElementById('f_name').value, q = Number(document.getElementById('f_qty').value);
+            if (n && q > 0) { currentFlavors.push({ name: n, qty: q }); renderTemp(); }
+        };
+
+        function renderTemp() { document.getElementById('tempFlavors').innerHTML = currentFlavors.map((f, i) => `<span class="flavor-tag">${f.name} (${f.qty})</span>`).join(''); }
+
+        function loadLive() {
             db.ref().on('value', snap => {
                 const data = snap.val() || {};
-                allProds = data.products || {};
-                allDebts = data.debts || {};
-                
-                // 1. تحديث المخزن
-                const pt = document.getElementById('pTableBody'); pt.innerHTML = '';
-                let totalItems = 0;
-                Object.keys(allProds).forEach(id => {
-                    const p = allProds[id];
-                    let fHtml = '';
-                    if(p.flavors) {
-                        p.flavors.forEach(f => {
-                            totalItems += f.qty;
-                            fHtml += `<span class="inline-block bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2 py-1 rounded-lg m-0.5 border border-indigo-100">${f.name} (${f.qty})</span>`;
-                        });
-                    }
-                    pt.innerHTML += `<tr class="border-b last:border-0 text-sm">
-                        <td class="py-4 font-bold text-slate-700">${p.name}</td>
-                        <td>${fHtml || '<span class="text-red-400">منتهي</span>'}</td>
-                        <td class="font-black text-green-600">${irq(p.sell)}</td>
-                        <td class="text-left"><button onclick="openSell('${id}')" class="bg-indigo-600 text-white px-5 py-1.5 rounded-xl text-xs font-bold shadow-md shadow-indigo-100">بيع</button></td>
-                    </tr>`;
-                });
-                document.getElementById('totalQty').innerText = totalItems;
+                const prods = data.products || {}; allLiveProducts = prods;
+                const stats = data.stats || { cash: 0, profit: 0 };
+                const debts = data.debts || {}; allLiveDebts = debts;
 
-                // 2. تحديث الديون
-                const dt = document.getElementById('debtTableBody'); dt.innerHTML = '';
-                let dSum = 0;
-                Object.keys(allDebts).forEach(id => {
-                    const d = allDebts[id]; dSum += d.amount;
-                    dt.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                        <div><p class="font-black text-slate-800 text-sm">${d.name}</p><p class="text-[10px] text-slate-400 font-bold">${d.details}</p></div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-rose-600 font-black text-sm">${irq(d.amount)}</span>
-                            <button onclick="returnItemProgrammatically('${id}')" class="bg-white text-rose-500 border border-rose-100 px-3 py-1.5 rounded-xl text-[10px] font-black hover:bg-rose-500 hover:text-white transition">إرجاع للمخزن</button>
+                document.getElementById('totalCash').innerText = irqPrice(stats.cash);
+                document.getElementById('soldProfit').innerText = irqPrice(stats.profit);
+
+                const pt = document.getElementById('pTableBody'); pt.innerHTML = ''; let tQty = 0;
+                Object.keys(prods).forEach(id => {
+                    const p = prods[id]; let pq = 0;
+                    let fHtml = p.flavors ? p.flavors.map(f => { pq += f.qty; return `<span class="flavor-tag">${f.name} (${f.qty})</span>` }).join('') : '';
+                    tQty += pq;
+                    pt.innerHTML += `<tr class="border-b"><td><b>${p.name}</b></td><td>${fHtml}</td><td class="font-bold text-green-600">${irqPrice(p.sell)}</td><td><button onclick="openSellMenu('${id}')" class="bg-green-500 text-white px-3 py-1 rounded text-[10px]">بيع</button></td></tr>`;
+                });
+                document.getElementById('totalQty').innerText = tQty;
+
+                const dt = document.getElementById('debtTableBody'); dt.innerHTML = ''; let tdSum = 0;
+                Object.keys(debts).forEach(id => {
+                    const d = debts[id]; tdSum += d.amount;
+                    dt.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border">
+                        <div><b>${d.name}</b><br><small class="text-[9px] text-slate-400">${d.details}</small></div>
+                        <div class="flex gap-2">
+                            <span class="text-rose-600 font-black">${irqPrice(d.amount)}</span>
+                            <button onclick="returnToStockAndDelete('${id}')" class="bg-rose-50 text-rose-500 px-3 py-1 rounded-lg text-[10px] font-bold border border-rose-100">حذف وإرجاع للمخزن</button>
                         </div>
                     </div>`;
                 });
-                document.getElementById('totalDebts').innerText = irq(dSum);
-                document.getElementById('totalCash').innerText = irq(data.stats?.cash || 0);
-                document.getElementById('soldProfit').innerText = irq(data.stats?.profit || 0);
+                document.getElementById('totalDebts').innerText = irqPrice(tdSum);
             });
         }
 
-        // البيع مع تخزين معرفات البرمجة (pId, fIdx)
-        function openSell(id) {
-            currentSale.pId = id;
-            const p = allProds[id];
-            const div = document.getElementById('sellOptions');
-            div.innerHTML = `<h3 class="text-center font-black text-indigo-900 mb-4">اختر النكهة المطلوبة</h3>`;
-            p.flavors.forEach((f, idx) => {
-                if(f.qty > 0) div.innerHTML += `<button onclick="chooseFlavor(${idx})" class="btn-choice font-bold text-slate-600 italic">${f.name} (متوفر: ${f.qty})</button>`;
+        // --- نظام البيع الذكي ---
+        window.openSellMenu = (id) => {
+            const p = allLiveProducts[id]; currentSale.id = id;
+            const container = document.getElementById('sellOptions');
+            container.innerHTML = `<h3 class="text-center font-bold mb-4">اختر النكهة</h3>`;
+            p.flavors.forEach((f, fIdx) => {
+                container.innerHTML += `<button onclick="stepTwo(${fIdx})" class="btn-choice bg-indigo-50 border-indigo-100">${f.name} (${f.qty})</button>`;
             });
             document.getElementById('sellModal').style.display = 'flex';
-        }
+        };
 
-        function chooseFlavor(fIdx) {
+        window.stepTwo = (fIdx) => {
             currentSale.fIdx = fIdx;
-            const div = document.getElementById('sellOptions');
-            div.innerHTML = `
-                <button onclick="completeSale('CASH')" class="w-full p-4 bg-green-500 text-white rounded-[1.2rem] font-black shadow-lg mb-3">💰 استلام نقد (كاش)</button>
-                <div class="bg-slate-50 p-4 rounded-[1.5rem] border-2 border-dashed border-slate-200">
-                    <input type="text" id="debtorName" placeholder="اسم المديون الصريح..." class="mb-3">
-                    <button onclick="completeSale('DEBT')" class="w-full p-4 bg-slate-800 text-white rounded-[1.2rem] font-black">👤 تسجيل دين بذمة</button>
-                </div>`;
-        }
+            const container = document.getElementById('sellOptions');
+            container.innerHTML = `<button onclick="finalSale('CASH')" class="btn-choice bg-green-500 text-white">💰 بيع كاش</button>
+                                   <button onclick="showNewDebtInput()" class="btn-choice bg-slate-800 text-white">👤 مديون جديد</button>`;
+        };
 
-        async function completeSale(type) {
-            const p = allProds[currentSale.pId];
-            const flavor = p.flavors[currentSale.fIdx];
+        window.showNewDebtInput = () => {
+            const container = document.getElementById('sellOptions');
+            container.innerHTML = `<input type="text" id="new_debtor_name" placeholder="اسم المديون..." class="mb-4 text-center">
+                                   <button onclick="finalSale('NEW', document.getElementById('new_debtor_name').value)" class="btn-choice bg-indigo-600 text-white">تأكيد الدين</button>`;
+        };
+
+        window.finalSale = async (type, extra) => {
+            const id = currentSale.id; const p = allLiveProducts[id]; const fIdx = currentSale.fIdx;
+            const flavor = p.flavors[fIdx];
             
-            // خصم الكمية
+            // خصم من المخزن
             flavor.qty -= 1;
-            await db.ref('products/' + currentSale.pId + '/flavors').set(p.flavors);
+            const updatedFlavors = p.flavors.filter(f => f.qty > 0);
+            await db.ref('products/' + id).update({ flavors: updatedFlavors });
 
-            if(type === 'CASH') {
-                const s = (await db.ref('stats').once('value')).val() || {cash:0, profit:0};
+            if (type === 'CASH') {
+                const s = (await db.ref('stats').once('value')).val() || { cash: 0, profit: 0 };
                 await db.ref('stats').set({ cash: s.cash + p.sell, profit: s.profit + (p.sell - p.cost) });
             } else {
-                const name = document.getElementById('debtorName').value || "زبون مجهول";
-                await db.ref('debts').push({
-                    name: name,
-                    amount: p.sell,
-                    details: `${p.name} (${flavor.name})`,
-                    pId: currentSale.pId, // برمجياً: معرف المنتج
-                    fIdx: currentSale.fIdx  // برمجياً: ترتيب النكهة
+                // حفظ كود المنتج واسم النكهة في الدين لضمان الإرجاع
+                await db.ref('debts').push({ 
+                    name: extra, 
+                    amount: p.sell, 
+                    details: `${p.name} - ${flavor.name}`,
+                    pId: id, // كود المنتج
+                    fName: flavor.name // اسم النكهة
                 });
             }
-            closeModal();
-        }
+            document.getElementById('sellModal').style.display = 'none';
+        };
 
-        // --- وظيفة الإرجاع البرمجية (الحل النهائي) ---
-        async function returnItemProgrammatically(debtId) {
-            const debt = allDebts[debtId];
-            if(!confirm(`تأكيد إرجاع (${debt.details}) للمخزن وحذف الدين؟`)) return;
+        // --- الحذف والإرجاع المضمون ---
+        window.returnToStockAndDelete = async (debtId) => {
+            const debt = allLiveDebts[debtId];
+            if (!confirm(`هل تريد حذف دين ${debt.name} وإرجاع القطعة للمخزن؟`)) return;
 
             const pId = debt.pId;
-            const fIdx = debt.fIdx;
+            const fName = debt.fName;
 
-            // التحقق برمجياً من وجود المنتج والنكهة في المصفوفة
-            const pSnap = await db.ref('products/' + pId).once('value');
-            if(pSnap.exists()) {
-                let pData = pSnap.val();
-                if(pData.flavors && pData.flavors[fIdx]) {
-                    pData.flavors[fIdx].qty += 1; // إعادة القطعة برمجياً لمكانها
-                    await db.ref('products/' + pId + '/flavors').set(pData.flavors);
+            if (pId && fName) {
+                const snap = await db.ref('products/' + pId).once('value');
+                if (snap.exists()) {
+                    let p = snap.val();
+                    let flavors = p.flavors || [];
+                    let found = false;
+
+                    // ابحث عن النكهة بالاسم وزد عددها
+                    flavors.forEach(f => {
+                        if (f.name === fName) {
+                            f.qty += 1;
+                            found = true;
+                        }
+                    });
+
+                    // إذا كانت النكهة محذوفة (كانت صفر)، أعد إضافتها
+                    if (!found) {
+                        flavors.push({ name: fName, qty: 1 });
+                    }
+
+                    await db.ref('products/' + pId).update({ flavors: flavors });
                 }
             }
 
-            // حذف سجل الدين نهائياً
             await db.ref('debts/' + debtId).remove();
-            alert("تم إرجاع النكهة برمجياً بنجاح ✅");
-        }
+            alert("تم الإرجاع للمخزن وحذف الدين.");
+        };
 
-        function closeModal() { document.getElementById('sellModal').style.display = 'none'; currentSale = {}; }
+        window.saveProduct = () => {
+            const n = document.getElementById('p_name').value, s = Number(document.getElementById('p_sell').value), c = Number(document.getElementById('p_cost').value);
+            if (!n || !s || currentFlavors.length === 0) return alert("اكمل البيانات!");
+            db.ref('products').push({ name: n, sell: s, cost: c, img: base64Img, flavors: currentFlavors });
+            currentFlavors = []; renderTemp();
+        };
     </script>
 </body>
 </html>
