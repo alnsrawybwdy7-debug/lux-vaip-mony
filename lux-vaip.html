@@ -1,232 +1,484 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة LUX_VAIP | النسخة الاحترافية</title>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap');
-        body { font-family: 'Tajawal', sans-serif; background-color: #f1f5f9; color: #1e293b; text-align: right; }
-        .stat-card { background: white; border-radius: 1rem; padding: 15px; border-right: 5px solid #6366f1; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; position: relative; }
-        input { border: 1px solid #cbd5e1; border-radius: 0.75rem; padding: 10px; font-size: 14px; width: 100%; outline: none; text-align: right; }
-        .flavor-tag { background: #e0e7ff; color: #4338ca; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; margin: 2px; display: inline-block; border: 1px solid #c7d2fe; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
-        .btn-choice { width: 100%; padding: 14px; border-radius: 15px; margin-bottom: 8px; font-weight: 900; text-align: center; transition: 0.2s; border: 1px solid transparent; }
-    </style>
-</head>
-<body class="p-4 md:p-8">
 
-    <div id="authOverlay" class="fixed inset-0 bg-slate-900 z-[999] flex flex-col items-center justify-center">
-        <div class="w-12 h-12 bg-indigo-600 rounded-xl mb-6 flex items-center justify-center"><i class="fas fa-user-shield text-white text-xl"></i></div>
-        <input type="password" id="adminPass" placeholder="رمز الدخول" class="max-w-[200px] text-center mb-4 bg-white/10 text-white border-white/20">
-        <button onclick="checkAuth()" class="bg-indigo-600 text-white px-12 py-2 rounded-xl font-bold">دخول</button>
-    </div>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>إدارة LUX_VAIP | النسخة الاحترافية</title>
+        <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;900&display=swap');
 
-    <div id="sellModal" class="modal">
-        <div class="bg-white p-6 rounded-[2rem] w-full max-w-md shadow-2xl border-t-8 border-indigo-600">
-            <div id="sellOptions" class="space-y-2 max-h-[450px] overflow-y-auto p-1"></div>
-            <button onclick="document.getElementById('sellModal').style.display='none'" class="w-full mt-4 text-slate-400 font-bold text-xs">إلغاء ✕</button>
-        </div>
-    </div>
+            body {
+                font-family: 'Tajawal', sans-serif;
+                background-color: #f1f5f9;
+                color: #1e293b;
+                text-align: right;
+            }
 
-    <div id="mainContent" class="opacity-0 transition-opacity duration-700">
-        <div class="flex justify-between items-center mb-6">
-            <button onclick="logout()" class="text-red-500 text-sm font-bold">خروج</button>
-            <h1 class="text-xl font-black italic text-slate-800 underline decoration-indigo-500">لوحة تحكم LUX_VAIP</h1>
-        </div>
+            #authOverlay {
+                position: fixed;
+                inset: 0;
+                background: #020617;
+                z-index: 999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+            }
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            <div class="stat-card"><p class="text-green-600 text-[10px] font-bold">الكاش المستلم</p><h2 id="totalCash" class="text-lg font-black text-green-700">0</h2></div>
-            <div class="stat-card"><p class="text-indigo-600 text-[10px] font-bold">صافي الأرباح</p><h2 id="soldProfit" class="text-lg font-black text-indigo-700">0</h2></div>
-            <div class="stat-card" style="border-right-color: #f43f5e;"><p class="text-rose-600 text-[10px] font-bold">إجمالي الديون</p><h2 id="totalDebts" class="text-lg font-black text-rose-700">0</h2></div>
-            <div class="stat-card" style="border-right-color: #64748b;"><p class="text-slate-400 text-[10px] font-bold">قطع المخزن</p><h2 id="totalQty" class="text-lg font-black text-slate-700">0</h2></div>
-        </div>
+            .stat-card {
+                background: white;
+                border-radius: 1rem;
+                padding: 15px;
+                border-right: 5px solid #6366f1;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+                text-align: center;
+                position: relative;
+            }
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-rose-100">
-            <h3 class="font-black mb-4 text-rose-600 italic uppercase">حسابات المديونين</h3>
-            <div id="debtTableBody" class="space-y-2"></div>
-        </div>
+            input {
+                border: 1px solid #cbd5e1;
+                border-radius: 0.75rem;
+                padding: 10px;
+                font-size: 14px;
+                width: 100%;
+                outline: none;
+                text-align: right;
+            }
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-slate-200">
-            <h3 class="font-black mb-4 text-indigo-600 italic uppercase">إضافة بضاعة جديدة</h3>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-                <input type="text" id="p_name" placeholder="اسم الجهاز">
-                <input type="number" id="p_cost" placeholder="سعر الكلفة">
-                <input type="number" id="p_sell" placeholder="سعر البيع">
-                <input type="file" accept="image/*" onchange="previewImage(this)" class="text-[10px] p-1 border-dashed">
+            .flavor-tag {
+                background: #e0e7ff;
+                color: #4338ca;
+                padding: 2px 8px;
+                border-radius: 6px;
+                font-size: 11px;
+                font-weight: bold;
+                margin: 2px;
+                display: inline-block;
+                border: 1px solid #c7d2fe;
+            }
+
+            .modal {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.7);
+                z-index: 100;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+                backdrop-filter: blur(5px);
+            }
+
+            .btn-choice {
+                width: 100%;
+                padding: 14px;
+                border-radius: 15px;
+                margin-bottom: 8px;
+                font-weight: 900;
+                text-align: center;
+                transition: 0.2s;
+                border: 1px solid transparent;
+            }
+
+            .flavor-edit-row {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                background: #f8fafc;
+                padding: 8px;
+                border-radius: 12px;
+                margin-bottom: 6px;
+                border: 1px solid #e2e8f0;
+            }
+        </style>
+    </head>
+
+    <body class="p-4 md:p-8">
+
+        <div id="authOverlay">
+            <div class="w-12 h-12 bg-indigo-600 rounded-xl mb-6 flex items-center justify-center shadow-lg shadow-indigo-500/50">
+                <i class="fas fa-user-shield text-white text-xl"></i>
             </div>
-            <div class="bg-indigo-50 p-4 rounded-xl mb-4">
-                <div class="flex gap-2">
-                    <input type="text" id="f_name" placeholder="النكهة" class="bg-white">
-                    <input type="number" id="f_qty" placeholder="العدد" class="bg-white w-20 text-center">
-                    <button onclick="addFlavorToList()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold">+</button>
-                </div>
-                <div id="tempFlavors" class="mt-3 flex flex-wrap"></div>
+            <input type="password" id="adminPass" placeholder="رمز الدخول" class="max-w-[200px] text-center bg-white/10 border-white/20 text-white mb-4 rounded-xl p-2 outline-none">
+            <button onclick="checkAuth()" class="bg-indigo-600 text-white px-12 py-2 rounded-xl font-bold hover:bg-indigo-700 transition">دخول</button>
+        </div>
+
+        <div id="sellModal" class="modal">
+            <div class="bg-white p-6 rounded-[2rem] w-full max-w-md shadow-2xl border-t-8 border-indigo-600">
+                <div id="sellOptions" class="space-y-2 max-h-[450px] overflow-y-auto p-1"></div>
+                <button onclick="document.getElementById('sellModal').style.display='none'" class="w-full mt-4 text-slate-400 font-bold text-xs uppercase">إلغاء ✕</button>
             </div>
-            <button onclick="saveProduct()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-xl">حفظ المنتج ورفع للمتجر 🚀</button>
         </div>
 
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
-            <h3 class="font-black mb-4 italic text-slate-500 underline uppercase">المخزن الحالي</h3>
-            <div class="overflow-x-auto"><table class="min-w-full text-right"><thead><tr class="text-[10px] text-slate-400 border-b"><th>المنتج</th><th>النكهات</th><th>البيع</th><th>إجراء</th></tr></thead><tbody id="pTableBody"></tbody></table></div>
-        </div>
-    </div>
-
-    <script>
-        const CORRECT_PASS = "1221";
-        let db, base64Img = "", currentFlavors = [], allLiveProducts = {}, allLiveDebts = {}, currentSale = {};
-
-        window.onload = () => { if (localStorage.getItem('admin_logged_in') === 'true') { document.getElementById('authOverlay').style.display = 'none'; document.getElementById('mainContent').classList.remove('opacity-0'); initFirebase(); } };
-        function checkAuth() { if (document.getElementById('adminPass').value === CORRECT_PASS) { localStorage.setItem('admin_logged_in', 'true'); location.reload(); } else alert("خطأ!"); }
-        function logout() { localStorage.removeItem('admin_logged_in'); location.reload(); }
-
-        function initFirebase() {
-            const firebaseConfig = { apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc", databaseURL: "https://lux-vaip-default-rtdb.firebaseio.com/", projectId: "lux-vaip" };
-            firebase.initializeApp(firebaseConfig);
-            db = firebase.database();
-            loadLive();
-        }
-
-        const irqPrice = (n) => new Intl.NumberFormat('ar-IQ').format(n) + " د.ع";
-
-        window.previewImage = (i) => { const r = new FileReader(); r.onload = (e) => base64Img = e.target.result; r.readAsDataURL(i.files[0]); };
-
-        window.addFlavorToList = () => {
-            const n = document.getElementById('f_name').value, q = Number(document.getElementById('f_qty').value);
-            if (n && q > 0) { currentFlavors.push({ name: n, qty: q }); renderTemp(); }
-        };
-
-        function renderTemp() { document.getElementById('tempFlavors').innerHTML = currentFlavors.map((f, i) => `<span class="flavor-tag">${f.name} (${f.qty})</span>`).join(''); }
-
-        function loadLive() {
-            db.ref().on('value', snap => {
-                const data = snap.val() || {};
-                const prods = data.products || {}; allLiveProducts = prods;
-                const stats = data.stats || { cash: 0, profit: 0 };
-                const debts = data.debts || {}; allLiveDebts = debts;
-
-                document.getElementById('totalCash').innerText = irqPrice(stats.cash);
-                document.getElementById('soldProfit').innerText = irqPrice(stats.profit);
-
-                const pt = document.getElementById('pTableBody'); pt.innerHTML = ''; let tQty = 0;
-                Object.keys(prods).forEach(id => {
-                    const p = prods[id]; let pq = 0;
-                    let fHtml = p.flavors ? p.flavors.map(f => { pq += f.qty; return `<span class="flavor-tag">${f.name} (${f.qty})</span>` }).join('') : '';
-                    tQty += pq;
-                    pt.innerHTML += `<tr class="border-b"><td><b>${p.name}</b></td><td>${fHtml}</td><td class="font-bold text-green-600">${irqPrice(p.sell)}</td><td><button onclick="openSellMenu('${id}')" class="bg-green-500 text-white px-3 py-1 rounded text-[10px]">بيع</button></td></tr>`;
-                });
-                document.getElementById('totalQty').innerText = tQty;
-
-                const dt = document.getElementById('debtTableBody'); dt.innerHTML = ''; let tdSum = 0;
-                Object.keys(debts).forEach(id => {
-                    const d = debts[id]; tdSum += d.amount;
-                    dt.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border">
-                        <div><b>${d.name}</b><br><small class="text-[9px] text-slate-400">${d.details}</small></div>
+        <div id="editModal" class="modal">
+            <div class="bg-white p-6 rounded-3xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto">
+                <h3 class="font-black text-indigo-600 mb-4 border-b pb-2 italic uppercase">تعديل المنتج والنكهات</h3>
+                <input type="hidden" id="edit_id">
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">سعر الكلفة</label><input type="number" id="edit_cost"></div>
+                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">سعر البيع</label><input type="number" id="edit_sell"></div>
+                    </div>
+                    <div class="border-t pt-4">
+                        <label class="text-[10px] font-bold text-indigo-500 uppercase block mb-3 italic">تعديل النكهات المتوفرة:</label>
+                        <div id="currentFlavorsList"></div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-dashed border-slate-300">
+                        <p class="text-[11px] font-bold mb-2">إضافة نكهة جديدة:</p>
                         <div class="flex gap-2">
-                            <span class="text-rose-600 font-black">${irqPrice(d.amount)}</span>
-                            <button onclick="returnToStockAndDelete('${id}')" class="bg-rose-50 text-rose-500 px-3 py-1 rounded-lg text-[10px] font-bold border border-rose-100">حذف وإرجاع للمخزن</button>
+                            <input type="text" id="new_f_name" placeholder="النكهة" class="text-xs bg-white">
+                            <input type="number" id="new_f_qty" placeholder="العدد" class="text-xs w-16 bg-white text-center">
+                            <button onclick="addNewFlavorToProduct()" class="bg-green-600 text-white px-3 rounded-lg text-xs">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2 mt-6">
+                    <button onclick="updateProductData()" class="flex-grow bg-indigo-600 text-white py-2 rounded-xl font-bold shadow-lg">حفظ التغييرات</button>
+                    <button onclick="document.getElementById('editModal').style.display='none'" class="bg-slate-100 px-4 rounded-xl font-bold text-sm">إلغاء</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mainContent" class="opacity-0 transition-opacity duration-700">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="logout()" class="text-red-500 text-sm font-bold"><i class="fas fa-sign-out-alt"></i> خروج</button>
+                <h1 class="text-xl font-black italic text-slate-800 underline decoration-indigo-500 decoration-4 uppercase">لوحة تحكم LUX_VAIP</h1>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+                <div class="stat-card"> 
+                    <i class="fas fa-redo absolute top-2 left-2 text-[10px] text-red-400 cursor-pointer" onclick="resetFinance()"></i>
+                    <p class="text-green-600 text-[10px] font-bold uppercase">الكاش المستلم</p>
+                    <h2 id="totalCash" class="text-lg font-black text-green-700">0</h2>
+                </div>
+                <div class="stat-card">
+                    <p class="text-indigo-600 text-[10px] font-bold uppercase">صافي الأرباح</p>
+                    <h2 id="soldProfit" class="text-lg font-black text-indigo-700">0</h2>
+                </div>
+                <div class="stat-card" style="border-right-color: #f43f5e;">
+                    <p class="text-rose-600 text-[10px] font-bold uppercase">إجمالي الديون</p>
+                    <h2 id="totalDebts" class="text-lg font-black text-rose-700">0</h2>
+                </div>
+                <div class="stat-card" style="border-right-color: #64748b;">
+                    <p class="text-slate-400 text-[10px] font-bold uppercase">قطع المخزن</p>
+                    <h2 id="totalQty" class="text-lg font-black text-slate-700">0</h2>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-rose-100">
+                <h3 class="font-black mb-4 text-rose-600 italic uppercase">حسابات المديونين</h3>
+                <div id="debtTableBody" class="space-y-2"></div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm mb-10 border border-slate-200">
+                <h3 class="font-black mb-4 text-indigo-600 italic uppercase">إضافة بضاعة جديدة</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+                    <input type="text" id="p_name" placeholder="اسم الجهاز">
+                    <input type="number" id="p_cost" placeholder="سعر الكلفة">
+                    <input type="number" id="p_sell" placeholder="سعر البيع">
+                    <input type="file" accept="image/*" onchange="previewImage(this)" class="text-[10px] p-1 border-dashed">
+                </div>
+                <div class="bg-indigo-50 p-4 rounded-xl mb-4 border border-indigo-100">
+                    <div class="flex gap-2">
+                        <input type="text" id="f_name" placeholder="النكهة" class="bg-white">
+                        <input type="number" id="f_qty" placeholder="العدد" class="bg-white w-20 text-center">
+                        <button onclick="addFlavorToList()" class="bg-indigo-600 text-white px-6 rounded-xl font-bold shadow-lg">+</button>
+                    </div>
+                    <div id="tempFlavors" class="mt-3 flex flex-wrap"></div>
+                </div>
+                <button onclick="saveProduct()" class="w-full bg-slate-900 text-white font-black py-4 rounded-xl shadow-xl hover:bg-black transition uppercase">حفظ المنتج ورفع للمتجر 🚀</button>
+            </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 mb-10">
+                <h3 class="font-black mb-4 italic text-slate-500 underline uppercase">المخزن الحالي</h3>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-right">
+                        <thead>
+                            <tr class="text-[10px] text-slate-400 font-bold uppercase border-b">
+                                <th>المنتج</th>
+                                <th>النكهات</th>
+                                <th>الكلفة</th>
+                                <th>البيع</th>
+                                <th>إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const CORRECT_PASS = "1221";
+            let db, base64Img = "", currentFlavors = [], allLiveProducts = {}, allLiveDebts = {}, currentSale = {};
+
+            window.onload = () => {
+                if (localStorage.getItem('admin_logged_in') === 'true') {
+                    document.getElementById('authOverlay').style.display = 'none';
+                    document.getElementById('mainContent').classList.remove('opacity-0');
+                    initFirebase();
+                }
+            };
+
+            function checkAuth() {
+                if (document.getElementById('adminPass').value === CORRECT_PASS) {
+                    localStorage.setItem('admin_logged_in', 'true');
+                    location.reload();
+                } else alert("الرمز خطأ!");
+            }
+
+            function logout() { localStorage.removeItem('admin_logged_in'); location.reload(); }
+
+            function initFirebase() {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyBlmUZlz9Qg8346vU92vNg9jDFQCH06Gpc",
+                    databaseURL: "https://lux-vaip-default-rtdb.firebaseio.com/",
+                    projectId: "lux-vaip"
+                };
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+                loadLive();
+            }
+
+            const irqPrice = (n) => new Intl.NumberFormat('ar-IQ').format(n) + " د.ع";
+
+            window.previewImage = (i) => {
+                const r = new FileReader();
+                r.onload = (e) => base64Img = e.target.result;
+                r.readAsDataURL(i.files[0]);
+            };
+
+            window.addFlavorToList = () => {
+                const n = document.getElementById('f_name').value, q = Number(document.getElementById('f_qty').value);
+                if (n && q > 0) {
+                    currentFlavors.push({ name: n, qty: q });
+                    document.getElementById('f_name').value = ''; document.getElementById('f_qty').value = '';
+                    renderTemp();
+                }
+            };
+
+            function renderTemp() {
+                document.getElementById('tempFlavors').innerHTML = currentFlavors.map((f, i) => `<span class="flavor-tag">${f.name} (${f.qty}) <i class="fas fa-times ml-2 cursor-pointer text-red-500" onclick="currentFlavors.splice(${i},1);renderTemp()"></i></span>`).join('');
+            }
+
+            function loadLive() {
+                db.ref().on('value', snap => {
+                    const data = snap.val() || {};
+                    const prods = data.products || {};
+                    allLiveProducts = prods;
+                    const stats = data.stats || { cash: 0, profit: 0 };
+                    const debts = data.debts || {};
+                    allLiveDebts = debts;
+
+                    document.getElementById('totalCash').innerText = irqPrice(stats.cash);
+                    document.getElementById('soldProfit').innerText = irqPrice(stats.profit);
+
+                    const pt = document.getElementById('pTableBody');
+                    pt.innerHTML = ''; let tQty = 0;
+                    Object.keys(prods).forEach(id => {
+                        const p = prods[id]; let pq = 0;
+                        let fHtml = p.flavors ? p.flavors.map(f => { pq += f.qty; return `<span class="flavor-tag">${f.name} (${f.qty})</span>` }).join('') : '';
+                        tQty += pq;
+                        pt.innerHTML += `<tr class="border-b">
+                        <td class="py-3"><div class="flex items-center gap-2"><img src="${p.img || ''}" class="w-8 h-8 rounded object-cover shadow-sm"><b>${p.name}</b></div></td>
+                        <td>${fHtml}</td>
+                        <td class="text-slate-400 text-[10px] font-bold">${irqPrice(p.cost)}</td>
+                        <td class="font-bold text-green-600">${irqPrice(p.sell)}</td>
+                        <td class="flex gap-2 justify-end py-3">
+                            <button onclick="openSellMenu('${id}')" class="bg-green-500 text-white px-3 py-1 rounded text-[10px] font-black">بيع</button>
+                            <button onclick="openEditModal('${id}')" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded text-[10px] font-bold border border-indigo-100">تعديل</button>
+                            <button onclick="db.ref('products/${id}').remove()" class="text-slate-200 px-1 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                    });
+                    document.getElementById('totalQty').innerText = tQty;
+
+                    const dt = document.getElementById('debtTableBody');
+                    dt.innerHTML = ''; let tdSum = 0;
+                    Object.keys(debts).forEach(id => {
+                        const d = debts[id]; tdSum += d.amount;
+                        dt.innerHTML += `<div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <div><b class="text-slate-700">${d.name}</b><br><small class="text-slate-400 text-[9px] font-bold">${d.details}</small></div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-rose-600 font-black text-sm ml-2">${irqPrice(d.amount)}</span>
+                            <button onclick="payDebtFlow('${id}')" class="bg-white text-indigo-600 px-3 py-1 rounded-lg text-[10px] font-black border border-indigo-100 italic">تحصيل</button>
+                            <button onclick="returnToStockAndDelete('${id}')" class="bg-rose-50 text-rose-500 px-3 py-1 rounded-lg text-[10px] font-black border border-rose-100 hover:bg-rose-500 hover:text-white transition">حذف وإرجاع</button>
                         </div>
                     </div>`;
-                });
-                document.getElementById('totalDebts').innerText = irqPrice(tdSum);
-            });
-        }
-
-        // --- نظام البيع الذكي ---
-        window.openSellMenu = (id) => {
-            const p = allLiveProducts[id]; currentSale.id = id;
-            const container = document.getElementById('sellOptions');
-            container.innerHTML = `<h3 class="text-center font-bold mb-4">اختر النكهة</h3>`;
-            p.flavors.forEach((f, fIdx) => {
-                container.innerHTML += `<button onclick="stepTwo(${fIdx})" class="btn-choice bg-indigo-50 border-indigo-100">${f.name} (${f.qty})</button>`;
-            });
-            document.getElementById('sellModal').style.display = 'flex';
-        };
-
-        window.stepTwo = (fIdx) => {
-            currentSale.fIdx = fIdx;
-            const container = document.getElementById('sellOptions');
-            container.innerHTML = `<button onclick="finalSale('CASH')" class="btn-choice bg-green-500 text-white">💰 بيع كاش</button>
-                                   <button onclick="showNewDebtInput()" class="btn-choice bg-slate-800 text-white">👤 مديون جديد</button>`;
-        };
-
-        window.showNewDebtInput = () => {
-            const container = document.getElementById('sellOptions');
-            container.innerHTML = `<input type="text" id="new_debtor_name" placeholder="اسم المديون..." class="mb-4 text-center">
-                                   <button onclick="finalSale('NEW', document.getElementById('new_debtor_name').value)" class="btn-choice bg-indigo-600 text-white">تأكيد الدين</button>`;
-        };
-
-        window.finalSale = async (type, extra) => {
-            const id = currentSale.id; const p = allLiveProducts[id]; const fIdx = currentSale.fIdx;
-            const flavor = p.flavors[fIdx];
-            
-            // خصم من المخزن
-            flavor.qty -= 1;
-            const updatedFlavors = p.flavors.filter(f => f.qty > 0);
-            await db.ref('products/' + id).update({ flavors: updatedFlavors });
-
-            if (type === 'CASH') {
-                const s = (await db.ref('stats').once('value')).val() || { cash: 0, profit: 0 };
-                await db.ref('stats').set({ cash: s.cash + p.sell, profit: s.profit + (p.sell - p.cost) });
-            } else {
-                // حفظ كود المنتج واسم النكهة في الدين لضمان الإرجاع
-                await db.ref('debts').push({ 
-                    name: extra, 
-                    amount: p.sell, 
-                    details: `${p.name} - ${flavor.name}`,
-                    pId: id, // كود المنتج
-                    fName: flavor.name // اسم النكهة
-                });
-            }
-            document.getElementById('sellModal').style.display = 'none';
-        };
-
-        // --- الحذف والإرجاع المضمون ---
-        window.returnToStockAndDelete = async (debtId) => {
-            const debt = allLiveDebts[debtId];
-            if (!confirm(`هل تريد حذف دين ${debt.name} وإرجاع القطعة للمخزن؟`)) return;
-
-            const pId = debt.pId;
-            const fName = debt.fName;
-
-            if (pId && fName) {
-                const snap = await db.ref('products/' + pId).once('value');
-                if (snap.exists()) {
-                    let p = snap.val();
-                    let flavors = p.flavors || [];
-                    let found = false;
-
-                    // ابحث عن النكهة بالاسم وزد عددها
-                    flavors.forEach(f => {
-                        if (f.name === fName) {
-                            f.qty += 1;
-                            found = true;
-                        }
                     });
-
-                    // إذا كانت النكهة محذوفة (كانت صفر)، أعد إضافتها
-                    if (!found) {
-                        flavors.push({ name: fName, qty: 1 });
-                    }
-
-                    await db.ref('products/' + pId).update({ flavors: flavors });
-                }
+                    document.getElementById('totalDebts').innerText = irqPrice(tdSum);
+                });
             }
 
-            await db.ref('debts/' + debtId).remove();
-            alert("تم الإرجاع للمخزن وحذف الدين.");
-        };
+            // --- الوظيفة الجديدة: حذف الدين وإرجاع القطعة للمخزن ---
+            window.returnToStockAndDelete = async (debtId) => {
+                const debt = allLiveDebts[debtId];
+                if (!confirm(`هل تريد حذف دين (${debt.name}) وإرجاع القطع للمخزن؟`)) return;
 
-        window.saveProduct = () => {
-            const n = document.getElementById('p_name').value, s = Number(document.getElementById('p_sell').value), c = Number(document.getElementById('p_cost').value);
-            if (!n || !s || currentFlavors.length === 0) return alert("اكمل البيانات!");
-            db.ref('products').push({ name: n, sell: s, cost: c, img: base64Img, flavors: currentFlavors });
-            currentFlavors = []; renderTemp();
-        };
-    </script>
-</body>
+                const pId = debt.pId;
+                const fIdx = debt.fIdx;
+
+                // إذا كان المنتج والنكهة لا يزالون موجودين في المخزن
+                if (pId && fIdx !== undefined) {
+                    const pSnap = await db.ref('products/' + pId).once('value');
+                    if (pSnap.exists()) {
+                        let pData = pSnap.val();
+                        if (pData.flavors && pData.flavors[fIdx]) {
+                            pData.flavors[fIdx].qty += 1; // إرجاع القطعة
+                            await db.ref('products/' + pId).update({ flavors: pData.flavors });
+                        }
+                    }
+                }
+
+                // حذف سجل الدين
+                await db.ref('debts/' + debtId).remove();
+                alert("تم حذف الدين وإرجاع البضاعة للمخزن بنجاح ✅");
+            };
+
+            window.openSellMenu = (id) => {
+                const p = allLiveProducts[id]; currentSale.id = id;
+                const container = document.getElementById('sellOptions');
+                container.innerHTML = `<h3 class="text-xs font-black text-slate-400 mb-4 text-center border-b pb-2 italic uppercase">اختر النكهة</h3>`;
+                p.flavors.forEach((f, fIdx) => {
+                    container.innerHTML += `<button onclick="stepTwo(${fIdx})" class="btn-choice bg-indigo-50 text-indigo-700 border-indigo-100 border italic">${f.name} (${f.qty})</button>`;
+                });
+                document.getElementById('sellModal').style.display = 'flex';
+            };
+
+            window.stepTwo = (fIdx) => {
+                currentSale.fIdx = fIdx;
+                const container = document.getElementById('sellOptions');
+                container.innerHTML = `<h3 class="text-xs font-black text-slate-400 mb-4 text-center border-b pb-2 italic uppercase">طريقة الدفع</h3>`;
+                container.innerHTML += `<button onclick="finalSale('CASH')" class="btn-choice bg-green-500 text-white shadow-lg italic">💰 استلام نقد (كاش)</button>`;
+                
+                const uniqueDebtors = {};
+                Object.keys(allLiveDebts).forEach(id => { uniqueDebtors[allLiveDebts[id].name] = id; });
+
+                if (Object.keys(uniqueDebtors).length > 0) {
+                    container.innerHTML += `<div class="py-2 text-center text-[10px] font-black text-slate-300 uppercase italic">إضافة لدين سابق</div>`;
+                    Object.keys(uniqueDebtors).forEach(name => {
+                        container.innerHTML += `<button onclick="finalSale('EXISTING', '${uniqueDebtors[name]}')" class="btn-choice bg-white text-slate-700 border-slate-200 border">${name}</button>`;
+                    });
+                }
+                container.innerHTML += `<button onclick="showNewDebtInput()" class="btn-choice bg-slate-800 text-white mt-4 italic uppercase">👤 مديون جديد</button>`;
+            };
+
+            window.showNewDebtInput = () => {
+                const container = document.getElementById('sellOptions');
+                container.innerHTML = `<h3 class="text-xs font-black text-slate-400 mb-4 text-center border-b pb-2 italic">اسم الزبون الجديد</h3><input type="text" id="new_debtor_name" placeholder="الاسم هنا..." class="mb-4 text-center"><button onclick="finalSale('NEW', document.getElementById('new_debtor_name').value)" class="btn-choice bg-indigo-600 text-white font-black italic shadow-lg uppercase">تأكيد العملية</button>`;
+            };
+
+            window.finalSale = async (type, extra) => {
+                const id = currentSale.id; const p = allLiveProducts[id]; const flavor = p.flavors[currentSale.fIdx];
+                const detailStr = `${p.name} (${flavor.name})`;
+                
+                flavor.qty -= 1;
+                // تحديث المخزن
+                await db.ref('products/' + id).update({ flavors: p.flavors });
+
+                if (type === 'CASH') {
+                    const s = (await db.ref('stats').once('value')).val() || { cash: 0, profit: 0 };
+                    await db.ref('stats').set({ cash: s.cash + p.sell, profit: s.profit + (p.sell - p.cost) });
+                } else if (type === 'EXISTING') {
+                    const d = allLiveDebts[extra];
+                    await db.ref('debts/' + extra).update({ 
+                        amount: d.amount + p.sell, 
+                        details: d.details + " + " + detailStr,
+                        pId: id, // حفظ المعرف للرجوع
+                        fIdx: currentSale.fIdx 
+                    });
+                } else if (type === 'NEW') {
+                    if (!extra) return alert("ادخل اسم المديون");
+                    await db.ref('debts').push({ 
+                        name: extra, 
+                        amount: p.sell, 
+                        details: detailStr,
+                        pId: id, // حفظ المعرف للرجوع
+                        fIdx: currentSale.fIdx
+                    });
+                }
+                document.getElementById('sellModal').style.display = 'none';
+            };
+
+            window.openEditModal = (id) => {
+                const p = allLiveProducts[id];
+                document.getElementById('edit_id').value = id;
+                document.getElementById('edit_cost').value = p.cost;
+                document.getElementById('edit_sell').value = p.sell;
+                const list = document.getElementById('currentFlavorsList');
+                list.innerHTML = '';
+                if (p.flavors) {
+                    p.flavors.forEach((f, fIdx) => {
+                        list.innerHTML += `<div class="flavor-edit-row"><input type="text" value="${f.name}" onchange="updateFlavorNameInMemory('${id}', ${fIdx}, this.value)"><span class="text-[10px] font-bold text-slate-400">Qty: ${f.qty}</span><button onclick="deleteFlavorFromProduct('${id}', ${fIdx})" class="text-red-300 hover:text-red-600"><i class="fas fa-times-circle"></i></button></div>`;
+                    });
+                }
+                document.getElementById('editModal').style.display = 'flex';
+            };
+
+            window.updateFlavorNameInMemory = (id, fIdx, newVal) => {
+                if (newVal.trim()) allLiveProducts[id].flavors[fIdx].name = newVal;
+            };
+
+            window.deleteFlavorFromProduct = (id, fIdx) => {
+                if (confirm("حذف النكهة؟")) {
+                    allLiveProducts[id].flavors.splice(fIdx, 1);
+                    db.ref('products/' + id).update({ flavors: allLiveProducts[id].flavors });
+                    openEditModal(id);
+                }
+            };
+
+            window.addNewFlavorToProduct = () => {
+                const id = document.getElementById('edit_id').value, n = document.getElementById('new_f_name').value, q = Number(document.getElementById('new_f_qty').value);
+                if (!n || q <= 0) return;
+                const p = allLiveProducts[id]; if (!p.flavors) p.flavors = [];
+                p.flavors.push({ name: n, qty: q });
+                db.ref('products/' + id).update({ flavors: p.flavors });
+                document.getElementById('new_f_name').value = ''; document.getElementById('new_f_qty').value = '';
+                openEditModal(id);
+            };
+
+            window.updateProductData = () => {
+                const id = document.getElementById('edit_id').value;
+                db.ref('products/' + id).update({
+                    cost: Number(document.getElementById('edit_cost').value),
+                    sell: Number(document.getElementById('edit_sell').value),
+                    flavors: allLiveProducts[id].flavors || []
+                });
+                document.getElementById('editModal').style.display = 'none';
+            };
+
+            window.payDebtFlow = (id) => {
+                const d = allLiveDebts[id]; currentSale.debtId = id;
+                const container = document.getElementById('sellOptions');
+                container.innerHTML = `<h3 class="text-xs font-black text-slate-400 mb-2 text-center italic border-b pb-2">تحصيل من: ${d.name}</h3><p class="text-[10px] text-center text-rose-400 mb-4 font-black">المطلوب: ${irqPrice(d.amount)}</p><input type="number" id="pay_amt" placeholder="المبلغ المستلم..." class="mb-4 text-center"><button onclick="confirmDebtPayment()" class="btn-choice bg-green-600 text-white font-black italic shadow-lg uppercase">تأكيد الاستلام ✅</button>`;
+                document.getElementById('sellModal').style.display = 'flex';
+            };
+
+            window.confirmDebtPayment = async () => {
+                const amt = Number(document.getElementById('pay_amt').value);
+                const id = currentSale.debtId; const d = allLiveDebts[id];
+                if (!amt || amt <= 0) return;
+                const s = (await db.ref('stats').once('value')).val() || { cash: 0, profit: 0 };
+                await db.ref('stats').update({ cash: s.cash + amt });
+                if (amt >= d.amount) await db.ref('debts/' + id).remove();
+                else await db.ref('debts/' + id).update({ amount: d.amount - amt });
+                document.getElementById('sellModal').style.display = 'none';
+            };
+
+            window.saveProduct = () => {
+                const n = document.getElementById('p_name').value, s = Number(document.getElementById('p_sell').value), c = Number(document.getElementById('p_cost').value);
+                if (!n || !s || currentFlavors.length === 0) return alert("اكمل البيانات!");
+                db.ref('products').push({ name: n, sell: s, cost: c, img: base64Img, flavors: currentFlavors });
+                currentFlavors = []; document.getElementById('p_name').value = ''; document.getElementById('p_sell').value = ''; document.getElementById('p_cost').value = '';
+                renderTemp();
+            };
+
+            window.resetFinance = () => { if (confirm("تصفير الحسابات؟")) db.ref('stats').set({ cash: 0, profit: 0 }); };
+        </script>
+    </body>
 </html>
